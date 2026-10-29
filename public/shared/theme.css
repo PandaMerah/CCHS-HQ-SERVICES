@@ -1,0 +1,300 @@
+/* ============================================================================
+   CARECLINICS HEALTHCARE SERVICES (CCHS-HQ-SERVICES)
+   Unified Healthcare & Corporate Design System — theme.css
+   ============================================================================ */
+
+:root {
+  /* Core Surfaces & Backgrounds */
+  --cc-bg: #F8FAFC;
+  --cc-bg-subtle: #F1F5F9;
+  --cc-surface: #FFFFFF;
+  --cc-surface-hover: #F8FAFC;
+
+  /* Brand & Healthcare Accent Palette (anchored on careclinic-logo.webp) */
+  --cc-navy: #0F172A;
+  --cc-brand-navy: #112349;
+  --cc-primary: #1863DC;
+  --cc-primary-hover: #134EB0;
+  --cc-primary-soft: #EFF6FF;
+  --cc-teal: #0D9488;
+  --cc-teal-soft: #F0FDFA;
+  --cc-sky: #0284C7;
+
+  /* Typography Hierarchy */
+  --cc-text: #0F172A;
+  --cc-text-secondary: #334155;
+  --cc-text-muted: #64748B;
+
+  /* Borders, Dividers & Focus Rings */
+  --cc-border: #E2E8F0;
+  --cc-border-strong: #CBD5E1;
+  --cc-focus-ring: 0 0 0 3px rgba(24, 99, 220, 0.22);
+
+  /* Semantic Status Colors */
+  --cc-success: #059669;
+  --cc-success-bg: #ECFDF5;
+  --cc-success-border: #A7F3D0;
+
+  --cc-warning: #D97706;
+  --cc-warning-bg: #FFFBEB;
+  --cc-warning-border: #FDE68A;
+
+  --cc-danger: #DC2626;
+  --cc-danger-bg: #FEF2F2;
+  --cc-danger-border: #FECACA;
+
+  --cc-info: #0284C7;
+  --cc-info-bg: #F0F9FF;
+  --cc-info-border: #BAE6FD;
+
+  /* Elevation & Radii */
+  --cc-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --cc-shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.05);
+  --cc-shadow-md: 0 10px 25px rgba(15, 23, 42, 0.07);
+  --cc-shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.12);
+  --cc-radius-sm: 8px;
+  --cc-radius-md: 12px;
+  --cc-radius-lg: 16px;
+  --cc-radius-xl: 20px;
+
+  /* Spacing & Touch Targets */
+  --cc-card-padding: 1.75rem;
+  --cc-control-height: 44px;
+  --cc-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--cc-font-sans);
+  background-color: var(--cc-bg);
+  color: var(--cc-text);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================================
+   UNIFIED MINIMAL TOP NAVIGATION BAR
+   ============================================================================ */
+.cchs-navbar {
+  background: var(--cc-surface);
+  border-bottom: 1px solid var(--cc-border);
+  padding: 0.85rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: var(--cc-shadow-xs);
+}
+
+.cchs-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  text-decoration: none;
+  color: var(--cc-text);
+}
+
+.cchs-brand-logo {
+  height: 40px;
+  width: auto;
+  background: var(--cc-brand-navy);
+  padding: 5px 10px;
+  border-radius: var(--cc-radius-sm);
+  object-fit: contain;
+}
+
+.cchs-brand-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--cc-navy);
+  letter-spacing: -0.01em;
+}
+
+.cchs-brand-subtitle {
+  font-size: 0.78rem;
+  color: var(--cc-text-muted);
+  font-weight: 500;
+}
+
+.cchs-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.cchs-nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 38px;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--cc-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cc-text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cchs-nav-link:hover {
+  background: var(--cc-bg-subtle);
+  color: var(--cc-primary);
+}
+
+.cchs-nav-link.active {
+  background: var(--cc-primary-soft);
+  color: var(--cc-primary);
+  border-color: #BFDBFE;
+  font-weight: 700;
+}
+
+.cchs-nav-link.btn-primary-nav {
+  background: var(--cc-primary);
+  color: #FFFFFF;
+  border-color: var(--cc-primary);
+}
+
+.cchs-nav-link.btn-primary-nav:hover {
+  background: var(--cc-primary-hover);
+  color: #FFFFFF;
+}
+
+.cchs-nav-link.btn-admin-nav {
+  background: var(--cc-warning-bg);
+  color: var(--cc-warning);
+  border-color: var(--cc-warning-border);
+}
+
+.cchs-nav-link.btn-danger-nav {
+  background: var(--cc-danger-bg);
+  color: var(--cc-danger);
+  border-color: var(--cc-danger-border);
+}
+
+/* ============================================================================
+   UNIFIED CARDS, FORMS & BUTTONS
+   ============================================================================ */
+.cchs-card {
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  border-radius: var(--cc-radius-lg);
+  padding: var(--cc-card-padding);
+  box-shadow: var(--cc-shadow-sm);
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cc-text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+  width: 100%;
+  min-height: var(--cc-control-height);
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--cc-border-strong);
+  border-radius: var(--cc-radius-sm);
+  background: var(--cc-surface);
+  color: var(--cc-text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--cc-primary);
+  box-shadow: var(--cc-focus-ring);
+}
+
+button,
+.cchs-btn {
+  min-height: var(--cc-control-height);
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--cc-radius-sm);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Semantic Status Badges */
+.cchs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cchs-badge-success {
+  background: var(--cc-success-bg);
+  color: var(--cc-success);
+  border: 1px solid var(--cc-success-border);
+}
+
+.cchs-badge-warning {
+  background: var(--cc-warning-bg);
+  color: var(--cc-warning);
+  border: 1px solid var(--cc-warning-border);
+}
+
+.cchs-badge-danger {
+  background: var(--cc-danger-bg);
+  color: var(--cc-danger);
+  border: 1px solid var(--cc-danger-border);
+}
+
+.cchs-badge-info {
+  background: var(--cc-info-bg);
+  color: var(--cc-info);
+  border: 1px solid var(--cc-info-border);
+}
+
+@media (max-width: 768px) {
+  .cchs-navbar {
+    padding: 0.75rem 1rem;
+  }
+  :root {
+    --cc-card-padding: 1.25rem;
+  }
+}
