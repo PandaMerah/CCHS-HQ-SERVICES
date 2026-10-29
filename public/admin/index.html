@@ -542,6 +542,57 @@
       <div id="adminBookingList" class="booking-admin-list"></div>
     </section>
 
+    <!-- Section 2B: Admin HQ Meeting Rooms Customization (Quantity, Names, Details) -->
+    <div class="section-header" id="roomCustomizationSection">
+      <div class="section-title">🏢 Customize HQ Meeting Rooms — Quantity, Room Names & Details</div>
+      <span id="adminRoomCountBadge" class="btn-top">5 Rooms Available</span>
+    </div>
+
+    <section class="admin-panel">
+      <div id="adminRoomToast" class="toast-msg"></div>
+
+      <form id="adminRoomConfigForm" style="background:rgba(12,25,54,0.65); border:1px solid var(--cc-border); border-radius:14px; padding:18px; margin-bottom:20px;">
+        <div style="font-weight:800; font-size:0.95rem; color:var(--cc-sky); margin-bottom:12px;" id="adminRoomFormTitle">➕ Add New HQ Meeting Room</div>
+        <input type="hidden" id="admCfgRoomId" value="" />
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Meeting Room Name *</label>
+            <input type="text" id="admCfgRoomName" placeholder="e.g. Main Boardroom / Pod B" required />
+          </div>
+          <div class="form-field">
+            <label>Floor / Wing Location *</label>
+            <input type="text" id="admCfgRoomFloor" placeholder="e.g. Level 1 - East Wing" required />
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Pax Capacity *</label>
+            <input type="number" id="admCfgRoomCapacity" min="1" max="500" value="12" required />
+          </div>
+          <div class="form-field">
+            <label>Status & Theme Color</label>
+            <div style="display:flex; gap:10px;">
+              <select id="admCfgRoomStatus" style="flex:1;">
+                <option value="available">Available for Booking</option>
+                <option value="maintenance">Under Maintenance (Locked)</option>
+              </select>
+              <input type="color" id="admCfgRoomColor" value="#1863dc" style="width:52px; height:40px; padding:3px;" />
+            </div>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Room Equipment & Amenities (Comma-separated) *</label>
+          <input type="text" id="admCfgRoomAmenities" placeholder="e.g. 75&quot; 4K Smart TV, Video Conferencing, Whiteboard, Speakerphone" required />
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button type="button" class="btn-top" id="admBtnCancelRoomEdit" style="display:none;" onclick="adminResetRoomForm()">Cancel Edit</button>
+          <button type="submit" class="chip-btn" style="padding:10px 18px; font-size:0.86rem;" id="admBtnSaveRoom">Add Meeting Room</button>
+        </div>
+      </form>
+
+      <div id="adminRoomsList" class="booking-admin-list"></div>
+    </section>
+
     <!-- Section 3: Admin Security & Credentials Management -->
     <div class="section-header">
       <div class="section-title">🔐 Admin Login Credentials Settings</div>
@@ -627,7 +678,19 @@
 
   <script type="module">
     import { requireAdminAuth, getAdminSession, logoutAdmin, updateAdminCredentials } from '/shared/auth.js';
-    import { subscribeState, updateRoomBooking, deleteRoomBooking, selectActivePresenter, removePresenter } from '/shared/cloud-store.js';
+    import {
+      subscribeState,
+      updateRoomBooking,
+      deleteRoomBooking,
+      selectActivePresenter,
+      removePresenter,
+      addMeetingRoom,
+      updateMeetingRoom,
+      deleteMeetingRoom,
+      buildWhatsAppBookingUrl,
+      buildOutlookCalendarUrls,
+      downloadOutlookIcs
+    } from '/shared/cloud-store.js';
 
     // Guard route immediately
     if (!requireAdminAuth()) {
@@ -661,6 +724,7 @@
       populateFiltersAndModal(state);
       renderAdminPresenters(state);
       renderAdminBookings();
+      renderAdminRoomsList(state);
     });
 
     function renderAdminPresenters(state) {
@@ -756,7 +820,7 @@
       }
       if (searchQ) {
         list = list.filter(b =>
-          `${b.title} ${b.department} ${b.organizer} ${b.notes || ''}`.toLowerCase().includes(searchQ)
+          `${b.title} ${b.department} ${b.organizer} ${b.phone || ''} ${b.notes || ''}`.toLowerCase().includes(searchQ)
         );
       }
 
@@ -773,6 +837,9 @@
 
       container.innerHTML = list.map(b => {
         const room = roomMap[b.roomId] || { name: b.roomId, color: '#1863dc' };
+        const waUrl = buildWhatsAppBookingUrl(b, room, 'starting');
+        const outlookUrls = buildOutlookCalendarUrls(b, room);
+
         return `
           <div class="booking-row" style="border-left-color: ${room.color || '#1863dc'};">
             <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
@@ -783,12 +850,15 @@
               <div>
                 <div style="font-weight:700; font-size:1.02rem; color:#fff;">${b.title}</div>
                 <div style="font-size:0.82rem; color:var(--cc-muted); margin-top:3px;">
-                  📍 <strong style="color:#e2e8f0;">${room.name}</strong> • 🏷️ ${b.department} • 👤 ${b.organizer || 'HQ Staff'}
+                  📍 <strong style="color:#e2e8f0;">${room.name}</strong> • 🏷️ ${b.department} • 👤 ${b.organizer || 'HQ Staff'}${b.phone ? ' • 📱 ' + b.phone : ''}
                 </div>
                 ${b.notes ? `<div style="font-size:0.78rem; color:#94a3b8; margin-top:4px;">💬 ${b.notes}</div>` : ''}
               </div>
             </div>
-            <div class="booking-actions">
+            <div class="booking-actions" style="flex-wrap:wrap;">
+              <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="btn-edit" style="text-decoration:none;">📅 Outlook</a>
+              <button type="button" class="btn-edit" onclick="adminDownloadIcs('${b.id}')">📥 .ics</button>
+              <a href="${waUrl}" target="_blank" rel="noopener" class="btn-edit" style="border-color:#10b981; color:#6ee7b7; text-decoration:none;">💬 WhatsApp</a>
               <button type="button" class="btn-edit" onclick="openEditModal('${b.id}')">✎ Edit / Update</button>
               <button type="button" class="btn-del" onclick="adminDeleteBooking('${b.id}')">🗑 Delete</button>
             </div>
@@ -796,6 +866,112 @@
         `;
       }).join('');
     }
+
+    window.adminDownloadIcs = (bookingId) => {
+      const b = (currentState?.bookings || []).find(item => item.id === bookingId);
+      if (!b) return;
+      const room = (currentState?.rooms || []).find(r => r.id === b.roomId);
+      downloadOutlookIcs(b, room);
+    };
+
+    // =========================================================================
+    // ADMIN MEETING ROOM CUSTOMIZATION HANDLERS
+    // =========================================================================
+    function renderAdminRoomsList(state) {
+      const rooms = state.rooms || [];
+      const countBadge = document.getElementById('adminRoomCountBadge');
+      if (countBadge) countBadge.textContent = `${rooms.length} Rooms Available`;
+
+      const container = document.getElementById('adminRoomsList');
+      if (!container) return;
+
+      container.innerHTML = rooms.map(r => `
+        <div class="booking-row" style="border-left-color: ${r.color || '#1863dc'};">
+          <div>
+            <div style="font-weight:800; font-size:1.02rem; color:#fff; display:flex; align-items:center; gap:10px;">
+              <span>🏢 ${r.name}</span>
+              <span style="font-size:0.72rem; padding:2px 9px; border-radius:999px; background:${r.status === 'maintenance' ? 'rgba(245,158,11,0.22)' : 'rgba(16,185,129,0.22)'}; color:${r.status === 'maintenance' ? '#fbbf24' : '#6ee7b7'};">
+                ${r.status === 'maintenance' ? '🛠️ Under Maintenance' : '● Available'}
+              </span>
+            </div>
+            <div style="font-size:0.84rem; color:var(--cc-sky); margin-top:3px;">
+              📍 ${r.floor || 'HQ'} • 👥 Capacity: ${r.capacity} pax
+            </div>
+            <div style="font-size:0.78rem; color:var(--cc-muted); margin-top:4px;">
+              🛠️ Amenities: ${(r.amenities || []).join(' • ')}
+            </div>
+          </div>
+          <div class="booking-actions">
+            <button type="button" class="btn-edit" onclick="adminStartEditRoom('${r.id}')">✎ Customize Room</button>
+            <button type="button" class="btn-del" onclick="adminRemoveRoom('${r.id}')">🗑 Remove Room</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.adminStartEditRoom = (roomId) => {
+      const r = (currentState?.rooms || []).find(item => item.id === roomId);
+      if (!r) return;
+      document.getElementById('admCfgRoomId').value = r.id;
+      document.getElementById('admCfgRoomName').value = r.name || '';
+      document.getElementById('admCfgRoomFloor').value = r.floor || '';
+      document.getElementById('admCfgRoomCapacity').value = r.capacity || 10;
+      document.getElementById('admCfgRoomStatus').value = r.status || 'available';
+      document.getElementById('admCfgRoomColor').value = r.color || '#1863dc';
+      document.getElementById('admCfgRoomAmenities').value = (r.amenities || []).join(', ');
+      document.getElementById('adminRoomFormTitle').textContent = `✎ Editing Room: ${r.name}`;
+      document.getElementById('admBtnSaveRoom').textContent = 'Save Room Changes';
+      document.getElementById('admBtnCancelRoomEdit').style.display = 'inline-block';
+      document.getElementById('roomCustomizationSection').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.adminResetRoomForm = () => {
+      document.getElementById('admCfgRoomId').value = '';
+      document.getElementById('admCfgRoomName').value = '';
+      document.getElementById('admCfgRoomFloor').value = '';
+      document.getElementById('admCfgRoomCapacity').value = '12';
+      document.getElementById('admCfgRoomStatus').value = 'available';
+      document.getElementById('admCfgRoomColor').value = '#1863dc';
+      document.getElementById('admCfgRoomAmenities').value = '';
+      document.getElementById('adminRoomFormTitle').textContent = '➕ Add New HQ Meeting Room';
+      document.getElementById('admBtnSaveRoom').textContent = 'Add Meeting Room';
+      document.getElementById('admBtnCancelRoomEdit').style.display = 'none';
+    };
+
+    window.adminRemoveRoom = async (roomId) => {
+      const r = (currentState?.rooms || []).find(item => item.id === roomId);
+      if (!confirm(`Remove meeting room "${r?.name || roomId}"?`)) return;
+      try {
+        await deleteMeetingRoom(roomId);
+        showToast('adminRoomToast', '✓ Meeting room removed.');
+      } catch (err) {
+        showToast('adminRoomToast', err.message, true);
+      }
+    };
+
+    document.getElementById('adminRoomConfigForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('admCfgRoomId').value;
+      const name = document.getElementById('admCfgRoomName').value.trim();
+      const floor = document.getElementById('admCfgRoomFloor').value.trim();
+      const capacity = Number(document.getElementById('admCfgRoomCapacity').value) || 10;
+      const status = document.getElementById('admCfgRoomStatus').value;
+      const color = document.getElementById('admCfgRoomColor').value;
+      const amenities = document.getElementById('admCfgRoomAmenities').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      try {
+        if (id) {
+          await updateMeetingRoom(id, { name, floor, capacity, status, color, amenities });
+          showToast('adminRoomToast', `✓ Updated "${name}" details!`);
+        } else {
+          await addMeetingRoom({ name, floor, capacity, status, color, amenities });
+          showToast('adminRoomToast', `✓ Added new meeting room "${name}"!`);
+        }
+        window.adminResetRoomForm();
+      } catch (err) {
+        showToast('adminRoomToast', err.message, true);
+      }
+    });
 
     document.getElementById('adminRoomFilter').addEventListener('change', renderAdminBookings);
     document.getElementById('adminScopeFilter').addEventListener('change', renderAdminBookings);
@@ -833,27 +1009,15 @@
       const endTime = document.getElementById('editEndTime').value;
       const notes = document.getElementById('editNotes').value.trim();
 
-      if (endTime <= startTime) {
+      try {
+        await updateRoomBooking(id, { roomId, title, department, organizer, date, startTime, endTime, notes });
+        window.closeEditModal();
+        showToast('adminBookingToast', '✓ Room booking updated and broadcasted!');
+      } catch (err) {
         const errEl = document.getElementById('modalError');
-        errEl.textContent = 'End time must be after start time.';
+        errEl.textContent = err.message;
         errEl.style.display = 'block';
-        return;
       }
-
-      // Conflict check against other bookings
-      const conflict = (currentState?.bookings || []).find(
-        b => b.id !== id && b.roomId === roomId && b.date === date && startTime < b.endTime && endTime > b.startTime
-      );
-      if (conflict) {
-        const errEl = document.getElementById('modalError');
-        errEl.textContent = `Conflict with "${conflict.title}" (${conflict.startTime}–${conflict.endTime}).`;
-        errEl.style.display = 'block';
-        return;
-      }
-
-      await updateRoomBooking(id, { roomId, title, department, organizer, date, startTime, endTime, notes });
-      window.closeEditModal();
-      showToast('adminBookingToast', '✓ Room booking updated and broadcasted!');
     });
 
     window.adminDeleteBooking = async (bookingId) => {

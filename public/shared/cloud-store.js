@@ -531,16 +531,64 @@ export async function resetToInitialSeed() {
   return saveFullState(fresh);
 }
 
+export function checkBookingConflict(bookings, { roomId, date, startTime, endTime, excludeId = null }) {
+  if (!Array.isArray(bookings)) return null;
+  return bookings.find(
+    (b) =>
+      b.id !== excludeId &&
+      b.roomId === roomId &&
+      b.date === date &&
+      startTime < b.endTime &&
+      endTime > b.startTime
+  ) || null;
+}
+
 export async function addRoomBooking(booking) {
   const state = JSON.parse(JSON.stringify(currentState));
   if (!Array.isArray(state.bookings)) state.bookings = [];
+
+  if (!booking.startTime || !booking.endTime || booking.endTime <= booking.startTime) {
+    throw new Error("End time must be after start time.");
+  }
+
+  const roomObj = (state.rooms || []).find((r) => r.id === booking.roomId);
+  if (roomObj && roomObj.status === "maintenance") {
+    throw new Error(`"${roomObj.name}" is currently marked as Under Maintenance by Administrator.`);
+  }
+
+  const conflict = checkBookingConflict(state.bookings, {
+    roomId: booking.roomId,
+    date: booking.date,
+    startTime: booking.startTime,
+    endTime: booking.endTime
+  });
+
+  if (conflict) {
+    throw new Error(
+      `Redundant booking not allowed: This room is already booked from ${conflict.startTime} to ${conflict.endTime} for "${conflict.title}" (${conflict.department}).`
+    );
+  }
+
   const newBooking = {
     id: "bk-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6),
     createdAt: Date.now(),
+    whatsappNotified: false,
     ...booking
   };
   state.bookings.push(newBooking);
-  await saveFullState(state);
+
+  currentState = deepMergeSeed(state);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  await pushApiAction("ADD_BOOKING", { booking: newBooking });
+
+  if (db) {
+    try {
+      await set(ref(db, "bookings"), currentState.bookings);
+    } catch (e) {}
+  }
   return newBooking;
 }
 
@@ -551,20 +599,273 @@ export async function updateRoomBooking(bookingId, updatedFields) {
   if (idx === -1) {
     throw new Error("Booking not found");
   }
-  state.bookings[idx] = {
+
+  const candidate = {
     ...state.bookings[idx],
     ...updatedFields,
     id: bookingId,
     updatedAt: Date.now()
   };
-  await saveFullState(state);
+
+  if (candidate.endTime <= candidate.startTime) {
+    throw new Error("End time must be after start time.");
+  }
+
+  const conflict = checkBookingConflict(state.bookings, {
+    roomId: candidate.roomId,
+    date: candidate.date,
+    startTime: candidate.startTime,
+    endTime: candidate.endTime,
+    excludeId: bookingId
+  });
+
+  if (conflict) {
+    throw new Error(
+      `Redundant booking not allowed: This room is already booked from ${conflict.startTime} to ${conflict.endTime} for "${conflict.title}" (${conflict.department}).`
+    );
+  }
+
+  state.bookings[idx] = candidate;
+  currentState = deepMergeSeed(state);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  await pushApiAction("UPDATE_BOOKING", { bookingId, updatedFields });
+
+  if (db) {
+    try {
+      await set(ref(db, "bookings"), currentState.bookings);
+    } catch (e) {}
+  }
   return state.bookings[idx];
 }
 
 export async function deleteRoomBooking(bookingId) {
   const state = JSON.parse(JSON.stringify(currentState));
   state.bookings = (state.bookings || []).filter((b) => b.id !== bookingId);
-  return saveFullState(state);
+  currentState = deepMergeSeed(state);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  await pushApiAction("DELETE_BOOKING", { bookingId });
+
+  if (db) {
+    try {
+      await set(ref(db, "bookings"), currentState.bookings);
+    } catch (e) {}
+  }
+  return currentState;
+}
+
+export async function markBookingNotified(bookingId) {
+  if (!Array.isArray(currentState.bookings)) return currentState;
+  const idx = currentState.bookings.findIndex((b) => b.id === bookingId);
+  if (idx === -1) return currentState;
+  currentState.bookings[idx].whatsappNotified = true;
+  currentState.bookings[idx].notifiedAt = Date.now();
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  await pushApiAction("MARK_BOOKING_NOTIFIED", { bookingId });
+
+  if (db) {
+    try {
+      await set(ref(db, "bookings"), currentState.bookings);
+    } catch (e) {}
+  }
+  return currentState;
+}
+
+// ============================================================================
+// ADMIN MEETING ROOM CUSTOMIZATION (Quantity, Name, Floor, Capacity, Details)
+// ============================================================================
+export async function saveMeetingRooms(roomsList) {
+  const state = JSON.parse(JSON.stringify(currentState));
+  state.rooms = Array.isArray(roomsList) ? roomsList : [];
+  currentState = deepMergeSeed(state);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  await pushApiAction("SAVE_ROOMS", { rooms: state.rooms });
+
+  if (db) {
+    try {
+      await set(ref(db, "rooms"), state.rooms);
+    } catch (e) {}
+  }
+  return currentState.rooms;
+}
+
+export async function addMeetingRoom(roomData) {
+  const rooms = JSON.parse(JSON.stringify(currentState.rooms || []));
+  const newRoom = {
+    id: roomData.id || ("room-" + Date.now() + "-" + Math.random().toString(36).slice(2, 5)),
+    name: roomData.name || "New HQ Meeting Room",
+    floor: roomData.floor || "Level 1",
+    capacity: Number(roomData.capacity) || 10,
+    amenities: Array.isArray(roomData.amenities)
+      ? roomData.amenities
+      : String(roomData.amenities || "TV Display, Whiteboard").split(",").map((s) => s.trim()).filter(Boolean),
+    color: roomData.color || "#1863dc",
+    status: roomData.status || "available"
+  };
+  rooms.push(newRoom);
+  await saveMeetingRooms(rooms);
+  return newRoom;
+}
+
+export async function updateMeetingRoom(roomId, updatedFields) {
+  const rooms = JSON.parse(JSON.stringify(currentState.rooms || []));
+  const idx = rooms.findIndex((r) => r.id === roomId);
+  if (idx === -1) throw new Error("Meeting room not found");
+  rooms[idx] = {
+    ...rooms[idx],
+    ...updatedFields,
+    id: roomId,
+    capacity: Number(updatedFields.capacity ?? rooms[idx].capacity) || 10,
+    amenities: Array.isArray(updatedFields.amenities)
+      ? updatedFields.amenities
+      : typeof updatedFields.amenities === "string"
+        ? updatedFields.amenities.split(",").map((s) => s.trim()).filter(Boolean)
+        : rooms[idx].amenities
+  };
+  await saveMeetingRooms(rooms);
+  return rooms[idx];
+}
+
+export async function deleteMeetingRoom(roomId) {
+  const rooms = (currentState.rooms || []).filter((r) => r.id !== roomId);
+  if (rooms.length === 0) {
+    throw new Error("At least 1 meeting room must remain in the system.");
+  }
+  await saveMeetingRooms(rooms);
+  return rooms;
+}
+
+// ============================================================================
+// WHATSAPP NOTIFICATION & OUTLOOK CALENDAR INTEGRATION HELPERS
+// ============================================================================
+export function formatWhatsAppPhone(rawPhone) {
+  if (!rawPhone) return "";
+  let digits = String(rawPhone).replace(/[^0-9]/g, "");
+  // Automatically convert Malaysian local numbers starting with '01' to '601'
+  if (digits.startsWith("01")) {
+    digits = "6" + digits;
+  } else if (digits.startsWith("1") && digits.length >= 9 && digits.length <= 10) {
+    digits = "60" + digits;
+  }
+  return digits;
+}
+
+export function buildWhatsAppBookingUrl(booking, room, type = "starting") {
+  const phone = formatWhatsAppPhone(booking.phone || "");
+  const roomName = room?.name || booking.roomId || "HQ Meeting Room";
+  const roomFloor = room?.floor ? ` (${room.floor})` : "";
+  const header = type === "starting"
+    ? "🔔 *CARECLINICS HQ — YOUR ROOM BOOKING IS STARTING NOW*"
+    : "✅ *CARECLINICS HQ — ROOM BOOKING CONFIRMED*";
+
+  const statusLine = type === "starting"
+    ? `Hi *${booking.organizer || "Staff"}*, your reserved meeting room is ready and your session time has arrived!`
+    : `Hi *${booking.organizer || "Staff"}*, your meeting room reservation at Careclinics HQ has been scheduled.`;
+
+  const lines = [
+    header,
+    "",
+    statusLine,
+    "",
+    `📍 *Room:* ${roomName}${roomFloor}`,
+    `📋 *Meeting:* ${booking.title || "Meeting"}`,
+    `🏢 *Department:* ${booking.department || "HQ"}`,
+    `📅 *Date:* ${booking.date}`,
+    `⏰ *Time:* ${booking.startTime} – ${booking.endTime}`,
+    booking.notes ? `💬 *Notes:* ${booking.notes}` : "",
+    "",
+    "_Careclinics Healthcare Services HQ Portal_"
+  ].filter(Boolean);
+
+  const text = encodeURIComponent(lines.join("\n"));
+  return phone
+    ? `https://wa.me/${phone}?text=${text}`
+    : `https://wa.me/?text=${text}`;
+}
+
+export function buildOutlookCalendarUrls(booking, room) {
+  const roomName = room ? `${room.name} (${room.floor || "Careclinics HQ"})` : (booking.roomId || "Careclinics HQ");
+  const startIso = `${booking.date}T${booking.startTime}:00`;
+  const endIso = `${booking.date}T${booking.endTime}:00`;
+  const subject = `[Careclinics HQ] ${booking.title} — ${room?.name || booking.roomId}`;
+  const bodyLines = [
+    `Careclinics Healthcare Services HQ Room Reservation`,
+    `Room: ${roomName}`,
+    `Department: ${booking.department || "HQ"}`,
+    `Booked By: ${booking.organizer || "Staff"}${booking.phone ? " (" + booking.phone + ")" : ""}`,
+    `Time: ${booking.date} | ${booking.startTime} - ${booking.endTime}`,
+    booking.notes ? `Notes: ${booking.notes}` : ""
+  ].filter(Boolean).join("\n");
+
+  const query = new URLSearchParams({
+    path: "/calendar/action/compose",
+    rru: "addevent",
+    subject,
+    startdt: startIso,
+    enddt: endIso,
+    location: roomName,
+    body: bodyLines
+  }).toString();
+
+  return {
+    office365Url: `https://outlook.office.com/calendar/0/deeplink/compose?${query}`,
+    outlookLiveUrl: `https://outlook.live.com/calendar/0/deeplink/compose?${query}`
+  };
+}
+
+export function downloadOutlookIcs(booking, room) {
+  const roomName = room ? `${room.name} (${room.floor || "Careclinics HQ"})` : (booking.roomId || "Careclinics HQ");
+  const dtStart = `${booking.date.replace(/-/g, "")}T${booking.startTime.replace(":", "")}00`;
+  const dtEnd = `${booking.date.replace(/-/g, "")}T${booking.endTime.replace(":", "")}00`;
+  const dtStamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const uid = `${booking.id || "bk-" + Date.now()}@careclinics-hq.local`;
+  const summary = `[Careclinics HQ] ${booking.title} (${room?.name || booking.roomId})`;
+  const desc = `Room: ${roomName}\\nDepartment: ${booking.department || "HQ"}\\nBooked By: ${booking.organizer || "Staff"}${booking.phone ? " (" + booking.phone + ")" : ""}${booking.notes ? "\\nNotes: " + booking.notes : ""}`;
+
+  const icsContent = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Careclinics Healthcare Services HQ//Room Booking//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${uid}`,
+    `DTSTAMP:${dtStamp}`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `SUMMARY:${summary}`,
+    `LOCATION:${roomName}`,
+    `DESCRIPTION:${desc}`,
+    "STATUS:CONFIRMED",
+    "BEGIN:VALARM",
+    "TRIGGER:-PT10M",
+    "ACTION:DISPLAY",
+    "DESCRIPTION:Careclinics HQ Room Booking Reminder",
+    "END:VALARM",
+    "END:VEVENT",
+    "END:VCALENDAR"
+  ].join("\r\n");
+
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Careclinics-Room-${booking.date}-${booking.startTime.replace(":", "")}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
 export async function updateRemoteDisplay(remoteDisplayPatch) {

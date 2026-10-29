@@ -194,6 +194,80 @@ module.exports = (req, res) => {
         writeState(current);
         return res.status(200).json({ ok: true, state: current });
       }
+
+      if (action === 'ADD_BOOKING' && payload.booking) {
+        if (!Array.isArray(current.bookings)) current.bookings = [];
+        const b = payload.booking;
+        if (!b.roomId || !b.date || !b.startTime || !b.endTime || b.endTime <= b.startTime) {
+          return res.status(400).json({ error: 'Invalid booking date or time range.' });
+        }
+        // Server-side non-redundant / overlap check
+        const conflict = current.bookings.find(
+          item => item.roomId === b.roomId && item.date === b.date && b.startTime < item.endTime && b.endTime > item.startTime
+        );
+        if (conflict) {
+          return res.status(409).json({
+            error: `Redundant booking blocked: Room is already reserved from ${conflict.startTime} to ${conflict.endTime} for "${conflict.title}" (${conflict.department}).`,
+            conflict
+          });
+        }
+        current.bookings.push(b);
+        writeState(current);
+        return res.status(200).json({ ok: true, booking: b, state: current });
+      }
+
+      if (action === 'UPDATE_BOOKING' && payload.bookingId && payload.updatedFields) {
+        if (!Array.isArray(current.bookings)) current.bookings = [];
+        const idx = current.bookings.findIndex(item => item.id === payload.bookingId);
+        if (idx === -1) {
+          return res.status(404).json({ error: 'Booking not found' });
+        }
+        const candidate = {
+          ...current.bookings[idx],
+          ...payload.updatedFields,
+          id: payload.bookingId,
+          updatedAt: Date.now()
+        };
+        if (candidate.endTime <= candidate.startTime) {
+          return res.status(400).json({ error: 'End time must be after start time.' });
+        }
+        const conflict = current.bookings.find(
+          item => item.id !== payload.bookingId && item.roomId === candidate.roomId && item.date === candidate.date && candidate.startTime < item.endTime && candidate.endTime > item.startTime
+        );
+        if (conflict) {
+          return res.status(409).json({
+            error: `Redundant booking blocked: Room is already reserved from ${conflict.startTime} to ${conflict.endTime} for "${conflict.title}" (${conflict.department}).`,
+            conflict
+          });
+        }
+        current.bookings[idx] = candidate;
+        writeState(current);
+        return res.status(200).json({ ok: true, booking: candidate, state: current });
+      }
+
+      if (action === 'DELETE_BOOKING' && payload.bookingId) {
+        current.bookings = (current.bookings || []).filter(item => item.id !== payload.bookingId);
+        writeState(current);
+        return res.status(200).json({ ok: true, state: current });
+      }
+
+      if (action === 'MARK_BOOKING_NOTIFIED' && payload.bookingId) {
+        if (Array.isArray(current.bookings)) {
+          const idx = current.bookings.findIndex(item => item.id === payload.bookingId);
+          if (idx !== -1) {
+            current.bookings[idx].whatsappNotified = true;
+            current.bookings[idx].notifiedAt = Date.now();
+            writeState(current);
+          }
+        }
+        return res.status(200).json({ ok: true, state: current });
+      }
+
+      if (action === 'SAVE_ROOMS' && Array.isArray(payload.rooms)) {
+        current.rooms = payload.rooms;
+        writeState(current);
+        return res.status(200).json({ ok: true, state: current });
+      }
     }
 
     // Standard full-state save: protect newer modeUpdatedAt and presenter queue from stale overwrites
