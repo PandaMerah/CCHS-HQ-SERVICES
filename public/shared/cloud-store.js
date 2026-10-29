@@ -182,6 +182,7 @@ export const INITIAL_SEED_DATA = {
     activeMode: "meeting-tv", // 'screen-share' | 'meeting-tv' | 'room-signage' | 'announcement' | 'welcome-board'
     activePresenterId: null,
     presenters: [],
+    modeUpdatedAt: 0,
     targetRoomId: "boardroom-main",
     autoRotateSeconds: 15,
     announcement: {
@@ -224,6 +225,7 @@ try {
 
 let syncMode = "connecting"; // 'firebase' | 'cloud-api' | 'local'
 let firebaseConnected = false;
+let lastLocalModeChangeAt = 0;
 let currentState = loadLocalState();
 const listeners = new Set();
 const statusListeners = new Set();
@@ -246,6 +248,23 @@ function deepMergeSeed(raw) {
       screens: Array.isArray(raw.remoteDisplay?.screens) ? raw.remoteDisplay.screens : base.remoteDisplay.screens
     }
   };
+}
+
+// Merge incoming state while protecting newer local mode switches from stale poll snapshots
+function mergeIncomingState(incomingRaw) {
+  const next = deepMergeSeed(incomingRaw);
+  const localRd = currentState?.remoteDisplay || {};
+  const nextRd = next.remoteDisplay || {};
+  const localModeTime = Math.max(localRd.modeUpdatedAt || 0, lastLocalModeChangeAt);
+  const incomingModeTime = nextRd.modeUpdatedAt || 0;
+
+  // If this client performed a more recent mode switch (within the last 8s or higher timestamp), preserve its mode & presenter choice
+  if (localModeTime > incomingModeTime && (Date.now() - lastLocalModeChangeAt) < 8000) {
+    next.remoteDisplay.activeMode = localRd.activeMode;
+    next.remoteDisplay.activePresenterId = localRd.activePresenterId;
+    next.remoteDisplay.modeUpdatedAt = localModeTime;
+  }
+  return next;
 }
 
 function loadLocalState() {
@@ -292,8 +311,17 @@ function setSyncStatus(mode, detail = "") {
 // Listen to cross-tab BroadcastChannel updates immediately
 if (bc) {
   bc.onmessage = (event) => {
-    if (event.data && event.data.type === "STATE_UPDATED" && event.data.state) {
-      currentState = deepMergeSeed(event.data.state);
+    const msg = event.data;
+    if (!msg) return;
+    if (msg.type === "PRESENTERS_ONLY_UPDATED" && Array.isArray(msg.presenters)) {
+      if (!currentState.remoteDisplay) currentState.remoteDisplay = {};
+      currentState.remoteDisplay.presenters = msg.presenters;
+      saveLocalState(currentState);
+      notifyListeners();
+      return;
+    }
+    if (msg.type === "STATE_UPDATED" && msg.state) {
+      currentState = mergeIncomingState(msg.state);
       saveLocalState(currentState);
       notifyListeners();
     }
@@ -302,12 +330,17 @@ if (bc) {
 
 // Fetch from Vercel Serverless API (/api/data) to stay synced even if Firebase RTDB rules are locked
 async function fetchApiState() {
+  const fetchStartedAt = Date.now();
   try {
     const res = await fetch("/api/data", { cache: "no-store" });
     if (res.ok) {
+      // Ignore poll responses that started before our latest local mode mutation
+      if (fetchStartedAt < lastLocalModeChangeAt) {
+        return true;
+      }
       const apiData = await res.json();
       if (apiData && typeof apiData === "object") {
-        currentState = deepMergeSeed(apiData);
+        currentState = mergeIncomingState(apiData);
         saveLocalState(currentState);
         notifyListeners();
         if (!firebaseConnected) {
@@ -324,11 +357,39 @@ async function fetchApiState() {
 
 async function pushApiState(newState) {
   try {
-    await fetch("/api/data", {
+    const res = await fetch("/api/data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newState)
     });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.state) {
+        currentState = mergeIncomingState(data.state);
+        saveLocalState(currentState);
+        notifyListeners();
+      }
+    }
+  } catch (e) {
+    // Non-fatal
+  }
+}
+
+async function pushApiAction(action, payload) {
+  try {
+    const res = await fetch("/api/data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ __action: action, payload })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.state) {
+        currentState = mergeIncomingState(data.state);
+        saveLocalState(currentState);
+        notifyListeners();
+      }
+    }
   } catch (e) {
     // Non-fatal
   }
@@ -356,7 +417,7 @@ function initRealtimeSync() {
           console.warn("Auto-seed Firebase warning:", seedErr);
         }
       } else {
-        currentState = deepMergeSeed(val);
+        currentState = mergeIncomingState(val);
         saveLocalState(currentState);
       }
       setSyncStatus("firebase", "Firebase Realtime DB Live");
@@ -378,12 +439,12 @@ function initRealtimeSync() {
 
 initRealtimeSync();
 
-// Poll API every 2.5 seconds when in cloud-api fallback mode so TV displays & screen share signaling update rapidly
+// Poll API every 2.0 seconds when in cloud-api fallback mode so TV displays & screen share signaling update rapidly
 setInterval(() => {
   if (!firebaseConnected) {
     fetchApiState();
   }
-}, 2500);
+}, 2000);
 
 export function subscribeState(callback) {
   listeners.add(callback);
@@ -507,64 +568,145 @@ export async function deleteRoomBooking(bookingId) {
 }
 
 export async function updateRemoteDisplay(remoteDisplayPatch) {
+  const now = Date.now();
+  lastLocalModeChangeAt = now;
   const state = JSON.parse(JSON.stringify(currentState));
+  const existingPresenters = Array.isArray(state.remoteDisplay?.presenters) ? state.remoteDisplay.presenters : [];
+  const existingActivePresenterId = state.remoteDisplay?.activePresenterId || null;
+
   state.remoteDisplay = {
     ...state.remoteDisplay,
     ...remoteDisplayPatch,
-    updatedAt: Date.now()
+    presenters: Array.isArray(remoteDisplayPatch.presenters) ? remoteDisplayPatch.presenters : existingPresenters,
+    modeUpdatedAt: now,
+    updatedAt: now
   };
-  return saveFullState(state);
+
+  if (remoteDisplayPatch.activeMode === "screen-share" && remoteDisplayPatch.activePresenterId === undefined) {
+    state.remoteDisplay.activePresenterId = existingActivePresenterId || existingPresenters[0]?.id || null;
+  }
+
+  currentState = deepMergeSeed(state);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  pushApiAction("UPDATE_REMOTE_DISPLAY", { patch: state.remoteDisplay });
+
+  if (db) {
+    try {
+      await set(ref(db, "remoteDisplay/activeMode"), state.remoteDisplay.activeMode);
+      await set(ref(db, "remoteDisplay/activePresenterId"), state.remoteDisplay.activePresenterId || null);
+      await set(ref(db, "remoteDisplay/modeUpdatedAt"), now);
+      if (remoteDisplayPatch.targetRoomId) await set(ref(db, "remoteDisplay/targetRoomId"), remoteDisplayPatch.targetRoomId);
+      if (remoteDisplayPatch.announcement) await set(ref(db, "remoteDisplay/announcement"), remoteDisplayPatch.announcement);
+      if (remoteDisplayPatch.welcomeBoard) await set(ref(db, "remoteDisplay/welcomeBoard"), remoteDisplayPatch.welcomeBoard);
+    } catch (e) {}
+  }
+  return currentState;
 }
 
 export async function registerPresenter(presenter) {
-  const state = JSON.parse(JSON.stringify(currentState));
-  if (!state.remoteDisplay) state.remoteDisplay = {};
-  const list = Array.isArray(state.remoteDisplay.presenters) ? state.remoteDisplay.presenters : [];
+  const now = Date.now();
+  if (!currentState.remoteDisplay) currentState.remoteDisplay = {};
+  const list = Array.isArray(currentState.remoteDisplay.presenters) ? currentState.remoteDisplay.presenters : [];
   const filtered = list.filter((p) => p.id !== presenter.id);
-  filtered.push({
+  const fullPresenter = {
     ...presenter,
-    startedAt: presenter.startedAt || Date.now(),
-    lastHeartbeat: Date.now()
-  });
-  state.remoteDisplay.presenters = filtered;
-  state.remoteDisplay.updatedAt = Date.now();
-  return saveFullState(state);
+    startedAt: presenter.startedAt || now,
+    lastHeartbeat: now
+  };
+  filtered.push(fullPresenter);
+  currentState.remoteDisplay.presenters = filtered;
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "PRESENTERS_ONLY_UPDATED", presenters: filtered });
+  notifyListeners();
+
+  pushApiAction("REGISTER_PRESENTER", { presenter: fullPresenter });
+
+  if (db) {
+    try {
+      await set(ref(db, "remoteDisplay/presenters"), filtered);
+    } catch (e) {}
+  }
+  return currentState;
 }
 
 export async function updatePresenterStreamData(presenterId, patch) {
-  const state = JSON.parse(JSON.stringify(currentState));
-  if (!state.remoteDisplay || !Array.isArray(state.remoteDisplay.presenters)) return currentState;
-  const idx = state.remoteDisplay.presenters.findIndex((p) => p.id === presenterId);
+  if (!currentState.remoteDisplay || !Array.isArray(currentState.remoteDisplay.presenters)) return currentState;
+  const idx = currentState.remoteDisplay.presenters.findIndex((p) => p.id === presenterId);
   if (idx === -1) return currentState;
-  state.remoteDisplay.presenters[idx] = {
-    ...state.remoteDisplay.presenters[idx],
+  currentState.remoteDisplay.presenters[idx] = {
+    ...currentState.remoteDisplay.presenters[idx],
     ...patch,
     lastHeartbeat: Date.now()
   };
-  state.remoteDisplay.updatedAt = Date.now();
-  return saveFullState(state);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "PRESENTERS_ONLY_UPDATED", presenters: currentState.remoteDisplay.presenters });
+  notifyListeners();
+
+  // Surgical update: only updates this presenter's stream data on the server, NEVER touching activeMode or activePresenterId
+  pushApiAction("UPDATE_PRESENTER", { presenterId, patch });
+
+  if (db) {
+    try {
+      await set(ref(db, "remoteDisplay/presenters"), currentState.remoteDisplay.presenters);
+    } catch (e) {}
+  }
+  return currentState;
 }
 
 export async function removePresenter(presenterId) {
-  const state = JSON.parse(JSON.stringify(currentState));
-  if (!state.remoteDisplay) return currentState;
-  const list = Array.isArray(state.remoteDisplay.presenters) ? state.remoteDisplay.presenters : [];
-  state.remoteDisplay.presenters = list.filter((p) => p.id !== presenterId);
-  if (state.remoteDisplay.activePresenterId === presenterId) {
-    state.remoteDisplay.activePresenterId = null;
-    if (state.remoteDisplay.activeMode === "screen-share") {
-      state.remoteDisplay.activeMode = "meeting-tv";
+  if (!currentState.remoteDisplay) return currentState;
+  const list = Array.isArray(currentState.remoteDisplay.presenters) ? currentState.remoteDisplay.presenters : [];
+  const nextList = list.filter((p) => p.id !== presenterId);
+  currentState.remoteDisplay.presenters = nextList;
+
+  if (currentState.remoteDisplay.activePresenterId === presenterId) {
+    currentState.remoteDisplay.activePresenterId = nextList[0]?.id || null;
+    if (!currentState.remoteDisplay.activePresenterId && currentState.remoteDisplay.activeMode === "screen-share") {
+      currentState.remoteDisplay.activeMode = "meeting-tv";
+      currentState.remoteDisplay.modeUpdatedAt = Date.now();
     }
   }
-  state.remoteDisplay.updatedAt = Date.now();
-  return saveFullState(state);
+
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  pushApiAction("REMOVE_PRESENTER", { presenterId });
+
+  if (db) {
+    try {
+      await set(ref(db, "remoteDisplay/presenters"), nextList);
+      await set(ref(db, "remoteDisplay/activePresenterId"), currentState.remoteDisplay.activePresenterId);
+      await set(ref(db, "remoteDisplay/activeMode"), currentState.remoteDisplay.activeMode);
+    } catch (e) {}
+  }
+  return currentState;
 }
 
 export async function selectActivePresenter(presenterId) {
-  const state = JSON.parse(JSON.stringify(currentState));
-  if (!state.remoteDisplay) state.remoteDisplay = {};
-  state.remoteDisplay.activePresenterId = presenterId || null;
-  state.remoteDisplay.activeMode = presenterId ? "screen-share" : "meeting-tv";
-  state.remoteDisplay.updatedAt = Date.now();
-  return saveFullState(state);
+  const now = Date.now();
+  lastLocalModeChangeAt = now;
+  if (!currentState.remoteDisplay) currentState.remoteDisplay = {};
+  currentState.remoteDisplay.activePresenterId = presenterId || null;
+  currentState.remoteDisplay.activeMode = presenterId ? "screen-share" : "meeting-tv";
+  currentState.remoteDisplay.modeUpdatedAt = now;
+  currentState.remoteDisplay.updatedAt = now;
+
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  pushApiAction("SELECT_PRESENTER", { presenterId: presenterId || null });
+
+  if (db) {
+    try {
+      await set(ref(db, "remoteDisplay/activePresenterId"), currentState.remoteDisplay.activePresenterId);
+      await set(ref(db, "remoteDisplay/activeMode"), currentState.remoteDisplay.activeMode);
+      await set(ref(db, "remoteDisplay/modeUpdatedAt"), now);
+    } catch (e) {}
+  }
+  return currentState;
 }

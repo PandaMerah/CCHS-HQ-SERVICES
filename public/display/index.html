@@ -796,12 +796,53 @@
     const ICE_SERVERS = [
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' },
-      { urls: 'stun:stun2.l.google.com:19302' }
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun.cloudflare.com:3478' }
     ];
 
     let currentState = null;
     let selectedMode = 'meeting-tv';
     let formInitialized = false;
+
+    // Boost WebRTC video sender to Full HD 1080p/1440p (8 Mbps + maintain-resolution) for razor-sharp slides & video
+    async function boostWebRTCHighQuality(call) {
+      if (!call) return;
+      const applyParams = async () => {
+        const pc = call.peerConnection;
+        if (!pc || !pc.getSenders) return;
+        for (const sender of pc.getSenders()) {
+          if (sender.track && sender.track.kind === 'video') {
+            try {
+              const params = sender.getParameters();
+              if (!params.encodings || params.encodings.length === 0) {
+                params.encodings = [{}];
+              }
+              params.degradationPreference = 'maintain-resolution';
+              params.encodings[0].maxBitrate = 8000000; // 8 Mbps HD
+              params.encodings[0].maxFramerate = 30;
+              params.encodings[0].scaleResolutionDownBy = 1.0;
+              if ('priority' in params.encodings[0]) params.encodings[0].priority = 'high';
+              if ('networkPriority' in params.encodings[0]) params.encodings[0].networkPriority = 'high';
+              await sender.setParameters(params);
+            } catch (e) {
+              // Ignore browser-specific parameter warnings
+            }
+          }
+        }
+      };
+
+      // Apply immediately and re-apply as ICE connection establishes
+      setTimeout(applyParams, 150);
+      setTimeout(applyParams, 800);
+      setTimeout(applyParams, 2000);
+      if (call.peerConnection) {
+        call.peerConnection.addEventListener('iceconnectionstatechange', () => {
+          if (call.peerConnection.iceConnectionState === 'connected' || call.peerConnection.iceConnectionState === 'completed') {
+            applyParams();
+          }
+        });
+      }
+    }
 
     // =========================================================================
     // A. STAFF PRESENTER LOGIC (?mode=share)
@@ -811,6 +852,8 @@
     let myPeer = null;
     let localStream = null;
     let frameCaptureTimer = null;
+    let shareStartedAt = 0;
+    let missingFromQueueCount = 0;
     const activeReceiverCalls = new Set();
 
     async function startStaffScreenShare() {
@@ -823,12 +866,12 @@
       const title = titleInput.value.trim() || 'Screen Presentation';
 
       try {
-        // Request Screen + System/Tab Audio like Google Meet
+        // Request Full HD / QHD Screen + System/Tab Audio
         const stream = await navigator.mediaDevices.getDisplayMedia({
           video: {
             cursor: 'always',
-            width: { ideal: 1920, max: 1920 },
-            height: { ideal: 1080, max: 1080 },
+            width: { ideal: 1920, max: 2560 },
+            height: { ideal: 1080, max: 1440 },
             frameRate: { ideal: 30, max: 60 }
           },
           audio: {
@@ -851,6 +894,18 @@
         localStream.getTracks().forEach(t => t.stop());
       }
       localStream = stream;
+      shareStartedAt = Date.now();
+      missingFromQueueCount = 0;
+
+      // Hint to browser encoder to preserve sharp text & slide resolution
+      const videoTrack = stream.getVideoTracks()[0];
+      if (videoTrack) {
+        try {
+          if ('contentHint' in videoTrack) {
+            videoTrack.contentHint = 'detail';
+          }
+        } catch (e) {}
+      }
 
       const videoEl = document.getElementById('localSharePreview');
       videoEl.srcObject = stream;
@@ -873,7 +928,7 @@
       }
 
       // Listen for native browser "Stop sharing" button
-      stream.getVideoTracks()[0].addEventListener('ended', () => {
+      videoTrack.addEventListener('ended', () => {
         stopStaffScreenShare();
       });
 
@@ -882,35 +937,52 @@
         myPeerId = 'cchs-' + myPresenterId;
       }
 
-      // Initialize PeerJS WebRTC Broadcaster
-      if (myPeer) {
-        try { myPeer.destroy(); } catch (e) {}
+      // Update any already-connected receivers with the new tracks seamlessly
+      for (const existingCall of activeReceiverCalls) {
+        try {
+          const pc = existingCall.peerConnection;
+          if (pc && pc.getSenders) {
+            for (const sender of pc.getSenders()) {
+              if (sender.track && sender.track.kind === 'video' && videoTrack) {
+                sender.replaceTrack(videoTrack);
+              }
+            }
+          }
+        } catch (e) {}
       }
 
-      if (window.Peer) {
-        myPeer = new window.Peer(myPeerId, { config: { iceServers: ICE_SERVERS } });
-        myPeer.on('open', (id) => {
-          document.getElementById('sharePeerBadge').textContent = `● Live Stream Ready (${hasAudio ? 'Video + Audio' : 'Video'})`;
-        });
-        // When a TV Receiver connects via data connection requesting our stream, call it with our MediaStream!
-        myPeer.on('connection', (conn) => {
-          conn.on('data', (msg) => {
-            if (msg && msg.type === 'REQUEST_STREAM' && msg.receiverPeerId && localStream) {
-              const call = myPeer.call(msg.receiverPeerId, localStream);
-              if (call) activeReceiverCalls.add(call);
+      // Initialize PeerJS WebRTC Broadcaster once
+      if (!myPeer || myPeer.destroyed) {
+        if (window.Peer) {
+          myPeer = new window.Peer(myPeerId, { config: { iceServers: ICE_SERVERS } });
+          myPeer.on('open', () => {
+            document.getElementById('sharePeerBadge').textContent = `● HD WebRTC Stream Ready (${hasAudio ? '1080p Video + Audio' : '1080p Video'})`;
+          });
+          // When a TV Receiver or Admin Monitor connects via data channel requesting our stream, call it with our Full HD MediaStream
+          myPeer.on('connection', (conn) => {
+            conn.on('data', (msg) => {
+              if (msg && msg.type === 'REQUEST_STREAM' && msg.receiverPeerId && localStream) {
+                const call = myPeer.call(msg.receiverPeerId, localStream);
+                if (call) {
+                  activeReceiverCalls.add(call);
+                  boostWebRTCHighQuality(call);
+                }
+              }
+            });
+          });
+          myPeer.on('call', (call) => {
+            if (localStream) {
+              call.answer(localStream);
+              activeReceiverCalls.add(call);
+              boostWebRTCHighQuality(call);
             }
           });
-        });
-        myPeer.on('call', (call) => {
-          if (localStream) {
-            call.answer(localStream);
-            activeReceiverCalls.add(call);
-          }
-        });
+        }
       }
 
-      // Capture an initial thumbnail and register presenter in cloud store
-      const initialFrame = captureVideoThumbnail(videoEl);
+      // Wait briefly for video dimensions to populate before capturing initial HD frame
+      await new Promise(r => setTimeout(r, 250));
+      const initialFrame = captureVideoThumbnail(videoEl, true);
       await registerPresenter({
         id: myPresenterId,
         peerId: myPeerId,
@@ -922,34 +994,47 @@
         startedAt: Date.now()
       });
 
-      // Periodically update preview frame & heartbeat every 1.6s
+      // Periodically send heartbeat + HD preview frame every 2.5s
       if (frameCaptureTimer) clearInterval(frameCaptureTimer);
       frameCaptureTimer = setInterval(() => {
         if (!localStream || !myPresenterId) return;
-        // Also verify if admin remotely removed us
-        const stillInList = (currentState?.remoteDisplay?.presenters || []).some(p => p.id === myPresenterId);
-        if (!stillInList) {
-          stopStaffScreenShare(true);
-          return;
+        const rd = currentState?.remoteDisplay || {};
+        const stillInList = (rd.presenters || []).some(p => p.id === myPresenterId);
+
+        // Only stop if admin explicitly removed us after initial registration grace period
+        if (!stillInList && (Date.now() - shareStartedAt) > 12000) {
+          missingFromQueueCount++;
+          if (missingFromQueueCount >= 2) {
+            stopStaffScreenShare(true);
+            return;
+          }
+        } else {
+          missingFromQueueCount = 0;
         }
-        const frame = captureVideoThumbnail(videoEl);
+
+        const isLiveOnTv = rd.activeMode === 'screen-share' && rd.activePresenterId === myPresenterId;
+        const frame = captureVideoThumbnail(videoEl, isLiveOnTv);
         if (frame) {
           updatePresenterStreamData(myPresenterId, { previewFrame: frame });
         }
-      }, 1600);
+      }, 2500);
     }
 
-    function captureVideoThumbnail(videoEl) {
+    function captureVideoThumbnail(videoEl, highRes = false) {
       try {
         if (!videoEl || !videoEl.videoWidth) return null;
         const canvas = document.createElement('canvas');
-        const targetW = 640;
+        // Capture Full HD 1920px when active on TV so even fallback frames are razor-sharp
+        const maxW = highRes ? 1920 : 960;
+        const targetW = Math.min(videoEl.videoWidth, maxW);
         const scale = targetW / videoEl.videoWidth;
         canvas.width = targetW;
         canvas.height = Math.round(videoEl.videoHeight * scale);
         const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
-        return canvas.toDataURL('image/jpeg', 0.55);
+        return canvas.toDataURL('image/jpeg', highRes ? 0.84 : 0.72);
       } catch (e) {
         return null;
       }
@@ -961,7 +1046,12 @@
       const title = document.getElementById('presTitle').value.trim() || 'Screen Presentation';
       try {
         const nextStream = await navigator.mediaDevices.getDisplayMedia({
-          video: { cursor: 'always', width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } },
+          video: {
+            cursor: 'always',
+            width: { ideal: 1920, max: 2560 },
+            height: { ideal: 1080, max: 1440 },
+            frameRate: { ideal: 30, max: 60 }
+          },
           audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
         });
         await attachLocalShareStream(nextStream, { name, department, title });
@@ -992,6 +1082,7 @@
         try { myPeer.destroy(); } catch (e) {}
         myPeer = null;
       }
+      activeReceiverCalls.clear();
       const idToRemove = myPresenterId;
       myPresenterId = null;
 
@@ -1027,65 +1118,103 @@
     // B. TV RECEIVER WEBRTC CLIENT LOGIC (?mode=receiver & Admin Monitor)
     // =========================================================================
     let receiverPeer = null;
+    let myReceiverPeerId = null;
     let connectedPresenterPeerId = null;
+    let connectingPresenterPeerId = null;
+    let connectionStartedAt = 0;
     let currentMediaStream = null;
 
-    function connectReceiverToPresenter(presenter) {
-      if (!presenter || !presenter.peerId || !window.Peer) return;
-      if (connectedPresenterPeerId === presenter.peerId && currentMediaStream) {
-        const vid = document.getElementById('tvLiveStreamVideo');
-        if (vid && vid.srcObject !== currentMediaStream) {
-          vid.srcObject = currentMediaStream;
-        }
-        return;
+    function ensureReceiverPeer() {
+      if (receiverPeer && !receiverPeer.destroyed) {
+        return receiverPeer;
       }
-
-      connectedPresenterPeerId = presenter.peerId;
-      currentMediaStream = null;
-
-      if (receiverPeer) {
-        try { receiverPeer.destroy(); } catch (e) {}
-      }
-
-      const myRecId = 'cchs-rec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-      receiverPeer = new window.Peer(myRecId, { config: { iceServers: ICE_SERVERS } });
-
-      receiverPeer.on('open', (id) => {
-        const conn = receiverPeer.connect(presenter.peerId);
-        conn.on('open', () => {
-          conn.send({ type: 'REQUEST_STREAM', receiverPeerId: id });
-        });
-      });
+      myReceiverPeerId = 'cchs-rec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+      receiverPeer = new window.Peer(myReceiverPeerId, { config: { iceServers: ICE_SERVERS } });
 
       receiverPeer.on('call', (call) => {
         call.answer();
         call.on('stream', (remoteStream) => {
           currentMediaStream = remoteStream;
-          const vid = document.getElementById('tvLiveStreamVideo');
-          if (vid) {
-            vid.srcObject = remoteStream;
-            vid.style.display = 'block';
-            const fbImg = document.getElementById('tvFallbackFrame');
-            if (fbImg) fbImg.style.display = 'none';
-
-            // Attempt unmuted playback on TV; if browser blocks unmuted autoplay, play muted & show 1-click Unmute button
-            if (isReceiverMode) {
-              vid.muted = false;
-              vid.play().catch(() => {
-                vid.muted = true;
-                vid.play().catch(() => {});
-                if (presenter.hasAudio) {
-                  document.getElementById('tvUnmuteBtn').style.display = 'inline-flex';
-                }
-              });
-            } else {
-              // Admin monitor preview is muted by default to avoid echo
-              vid.muted = true;
-              vid.play().catch(() => {});
-            }
-          }
+          connectedPresenterPeerId = connectingPresenterPeerId || connectedPresenterPeerId;
+          attachStreamToTvVideo(remoteStream);
         });
       });
+
+      return receiverPeer;
+    }
+
+    function attachStreamToTvVideo(remoteStream) {
+      const vid = document.getElementById('tvLiveStreamVideo');
+      if (!vid || !remoteStream) return;
+      if (vid.srcObject !== remoteStream) {
+        vid.srcObject = remoteStream;
+      }
+      vid.style.display = 'block';
+      const fbImg = document.getElementById('tvFallbackFrame');
+      if (fbImg) fbImg.style.display = 'none';
+      const streamQualityBadge = document.getElementById('tvStreamQualityBadge');
+      if (streamQualityBadge) {
+        streamQualityBadge.textContent = '● HD LIVE STREAM';
+        streamQualityBadge.style.background = 'rgba(16, 185, 129, 0.28)';
+        streamQualityBadge.style.color = '#6ee7b7';
+      }
+
+      const activePres = (currentState?.remoteDisplay?.presenters || []).find(
+        p => p.peerId === connectedPresenterPeerId
+      );
+
+      if (isReceiverMode) {
+        vid.muted = false;
+        vid.play().catch(() => {
+          vid.muted = true;
+          vid.play().catch(() => {});
+          if (!activePres || activePres.hasAudio) {
+            document.getElementById('tvUnmuteBtn').style.display = 'inline-flex';
+          }
+        });
+      } else {
+        // Admin monitor preview is muted by default to avoid local audio echo
+        vid.muted = true;
+        vid.play().catch(() => {});
+      }
+    }
+
+    function connectReceiverToPresenter(presenter) {
+      if (!presenter || !presenter.peerId || !window.Peer) return;
+
+      // 1. If already streaming live from this exact presenter, just ensure video element is attached
+      if (connectedPresenterPeerId === presenter.peerId && currentMediaStream && currentMediaStream.active) {
+        attachStreamToTvVideo(currentMediaStream);
+        return;
+      }
+
+      // 2. Crucial fix: Do NOT destroy/restart the connection while WebRTC handshake is already in progress (< 10s)
+      if (connectingPresenterPeerId === presenter.peerId && (Date.now() - connectionStartedAt) < 10000) {
+        return;
+      }
+
+      connectingPresenterPeerId = presenter.peerId;
+      connectionStartedAt = Date.now();
+      if (connectedPresenterPeerId !== presenter.peerId) {
+        currentMediaStream = null;
+        connectedPresenterPeerId = null;
+      }
+
+      const peer = ensureReceiverPeer();
+      const requestStreamFromPresenter = (recId) => {
+        const conn = peer.connect(presenter.peerId, { reliable: true });
+        conn.on('open', () => {
+          conn.send({ type: 'REQUEST_STREAM', receiverPeerId: recId });
+        });
+      };
+
+      if (peer.open && peer.id) {
+        requestStreamFromPresenter(peer.id);
+      } else {
+        peer.once('open', (id) => {
+          requestStreamFromPresenter(id);
+        });
+      }
     }
 
     window.enableTvAudio = () => {
@@ -1122,7 +1251,7 @@
         if (isChosen) {
           banner.className = 'share-status-banner live';
           icon.textContent = '🟢';
-          text.textContent = 'YOU ARE LIVE ON THE HQ TV NOW! Your screen & audio are broadcasting.';
+          text.textContent = 'YOU ARE LIVE ON THE HQ TV NOW! Your screen & audio are broadcasting in Full HD.';
         } else {
           banner.className = 'share-status-banner waiting';
           icon.textContent = '⏳';
@@ -1135,12 +1264,12 @@
           selectedMode = rd.activeMode || 'meeting-tv';
           populateEditorFields(state);
           formInitialized = true;
-        } else {
-          selectedMode = rd.activeMode || selectedMode;
+        } else if (rd.activeMode) {
+          selectedMode = rd.activeMode;
         }
         updateModeButtons();
         renderPresenterQueue(state);
-        renderDisplaySurface(document.getElementById('previewMonitor'), rd.activeMode || 'meeting-tv', state);
+        renderDisplaySurface(document.getElementById('previewMonitor'), selectedMode, state);
       }
 
       if (isReceiverMode) {
@@ -1154,10 +1283,9 @@
 
     function renderPresenterQueue(state) {
       const rd = state.remoteDisplay || {};
-      // Filter out stale presenters older than 45 seconds without heartbeat
       const now = Date.now();
       const presenters = (rd.presenters || []).filter(p => !p.lastHeartbeat || (now - p.lastHeartbeat) < 60000);
-      const activeId = rd.activeMode === 'screen-share' ? rd.activePresenterId : null;
+      const activeId = rd.activeMode === 'screen-share' ? (rd.activePresenterId || presenters[0]?.id || null) : null;
 
       document.getElementById('queueCountBadge').textContent = `${presenters.length} Sharing`;
       const container = document.getElementById('presenterQueueList');
@@ -1207,6 +1335,8 @@
     }
 
     window.adminSelectPresenter = async (presenterId) => {
+      selectedMode = presenterId ? 'screen-share' : 'meeting-tv';
+      updateModeButtons();
       await selectActivePresenter(presenterId);
       const toast = document.getElementById('statusToast');
       toast.textContent = presenterId
@@ -1248,12 +1378,20 @@
       document.getElementById('editorWelcome').style.display = selectedMode === 'welcome-board' ? 'block' : 'none';
     }
 
-    window.selectMode = (mode) => {
+    // Persist channel selection immediately on click so it never reverts back to Weekly Meeting Deck
+    window.selectMode = async (mode) => {
       selectedMode = mode;
       updateModeButtons();
-      if (currentState) {
-        renderDisplaySurface(document.getElementById('previewMonitor'), selectedMode, currentState);
+      const rd = currentState?.remoteDisplay || {};
+      const patch = { activeMode: mode };
+      if (mode === 'screen-share' && !rd.activePresenterId && rd.presenters?.length > 0) {
+        patch.activePresenterId = rd.presenters[0].id;
       }
+      await updateRemoteDisplay(patch);
+      const toast = document.getElementById('statusToast');
+      toast.textContent = `✓ Switched TV channel to ${mode === 'screen-share' ? 'Live Screen Share' : mode}!`;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2800);
     };
 
     window.pushBroadcastSettings = async () => {
@@ -1304,27 +1442,32 @@
           return;
         }
 
+        const isWebRTCLive = connectedPresenterPeerId === activePres.peerId && currentMediaStream && currentMediaStream.active;
+
         // Keep WebRTC video element persistent if already rendered for this presenter
         const existingWrap = targetEl.querySelector(`[data-presenter-id="${activePres.id}"]`);
         if (!existingWrap) {
           targetEl.innerHTML = `
             <div data-presenter-id="${activePres.id}" style="width:100%; height:100%; background:#000; position:relative; display:flex; align-items:center; justify-content:center;">
-              <video id="tvLiveStreamVideo" autoplay playsinline style="width:100%; height:100%; object-fit:contain; display:${currentMediaStream ? 'block' : 'none'};"></video>
-              <img id="tvFallbackFrame" src="${activePres.previewFrame || ''}" style="width:100%; height:100%; object-fit:contain; display:${currentMediaStream ? 'none' : 'block'};" alt="Live Screen Share" />
+              <video id="tvLiveStreamVideo" autoplay playsinline style="width:100%; height:100%; object-fit:contain; display:${isWebRTCLive ? 'block' : 'none'};"></video>
+              <img id="tvFallbackFrame" src="${activePres.previewFrame || ''}" style="width:100%; height:100%; object-fit:contain; display:${isWebRTCLive ? 'none' : 'block'};" alt="Live Screen Share" />
               <div class="tv-presenter-badge">
                 <span style="width:10px; height:10px; border-radius:50%; background:#10b981; box-shadow:0 0 10px #10b981;"></span>
                 <strong>${activePres.name}</strong>
                 <span style="color:var(--cc-sky); font-weight:700;">(${activePres.department})</span>
                 <span style="opacity:0.8;">— ${activePres.title || 'Screen Share'}</span>
                 ${activePres.hasAudio ? `<span style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:#6ee7b7; padding:2px 8px; border-radius:999px;">🔊 Audio</span>` : ''}
+                <span id="tvStreamQualityBadge" style="font-size:0.72rem; background:${isWebRTCLive ? 'rgba(16,185,129,0.28)' : 'rgba(24,99,220,0.3)'}; color:${isWebRTCLive ? '#6ee7b7' : '#8ed1fc'}; padding:2px 8px; border-radius:999px; font-weight:700;">
+                  ${isWebRTCLive ? '● HD LIVE STREAM' : '● 1080p HD SYNC'}
+                </span>
               </div>
             </div>
           `;
           connectReceiverToPresenter(activePres);
         } else {
-          // Update fallback frame seamlessly if WebRTC video isn't active yet
+          // Update fallback frame seamlessly only if WebRTC video isn't active yet
           const fbImg = document.getElementById('tvFallbackFrame');
-          if (fbImg && activePres.previewFrame && !currentMediaStream) {
+          if (fbImg && activePres.previewFrame && !isWebRTCLive) {
             fbImg.src = activePres.previewFrame;
           }
           connectReceiverToPresenter(activePres);
@@ -1332,8 +1475,9 @@
         return;
       }
 
-      // Reset WebRTC connection if switched away from screen-share
+      // Reset WebRTC connection tracking if switched away from screen-share
       connectedPresenterPeerId = null;
+      connectingPresenterPeerId = null;
       currentMediaStream = null;
 
       if (mode === 'meeting-tv') {
