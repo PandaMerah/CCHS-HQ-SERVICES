@@ -420,17 +420,18 @@
         </div>
       </div>
 
-      <!-- 2. Remote Display Controller -->
+      <!-- 2. Remote Display & Screen Share Switcher -->
       <div class="service-card">
         <div class="service-top">
-          <div class="service-icon" style="background: rgba(244, 63, 94, 0.22); color: #fb7185;">📡</div>
+          <div class="service-icon" style="background: rgba(244, 63, 94, 0.22); color: #fb7185;">🖥️</div>
           <div>
-            <div class="service-name">Remote Display Service</div>
-            <p class="service-desc">Control HQ Lobby TVs, Boardroom 75" Display, and Room Door Tablets in real time.</p>
+            <div class="service-name">Screen Share & TV Switcher</div>
+            <p class="service-desc">Choose which staff screen share (slides/video + audio) is displayed on the HQ TV Receiver.</p>
           </div>
         </div>
         <div class="chip-row">
-          <a href="/display/" class="chip-btn">Display Controller →</a>
+          <a href="/display/" class="chip-btn">Open TV Switcher →</a>
+          <a href="/display/?mode=share" target="_blank" class="chip-btn secondary">Share Screen ↗</a>
           <a href="/display/?mode=receiver" target="_blank" class="chip-btn secondary">TV Receiver ↗</a>
         </div>
       </div>
@@ -492,6 +493,23 @@
           <a href="/pdf/" class="chip-btn">Open PDF Studio →</a>
         </div>
       </div>
+    </section>
+
+    <!-- Section 1.5: Live Staff Screen Share Queue (Choose Presenter for TV) -->
+    <div class="section-header" id="screenShareControlSection">
+      <div class="section-title">🖥️ Active Staff Screen Share Queue — Choose Presenter to Output to TV</div>
+      <div style="display:flex; gap:8px;">
+        <a href="/display/?mode=share" target="_blank" class="btn-top">+ Launch Screen Share</a>
+        <a href="/display/?mode=receiver" target="_blank" class="btn-top">📺 Open TV Receiver ↗</a>
+      </div>
+    </div>
+
+    <section class="admin-panel">
+      <div id="adminShareToast" class="toast-msg"></div>
+      <div style="margin-bottom:14px; font-size:0.86rem; color:var(--cc-muted);">
+        Multiple staff can share their screen & audio simultaneously at <code>/display/?mode=share</code>. Select <strong>one presenter</strong> below to broadcast live to the HQ TV Receiver.
+      </div>
+      <div id="adminPresenterQueue" class="booking-admin-list"></div>
     </section>
 
     <!-- Section 2: Admin Room Booking Control Center (Update & Delete Existing/Upcoming Bookings) -->
@@ -609,7 +627,7 @@
 
   <script type="module">
     import { requireAdminAuth, getAdminSession, logoutAdmin, updateAdminCredentials } from '/shared/auth.js';
-    import { subscribeState, updateRoomBooking, deleteRoomBooking } from '/shared/cloud-store.js';
+    import { subscribeState, updateRoomBooking, deleteRoomBooking, selectActivePresenter, removePresenter } from '/shared/cloud-store.js';
 
     // Guard route immediately
     if (!requireAdminAuth()) {
@@ -641,8 +659,66 @@
       if (!state) return;
       currentState = state;
       populateFiltersAndModal(state);
+      renderAdminPresenters(state);
       renderAdminBookings();
     });
+
+    function renderAdminPresenters(state) {
+      const rd = state.remoteDisplay || {};
+      const now = Date.now();
+      const presenters = (rd.presenters || []).filter(p => !p.lastHeartbeat || (now - p.lastHeartbeat) < 60000);
+      const activeId = rd.activeMode === 'screen-share' ? rd.activePresenterId : null;
+      const container = document.getElementById('adminPresenterQueue');
+      if (!container) return;
+
+      if (presenters.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--cc-muted); border:1px dashed var(--cc-border); border-radius:12px;">No staff members are currently sharing their screen. Staff can click <strong>Share Screen & Audio to TV</strong> on the Staff Portal to join the queue.</div>`;
+        return;
+      }
+
+      container.innerHTML = presenters.map(p => {
+        const isLive = activeId === p.id;
+        return `
+          <div class="booking-row" style="border-left-color: ${isLive ? '#10b981' : '#f59e0b'}; ${isLive ? 'background:rgba(16,185,129,0.12);' : ''}">
+            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+              ${p.previewFrame
+                ? `<img src="${p.previewFrame}" style="width:120px; height:68px; object-fit:cover; border-radius:8px; border:1px solid var(--cc-border);" />`
+                : `<div style="width:120px; height:68px; border-radius:8px; background:#040914; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🖥️</div>`
+              }
+              <div>
+                <div style="font-weight:800; font-size:1.02rem; color:#fff; display:flex; align-items:center; gap:8px;">
+                  <span>👤 ${p.name}</span>
+                  <span style="font-size:0.72rem; padding:2px 8px; border-radius:999px; background:${isLive ? '#10b981' : 'rgba(245,158,11,0.22)'}; color:${isLive ? '#052e16' : '#fbbf24'};">${isLive ? '● LIVE ON TV NOW' : 'Waiting in Queue'}</span>
+                </div>
+                <div style="font-size:0.86rem; color:var(--cc-sky); margin-top:2px;">📑 ${p.title || 'Screen Presentation'}</div>
+                <div style="font-size:0.78rem; color:var(--cc-muted); margin-top:3px;">
+                  🏷️ ${p.department} • ${p.hasAudio ? '🔊 Audio Included' : '🔇 Video Only'}
+                </div>
+              </div>
+            </div>
+            <div class="booking-actions">
+              ${isLive
+                ? `<button type="button" class="btn-edit" style="border-color:#f59e0b; color:#fbbf24;" onclick="adminPickPresenter(null)">⏹ Stop TV Output</button>`
+                : `<button type="button" class="btn-edit" style="background:#10b981; border-color:#10b981; color:#052e16;" onclick="adminPickPresenter('${p.id}')">📺 Output This Screen to TV</button>`
+              }
+              <button type="button" class="btn-del" onclick="adminDisconnectPresenter('${p.id}')">✕ Disconnect</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.adminPickPresenter = async (presenterId) => {
+      await selectActivePresenter(presenterId);
+      showToast('adminShareToast', presenterId ? '✓ Selected staff screen is now live on the HQ TV Receiver!' : '✓ Stopped TV screen share output.');
+    };
+
+    window.adminDisconnectPresenter = async (presenterId) => {
+      if (confirm('Disconnect this staff presenter?')) {
+        await removePresenter(presenterId);
+        showToast('adminShareToast', '✓ Disconnected presenter.');
+      }
+    };
 
     function populateFiltersAndModal(state) {
       const rooms = state.rooms || [];

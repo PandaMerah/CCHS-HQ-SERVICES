@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Careclinics HQ — Remote Display & Signage Service</title>
+  <title>Careclinics HQ — Remote Display & Screen Share Service</title>
   <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <!-- PeerJS for WebRTC Live Screen & Audio Streaming -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <style>
     :root {
       --cc-navy: #0c1936;
@@ -24,16 +26,17 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #081226;
+      background: radial-gradient(circle at 15% 15%, #162e5e 0%, #081226 60%, #040914 100%);
       color: #f8fafc;
       min-height: 100vh;
     }
 
-    /* Controller Layout */
+    /* Common Topbar */
     .topbar {
-      background: rgba(12, 25, 54, 0.9);
+      background: rgba(12, 25, 54, 0.92);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--cc-border);
-      padding: 16px 32px;
+      padding: 15px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -60,6 +63,7 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .nav-btn {
@@ -69,7 +73,7 @@
       border: 1px solid var(--cc-border);
       padding: 8px 14px;
       border-radius: 10px;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -81,24 +85,33 @@
       color: #ffffff;
     }
 
+    /* Mode Visibility Switching */
+    #controllerRoot, #shareRoot, #receiverRoot {
+      display: none;
+    }
+    body.mode-controller #controllerRoot { display: block; }
+    body.mode-share #shareRoot { display: block; }
+    body.mode-receiver #receiverRoot { display: block; }
+
+    /* Controller Layout */
     .controller-container {
       max-width: 1440px;
       margin: 0 auto;
       padding: 28px 28px 60px;
       display: grid;
-      grid-template-columns: 460px 1fr;
+      grid-template-columns: 520px 1fr;
       gap: 26px;
       align-items: start;
     }
 
-    @media (max-width: 1080px) {
+    @media (max-width: 1120px) {
       .controller-container {
         grid-template-columns: 1fr;
       }
     }
 
     .card {
-      background: var(--cc-card);
+      background: rgba(19, 37, 76, 0.85);
       border: 1px solid var(--cc-border);
       border-radius: 18px;
       padding: 24px;
@@ -108,28 +121,158 @@
     .card-title {
       font-size: 1.1rem;
       font-weight: 800;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
 
     .card-sub {
-      font-size: 0.84rem;
+      font-size: 0.83rem;
       color: #94a3b8;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
+    /* Presenter Queue Items in Admin Controller */
+    .presenter-queue {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .presenter-item {
+      background: rgba(12, 25, 54, 0.78);
+      border: 2px solid var(--cc-border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+
+    .presenter-item.live-on-tv {
+      border-color: var(--cc-green);
+      background: rgba(16, 185, 129, 0.12);
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+    }
+
+    .presenter-top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .presenter-thumb {
+      width: 110px;
+      height: 64px;
+      border-radius: 8px;
+      background: #040914;
+      border: 1px solid var(--cc-border);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .presenter-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .presenter-name {
+      font-weight: 800;
+      font-size: 0.96rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .presenter-title {
+      font-size: 0.82rem;
+      color: var(--cc-sky);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    .presenter-badges {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mini-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .presenter-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .btn-cast {
+      background: var(--cc-green);
+      color: #052e16;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .btn-cast:hover {
+      background: #34d399;
+    }
+
+    .btn-stop-cast {
+      background: rgba(245, 158, 11, 0.22);
+      border: 1px solid #f59e0b;
+      color: #fbbf24;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-kick {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Standby Channel Buttons */
     .mode-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
     .mode-btn {
       background: rgba(12, 25, 54, 0.7);
       border: 2px solid var(--cc-border);
       border-radius: 14px;
-      padding: 16px 14px;
+      padding: 14px 12px;
       color: #e2e8f0;
       text-align: left;
       cursor: pointer;
@@ -146,41 +289,18 @@
       box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.25);
     }
 
-    .mode-icon {
-      font-size: 1.5rem;
-      margin-bottom: 6px;
-    }
+    .mode-icon { font-size: 1.35rem; margin-bottom: 4px; }
+    .mode-name { font-size: 0.88rem; font-weight: 700; color: #ffffff; }
+    .mode-desc { font-size: 0.74rem; color: #94a3b8; margin-top: 2px; }
 
-    .mode-name {
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .mode-desc {
-      font-size: 0.76rem;
-      color: #94a3b8;
-      margin-top: 2px;
-    }
-
-    .form-group {
-      margin-bottom: 14px;
-    }
-
-    label {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--cc-sky);
-      margin-bottom: 6px;
-    }
-
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--cc-sky); margin-bottom: 6px; }
     input, select, textarea {
       width: 100%;
       padding: 10px 12px;
       border-radius: 10px;
       border: 1px solid var(--cc-border);
-      background: rgba(12, 25, 54, 0.8);
+      background: rgba(12, 25, 54, 0.85);
       color: #ffffff;
       font-family: inherit;
       font-size: 0.9rem;
@@ -193,15 +313,13 @@
       border: none;
       padding: 13px 18px;
       border-radius: 10px;
-      font-size: 0.95rem;
+      font-size: 0.94rem;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.2s;
     }
 
-    .btn-broadcast:hover {
-      background: #2563eb;
-    }
+    .btn-broadcast:hover { background: #2563eb; }
 
     /* Live Monitor Frame */
     .monitor-frame {
@@ -209,25 +327,122 @@
       border: 3px solid #334155;
       border-radius: 20px;
       overflow: hidden;
-      height: 560px;
+      height: 580px;
       position: relative;
       box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
     }
 
-    /* Receiver Fullscreen View */
-    body.receiver-mode #controllerRoot {
-      display: none !important;
+    /* STAFF SCREEN SHARE STUDIO (?mode=share) */
+    .share-container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
     }
 
-    body:not(.receiver-mode) #receiverRoot {
-      display: none !important;
+    .share-hero-card {
+      background: rgba(19, 37, 76, 0.82);
+      border: 1px solid var(--cc-border);
+      border-radius: 22px;
+      padding: 32px;
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
     }
 
+    .meet-stage {
+      margin-top: 24px;
+      background: #040914;
+      border: 2px solid var(--cc-border);
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .meet-stage video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .meet-controls-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .meet-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 26px;
+      border-radius: 999px;
+      font-size: 0.96rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .meet-btn.start {
+      background: linear-gradient(135deg, #1863dc, #0ea5e9);
+      color: #ffffff;
+      box-shadow: 0 10px 25px rgba(24, 99, 220, 0.4);
+    }
+
+    .meet-btn.start:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(24, 99, 220, 0.55);
+    }
+
+    .meet-btn.stop {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .meet-btn.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--cc-border);
+      color: #ffffff;
+    }
+
+    .share-status-banner {
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .share-status-banner.waiting {
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fcd34d;
+    }
+
+    .share-status-banner.live {
+      background: rgba(16, 185, 129, 0.22);
+      border: 2px solid #10b981;
+      color: #6ee7b7;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+    }
+
+    /* RECEIVER FULLSCREEN VIEW (?mode=receiver) */
     #receiverRoot {
       width: 100vw;
       height: 100vh;
       overflow: hidden;
       position: relative;
+      background: #000;
     }
 
     .receiver-Screen {
@@ -255,9 +470,9 @@
     }
 
     .receiver-controls button, .receiver-controls a {
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.88);
       color: #ffffff;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.22);
       padding: 8px 14px;
       border-radius: 999px;
       font-size: 0.8rem;
@@ -265,64 +480,206 @@
       text-decoration: none;
       cursor: pointer;
     }
+
+    .tv-presenter-badge {
+      position: fixed;
+      bottom: 20px;
+      left: 24px;
+      z-index: 950;
+      background: rgba(12, 25, 54, 0.86);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      padding: 10px 18px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.88rem;
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .unmute-overlay-btn {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 999;
+      background: #f59e0b;
+      color: #0f172a;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.45);
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>
-  <!-- CONTROLLER UI -->
-  <div id="controllerRoot">
+  <!-- =========================================================================
+       1. STAFF SCREEN & AUDIO SHARE STUDIO (?mode=share) - Open to All Staff
+       ========================================================================= -->
+  <div id="shareRoot">
     <header class="topbar">
       <a href="/" class="brand-left">
         <img src="/careclinic-logo.webp" alt="Logo" onerror="this.src='/images/acme-logo.svg'" />
         <div>
-          <div style="font-weight: 800; font-size: 1.1rem;">Careclinics Remote Display Controller</div>
-          <div style="font-size: 0.78rem; color: #94a3b8;">Broadcast live content to HQ TVs, Lobby Screens & Room Door Tablets</div>
+          <div style="font-weight: 800; font-size: 1.1rem;">Careclinics HQ — Share Screen & Audio to TV</div>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Present slides or showcase video with audio to HQ TV screens</div>
+        </div>
+      </a>
+      <div class="nav-links" id="shareNavLinks">
+        <a href="/" class="nav-btn">← Staff Portal</a>
+        <a href="/meeting/input.html" class="nav-btn">📝 Dept Update</a>
+        <a href="/booking/" class="nav-btn">📅 Room Booking</a>
+        <a href="/pdf/" class="nav-btn">📄 BentoPDF</a>
+      </div>
+    </header>
+
+    <main class="share-container">
+      <div class="share-hero-card">
+        <!-- Live Banner when sharing -->
+        <div id="shareLiveBanner" class="share-status-banner waiting" style="display: none;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span id="shareBannerIcon">⏳</span>
+            <span id="shareBannerText">Sharing Active — Waiting for Admin to Select Your Screen for the TV</span>
+          </div>
+          <span id="sharePeerBadge" style="font-size:0.78rem; opacity:0.85;">WebRTC Ready</span>
+        </div>
+
+        <div id="shareSetupForm">
+          <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 6px;">🖥️ Share Your Screen & Audio to HQ TV</h2>
+          <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;">
+            Works just like Google Meet: multiple staff can share their screen in the queue, and the Administrator selects which presenter is displayed live on the HQ TV.
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 16px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label for="presName">Your Name *</label>
+              <input type="text" id="presName" placeholder="e.g. Muhammad Amri" required />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label for="presDept">Department *</label>
+              <select id="presDept"></select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label for="presTitle">Presentation / Video Title *</label>
+              <input type="text" id="presTitle" placeholder="e.g. Monthly IT Presentation Slides" required />
+            </div>
+          </div>
+
+          <div style="background: rgba(24, 99, 220, 0.15); border: 1px solid rgba(142, 209, 252, 0.3); border-radius: 12px; padding: 12px 16px; font-size: 0.83rem; color: #dbeafe;">
+            💡 <strong>Audio Sharing Tip:</strong> When the browser prompt appears, select a <strong>Browser Tab</strong> (with <em>"Also share tab audio"</em> checked) or <strong>Entire Screen</strong> (with <em>"Also share system audio"</em> checked) to stream video sound to the TV.
+          </div>
+        </div>
+
+        <!-- Video Preview Stage -->
+        <div class="meet-stage" id="meetStage">
+          <div id="meetPlaceholder" style="text-align: center; padding: 32px; color: #94a3b8;">
+            <div style="font-size: 3.2rem; margin-bottom: 10px;">🖥️</div>
+            <div style="font-weight: 700; font-size: 1.1rem; color: #e2e8f0;">Ready to Present to HQ TV</div>
+            <div style="font-size: 0.86rem; margin-top: 6px;">Enter your name & title above, then click <strong>Start Screen & Audio Share</strong> below.</div>
+          </div>
+          <video id="localSharePreview" autoplay muted playsinline style="display: none;"></video>
+        </div>
+
+        <!-- Google Meet Style Bottom Control Bar -->
+        <div class="meet-controls-bar">
+          <button type="button" class="meet-btn start" id="btnStartShare" onclick="startStaffScreenShare()">
+            <span>🖥️</span> Start Screen & Audio Share
+          </button>
+          <button type="button" class="meet-btn secondary" id="btnSwitchSource" style="display: none;" onclick="switchSharedScreen()">
+            🔄 Change Window / Tab
+          </button>
+          <button type="button" class="meet-btn secondary" id="btnToggleMicAudio" style="display: none;" onclick="toggleSharedAudioTrack()">
+            🔊 Shared Audio: ON
+          </button>
+          <button type="button" class="meet-btn stop" id="btnStopShare" style="display: none;" onclick="stopStaffScreenShare()">
+            ⏹ Stop Presenting
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       2. ADMIN CONTROLLER & SCREEN SHARE SWITCHER (/display/) - Admin Only
+       ========================================================================= -->
+  <div id="controllerRoot">
+    <header class="topbar">
+      <a href="/admin/" class="brand-left">
+        <img src="/careclinic-logo.webp" alt="Logo" onerror="this.src='/images/acme-logo.svg'" />
+        <div>
+          <div style="font-weight: 800; font-size: 1.1rem;">Careclinics Remote Display & Screen Share Switcher</div>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Select which staff presenter outputs to the HQ TV or switch standby signage</div>
         </div>
       </a>
       <div class="nav-links">
         <a href="/admin/" class="nav-btn">🛡️ Admin Portal</a>
-        <a href="/" class="nav-btn">Staff View</a>
-        <a href="/booking/" class="nav-btn">📅 Room Booking</a>
-        <a href="/meeting/" class="nav-btn">📺 Meeting Deck</a>
-        <a href="/display/?mode=receiver" target="_blank" class="nav-btn primary">⛶ Launch Fullscreen Receiver ↗</a>
+        <a href="/display/?mode=share" target="_blank" class="nav-btn">🖥️ Open Staff Share Page ↗</a>
+        <a href="/display/?mode=receiver" target="_blank" class="nav-btn primary">⛶ Launch TV Receiver ↗</a>
       </div>
     </header>
 
     <main class="controller-container">
-      <!-- Left Column: Mode Selection & Content Editor -->
+      <!-- Left Column: Presenter Queue + Standby Modes -->
       <div>
+        <!-- Card 1: Active Staff Screen Share Queue -->
+        <div class="card" style="border-color: rgba(142, 209, 252, 0.35);">
+          <div class="card-title">
+            <span>🖥️ Active Staff Screen Share Queue</span>
+            <span id="queueCountBadge" style="font-size:0.75rem; background:rgba(24,99,220,0.35); color:var(--cc-sky); padding:3px 10px; border-radius:999px;">0 Sharing</span>
+          </div>
+          <div class="card-sub">
+            Multiple staff can share their screen simultaneously. Choose <strong>one presenter</strong> below to output live to the HQ TV Receiver.
+          </div>
+
+          <div id="presenterQueueList" class="presenter-queue"></div>
+        </div>
+
+        <!-- Card 2: Standby Broadcast Channels (When not screen sharing) -->
         <div class="card">
-          <div class="card-title">1. Select Active Broadcast Channel</div>
-          <div class="card-sub">All HQ screens set to "Follow Master" switch immediately</div>
+          <div class="card-title">📡 Standby TV Channels</div>
+          <div class="card-sub">Switch the TV to a standby signage channel at any time</div>
 
           <div class="mode-grid">
+            <button type="button" class="mode-btn" data-mode="screen-share" onclick="selectMode('screen-share')">
+              <div class="mode-icon">🖥️</div>
+              <div class="mode-name">Live Screen Share</div>
+              <div class="mode-desc">Selected Staff Presenter</div>
+            </button>
+
             <button type="button" class="mode-btn" data-mode="meeting-tv" onclick="selectMode('meeting-tv')">
               <div class="mode-icon">📊</div>
               <div class="mode-name">Meeting TV Deck</div>
-              <div class="mode-desc">Weekly Alignment Slides & Q&A Reel</div>
+              <div class="mode-desc">Weekly Alignment Slides</div>
             </button>
 
             <button type="button" class="mode-btn" data-mode="room-signage" onclick="selectMode('room-signage')">
               <div class="mode-icon">🚪</div>
               <div class="mode-name">Room Door Signage</div>
-              <div class="mode-desc">Live Room Availability & Schedule</div>
+              <div class="mode-desc">Live Room Availability</div>
             </button>
 
             <button type="button" class="mode-btn" data-mode="announcement" onclick="selectMode('announcement')">
               <div class="mode-icon">📢</div>
               <div class="mode-name">HQ Notice Poster</div>
-              <div class="mode-desc">Fullscreen Announcement Banner</div>
+              <div class="mode-desc">Fullscreen Announcement</div>
             </button>
 
             <button type="button" class="mode-btn" data-mode="welcome-board" onclick="selectMode('welcome-board')">
               <div class="mode-icon">🤝</div>
               <div class="mode-name">VIP Welcome Board</div>
-              <div class="mode-desc">Lobby Visitor & Event Greeting</div>
+              <div class="mode-desc">Lobby Visitor Greeting</div>
             </button>
           </div>
 
           <div id="statusToast" style="display:none; padding:10px 14px; border-radius:10px; background:rgba(16,185,129,0.2); border:1px solid #10b981; color:#6ee7b7; font-size:0.85rem; font-weight:600; margin-bottom:14px;"></div>
 
-          <!-- Dynamic Sub-Settings -->
           <div id="editorRoomSignage" style="display: none;">
             <div class="form-group">
               <label>Target Room for Door Display</label>
@@ -341,7 +698,7 @@
             </div>
             <div class="form-group">
               <label>Message Body</label>
-              <textarea id="annMessage" rows="3"></textarea>
+              <textarea id="annMessage" rows="2"></textarea>
             </div>
             <div class="form-group">
               <label>Footer / Issuing Department</label>
@@ -360,32 +717,25 @@
             </div>
             <div class="form-group">
               <label>Today's Highlighted Events / Guests (One per line)</label>
-              <textarea id="welGuests" rows="3"></textarea>
+              <textarea id="welGuests" rows="2"></textarea>
             </div>
           </div>
 
           <button type="button" class="btn-broadcast" onclick="pushBroadcastSettings()">
-            📡 Save & Broadcast to All HQ Screens
+            📡 Save & Switch TV Channel
           </button>
-        </div>
-
-        <!-- Registered Screens List -->
-        <div class="card">
-          <div class="card-title">Connected HQ Display Endpoints</div>
-          <div class="card-sub">Open receiver URL on any smart TV or tablet</div>
-          <div id="screensList" style="display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
       </div>
 
       <!-- Right Column: Live 16:9 Screen Monitor Preview -->
       <div>
         <div class="card" style="padding: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
             <div>
-              <div class="card-title" style="margin-bottom: 2px;">Live Broadcast Monitor</div>
-              <div style="font-size: 0.8rem; color: #94a3b8;">Real-time mirror of active HQ display feed</div>
+              <div class="card-title" style="margin-bottom: 2px;">Live TV Output Monitor</div>
+              <div style="font-size: 0.8rem; color: #94a3b8;" id="monitorSubtitle">Real-time mirror of active HQ TV Receiver</div>
             </div>
-            <a href="/display/?mode=receiver" target="_blank" class="nav-btn primary">Open Fullscreen TV View ↗</a>
+            <a href="/display/?mode=receiver" target="_blank" class="nav-btn primary">Open Fullscreen TV Receiver ↗</a>
           </div>
 
           <div class="monitor-frame" id="previewMonitor"></div>
@@ -394,53 +744,483 @@
     </main>
   </div>
 
-  <!-- RECEIVER FULLSCREEN UI -->
+  <!-- =========================================================================
+       3. TV RECEIVER FULLSCREEN KIOSK (?mode=receiver)
+       ========================================================================= -->
   <div id="receiverRoot">
+    <button type="button" id="tvUnmuteBtn" class="unmute-overlay-btn" onclick="enableTvAudio()">
+      🔊 Click to Unmute TV Audio
+    </button>
     <div id="receiverViewport" style="width: 100%; height: 100%;"></div>
     <div class="receiver-controls">
-      <a href="/display/">⚙ Controller</a>
-      <a href="/">⌂ HQ Portal</a>
+      <a href="/display/?mode=share" target="_blank">🖥️ Share Screen</a>
+      <a href="/admin/">⚙ Admin Switcher</a>
       <button onclick="document.documentElement.requestFullscreen()">⛶ Fullscreen</button>
     </div>
   </div>
 
   <script type="module">
-    import { subscribeState, updateRemoteDisplay } from '/shared/cloud-store.js';
-    import { requireAdminAuth } from '/shared/auth.js';
+    import {
+      subscribeState,
+      updateRemoteDisplay,
+      registerPresenter,
+      updatePresenterStreamData,
+      removePresenter,
+      selectActivePresenter
+    } from '/shared/cloud-store.js';
+    import { requireAdminAuth, isAdminLoggedIn } from '/shared/auth.js';
 
     const params = new URLSearchParams(window.location.search);
-    const isReceiver = params.get('mode') === 'receiver';
-    const forcedView = params.get('view'); // optional override e.g. ?mode=receiver&view=room-signage
+    const modeParam = params.get('mode'); // 'share' | 'receiver' | null (controller)
+    const forcedView = params.get('view');
 
-    if (isReceiver) {
-      document.body.classList.add('receiver-mode');
-    } else if (!requireAdminAuth()) {
-      throw new Error('Redirecting to Admin Login');
+    const isShareMode = modeParam === 'share';
+    const isReceiverMode = modeParam === 'receiver';
+    const isControllerMode = !isShareMode && !isReceiverMode;
+
+    if (isShareMode) {
+      document.body.classList.add('mode-share');
+      if (isAdminLoggedIn()) {
+        document.getElementById('shareNavLinks').innerHTML += `<a href="/display/" class="nav-btn primary">🛡️ Admin TV Switcher</a>`;
+      }
+    } else if (isReceiverMode) {
+      document.body.classList.add('mode-receiver');
+    } else {
+      // Controller mode requires Admin Authentication
+      if (!requireAdminAuth()) {
+        throw new Error('Redirecting to Admin Login');
+      }
+      document.body.classList.add('mode-controller');
     }
+
+    const ICE_SERVERS = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' }
+    ];
 
     let currentState = null;
     let selectedMode = 'meeting-tv';
     let formInitialized = false;
 
+    // =========================================================================
+    // A. STAFF PRESENTER LOGIC (?mode=share)
+    // =========================================================================
+    let myPresenterId = null;
+    let myPeerId = null;
+    let myPeer = null;
+    let localStream = null;
+    let frameCaptureTimer = null;
+    const activeReceiverCalls = new Set();
+
+    async function startStaffScreenShare() {
+      const nameInput = document.getElementById('presName');
+      const deptInput = document.getElementById('presDept');
+      const titleInput = document.getElementById('presTitle');
+
+      const name = nameInput.value.trim() || 'HQ Staff';
+      const department = deptInput.value || 'IT';
+      const title = titleInput.value.trim() || 'Screen Presentation';
+
+      try {
+        // Request Screen + System/Tab Audio like Google Meet
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            cursor: 'always',
+            width: { ideal: 1920, max: 1920 },
+            height: { ideal: 1080, max: 1080 },
+            frameRate: { ideal: 30, max: 60 }
+          },
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false
+          }
+        });
+
+        await attachLocalShareStream(stream, { name, department, title });
+      } catch (err) {
+        if (err.name !== 'NotAllowedError') {
+          alert('Unable to start screen sharing: ' + err.message);
+        }
+      }
+    }
+
+    async function attachLocalShareStream(stream, meta) {
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+      }
+      localStream = stream;
+
+      const videoEl = document.getElementById('localSharePreview');
+      videoEl.srcObject = stream;
+      videoEl.style.display = 'block';
+      document.getElementById('meetPlaceholder').style.display = 'none';
+
+      document.getElementById('btnStartShare').style.display = 'none';
+      document.getElementById('btnSwitchSource').style.display = 'inline-flex';
+      document.getElementById('btnStopShare').style.display = 'inline-flex';
+      document.getElementById('shareLiveBanner').style.display = 'flex';
+
+      const audioTracks = stream.getAudioTracks();
+      const hasAudio = audioTracks.length > 0;
+      const audioBtn = document.getElementById('btnToggleMicAudio');
+      if (hasAudio) {
+        audioBtn.style.display = 'inline-flex';
+        audioBtn.textContent = '🔊 Shared Audio: ON';
+      } else {
+        audioBtn.style.display = 'none';
+      }
+
+      // Listen for native browser "Stop sharing" button
+      stream.getVideoTracks()[0].addEventListener('ended', () => {
+        stopStaffScreenShare();
+      });
+
+      if (!myPresenterId) {
+        myPresenterId = 'pres-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+        myPeerId = 'cchs-' + myPresenterId;
+      }
+
+      // Initialize PeerJS WebRTC Broadcaster
+      if (myPeer) {
+        try { myPeer.destroy(); } catch (e) {}
+      }
+
+      if (window.Peer) {
+        myPeer = new window.Peer(myPeerId, { config: { iceServers: ICE_SERVERS } });
+        myPeer.on('open', (id) => {
+          document.getElementById('sharePeerBadge').textContent = `● Live Stream Ready (${hasAudio ? 'Video + Audio' : 'Video'})`;
+        });
+        // When a TV Receiver connects via data connection requesting our stream, call it with our MediaStream!
+        myPeer.on('connection', (conn) => {
+          conn.on('data', (msg) => {
+            if (msg && msg.type === 'REQUEST_STREAM' && msg.receiverPeerId && localStream) {
+              const call = myPeer.call(msg.receiverPeerId, localStream);
+              if (call) activeReceiverCalls.add(call);
+            }
+          });
+        });
+        myPeer.on('call', (call) => {
+          if (localStream) {
+            call.answer(localStream);
+            activeReceiverCalls.add(call);
+          }
+        });
+      }
+
+      // Capture an initial thumbnail and register presenter in cloud store
+      const initialFrame = captureVideoThumbnail(videoEl);
+      await registerPresenter({
+        id: myPresenterId,
+        peerId: myPeerId,
+        name: meta.name,
+        department: meta.department,
+        title: meta.title,
+        hasAudio,
+        previewFrame: initialFrame,
+        startedAt: Date.now()
+      });
+
+      // Periodically update preview frame & heartbeat every 1.6s
+      if (frameCaptureTimer) clearInterval(frameCaptureTimer);
+      frameCaptureTimer = setInterval(() => {
+        if (!localStream || !myPresenterId) return;
+        // Also verify if admin remotely removed us
+        const stillInList = (currentState?.remoteDisplay?.presenters || []).some(p => p.id === myPresenterId);
+        if (!stillInList) {
+          stopStaffScreenShare(true);
+          return;
+        }
+        const frame = captureVideoThumbnail(videoEl);
+        if (frame) {
+          updatePresenterStreamData(myPresenterId, { previewFrame: frame });
+        }
+      }, 1600);
+    }
+
+    function captureVideoThumbnail(videoEl) {
+      try {
+        if (!videoEl || !videoEl.videoWidth) return null;
+        const canvas = document.createElement('canvas');
+        const targetW = 640;
+        const scale = targetW / videoEl.videoWidth;
+        canvas.width = targetW;
+        canvas.height = Math.round(videoEl.videoHeight * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL('image/jpeg', 0.55);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function switchSharedScreen() {
+      const name = document.getElementById('presName').value.trim() || 'HQ Staff';
+      const department = document.getElementById('presDept').value || 'IT';
+      const title = document.getElementById('presTitle').value.trim() || 'Screen Presentation';
+      try {
+        const nextStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { cursor: 'always', width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } },
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+        });
+        await attachLocalShareStream(nextStream, { name, department, title });
+      } catch (e) {
+        // User cancelled window picker
+      }
+    }
+
+    function toggleSharedAudioTrack() {
+      if (!localStream) return;
+      const tracks = localStream.getAudioTracks();
+      if (!tracks.length) return;
+      tracks[0].enabled = !tracks[0].enabled;
+      const btn = document.getElementById('btnToggleMicAudio');
+      btn.textContent = tracks[0].enabled ? '🔊 Shared Audio: ON' : '🔇 Shared Audio: MUTED';
+    }
+
+    async function stopStaffScreenShare(skipStoreRemove = false) {
+      if (frameCaptureTimer) {
+        clearInterval(frameCaptureTimer);
+        frameCaptureTimer = null;
+      }
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+        localStream = null;
+      }
+      if (myPeer) {
+        try { myPeer.destroy(); } catch (e) {}
+        myPeer = null;
+      }
+      const idToRemove = myPresenterId;
+      myPresenterId = null;
+
+      const videoEl = document.getElementById('localSharePreview');
+      if (videoEl) {
+        videoEl.srcObject = null;
+        videoEl.style.display = 'none';
+      }
+      document.getElementById('meetPlaceholder').style.display = 'block';
+      document.getElementById('btnStartShare').style.display = 'inline-flex';
+      document.getElementById('btnSwitchSource').style.display = 'none';
+      document.getElementById('btnToggleMicAudio').style.display = 'none';
+      document.getElementById('btnStopShare').style.display = 'none';
+      document.getElementById('shareLiveBanner').style.display = 'none';
+
+      if (idToRemove && !skipStoreRemove) {
+        await removePresenter(idToRemove);
+      }
+    }
+
+    window.addEventListener('beforeunload', () => {
+      if (myPresenterId) {
+        removePresenter(myPresenterId);
+      }
+    });
+
+    window.startStaffScreenShare = startStaffScreenShare;
+    window.switchSharedScreen = switchSharedScreen;
+    window.toggleSharedAudioTrack = toggleSharedAudioTrack;
+    window.stopStaffScreenShare = stopStaffScreenShare;
+
+    // =========================================================================
+    // B. TV RECEIVER WEBRTC CLIENT LOGIC (?mode=receiver & Admin Monitor)
+    // =========================================================================
+    let receiverPeer = null;
+    let connectedPresenterPeerId = null;
+    let currentMediaStream = null;
+
+    function connectReceiverToPresenter(presenter) {
+      if (!presenter || !presenter.peerId || !window.Peer) return;
+      if (connectedPresenterPeerId === presenter.peerId && currentMediaStream) {
+        const vid = document.getElementById('tvLiveStreamVideo');
+        if (vid && vid.srcObject !== currentMediaStream) {
+          vid.srcObject = currentMediaStream;
+        }
+        return;
+      }
+
+      connectedPresenterPeerId = presenter.peerId;
+      currentMediaStream = null;
+
+      if (receiverPeer) {
+        try { receiverPeer.destroy(); } catch (e) {}
+      }
+
+      const myRecId = 'cchs-rec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+      receiverPeer = new window.Peer(myRecId, { config: { iceServers: ICE_SERVERS } });
+
+      receiverPeer.on('open', (id) => {
+        const conn = receiverPeer.connect(presenter.peerId);
+        conn.on('open', () => {
+          conn.send({ type: 'REQUEST_STREAM', receiverPeerId: id });
+        });
+      });
+
+      receiverPeer.on('call', (call) => {
+        call.answer();
+        call.on('stream', (remoteStream) => {
+          currentMediaStream = remoteStream;
+          const vid = document.getElementById('tvLiveStreamVideo');
+          if (vid) {
+            vid.srcObject = remoteStream;
+            vid.style.display = 'block';
+            const fbImg = document.getElementById('tvFallbackFrame');
+            if (fbImg) fbImg.style.display = 'none';
+
+            // Attempt unmuted playback on TV; if browser blocks unmuted autoplay, play muted & show 1-click Unmute button
+            if (isReceiverMode) {
+              vid.muted = false;
+              vid.play().catch(() => {
+                vid.muted = true;
+                vid.play().catch(() => {});
+                if (presenter.hasAudio) {
+                  document.getElementById('tvUnmuteBtn').style.display = 'inline-flex';
+                }
+              });
+            } else {
+              // Admin monitor preview is muted by default to avoid echo
+              vid.muted = true;
+              vid.play().catch(() => {});
+            }
+          }
+        });
+      });
+    }
+
+    window.enableTvAudio = () => {
+      const vid = document.getElementById('tvLiveStreamVideo');
+      if (vid) {
+        vid.muted = false;
+        vid.volume = 1.0;
+        vid.play().catch(() => {});
+      }
+      document.getElementById('tvUnmuteBtn').style.display = 'none';
+    };
+
+    // =========================================================================
+    // C. STATE SUBSCRIPTION & UI RENDERING
+    // =========================================================================
     subscribeState((state) => {
       if (!state) return;
       currentState = state;
       const rd = state.remoteDisplay || {};
+      const depts = Object.keys(state.departments || {});
 
-      if (!formInitialized) {
-        selectedMode = rd.activeMode || 'meeting-tv';
-        populateEditorFields(state);
-        formInitialized = true;
+      // Populate Department dropdown on Share page
+      const presDept = document.getElementById('presDept');
+      if (presDept && presDept.options.length === 0) {
+        presDept.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
       }
 
-      updateModeButtons();
-      renderScreensList(state);
-      renderDisplaySurface(
-        isReceiver ? document.getElementById('receiverViewport') : document.getElementById('previewMonitor'),
-        forcedView || (isReceiver ? rd.activeMode : selectedMode),
-        state
-      );
+      // Update Share Banner if we are currently sharing
+      if (isShareMode && myPresenterId) {
+        const banner = document.getElementById('shareLiveBanner');
+        const icon = document.getElementById('shareBannerIcon');
+        const text = document.getElementById('shareBannerText');
+        const isChosen = rd.activeMode === 'screen-share' && rd.activePresenterId === myPresenterId;
+        if (isChosen) {
+          banner.className = 'share-status-banner live';
+          icon.textContent = '🟢';
+          text.textContent = 'YOU ARE LIVE ON THE HQ TV NOW! Your screen & audio are broadcasting.';
+        } else {
+          banner.className = 'share-status-banner waiting';
+          icon.textContent = '⏳';
+          text.textContent = 'Sharing Active in Queue — Waiting for Admin to Select Your Screen for the TV';
+        }
+      }
+
+      if (isControllerMode) {
+        if (!formInitialized) {
+          selectedMode = rd.activeMode || 'meeting-tv';
+          populateEditorFields(state);
+          formInitialized = true;
+        } else {
+          selectedMode = rd.activeMode || selectedMode;
+        }
+        updateModeButtons();
+        renderPresenterQueue(state);
+        renderDisplaySurface(document.getElementById('previewMonitor'), rd.activeMode || 'meeting-tv', state);
+      }
+
+      if (isReceiverMode) {
+        renderDisplaySurface(
+          document.getElementById('receiverViewport'),
+          forcedView || rd.activeMode || 'meeting-tv',
+          state
+        );
+      }
     });
+
+    function renderPresenterQueue(state) {
+      const rd = state.remoteDisplay || {};
+      // Filter out stale presenters older than 45 seconds without heartbeat
+      const now = Date.now();
+      const presenters = (rd.presenters || []).filter(p => !p.lastHeartbeat || (now - p.lastHeartbeat) < 60000);
+      const activeId = rd.activeMode === 'screen-share' ? rd.activePresenterId : null;
+
+      document.getElementById('queueCountBadge').textContent = `${presenters.length} Sharing`;
+      const container = document.getElementById('presenterQueueList');
+
+      if (presenters.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px 16px; background:rgba(12,25,54,0.5); border-radius:12px; border:1px dashed var(--cc-border); color:#94a3b8; font-size:0.85rem;">
+            <div style="font-size:1.6rem; margin-bottom:6px;">🖥️</div>
+            <div>No staff members are currently sharing their screen.</div>
+            <div style="margin-top:6px;">Staff can launch screen sharing from the <strong>HQ Staff Portal</strong> or <a href="/display/?mode=share" target="_blank" style="color:var(--cc-sky);">open Share Studio ↗</a>.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = presenters.map(p => {
+        const isLive = activeId === p.id;
+        return `
+          <div class="presenter-item ${isLive ? 'live-on-tv' : ''}">
+            <div class="presenter-top">
+              ${p.previewFrame
+                ? `<img src="${p.previewFrame}" class="presenter-thumb" alt="Screen Preview" />`
+                : `<div class="presenter-thumb" style="display:flex; align-items:center; justify-content:center; font-size:1.4rem;">🖥️</div>`
+              }
+              <div class="presenter-meta">
+                <div class="presenter-name">
+                  <span>👤 ${p.name}</span>
+                  ${isLive ? `<span class="mini-badge" style="background:#10b981; color:#052e16;">● LIVE ON TV</span>` : `<span class="mini-badge" style="background:rgba(245,158,11,0.2); color:#fbbf24;">Waiting in Queue</span>`}
+                </div>
+                <div class="presenter-title">📑 ${p.title || 'Screen Presentation'}</div>
+                <div class="presenter-badges">
+                  <span class="mini-badge" style="background:rgba(24,99,220,0.3); color:var(--cc-sky);">${p.department}</span>
+                  <span class="mini-badge" style="background:rgba(255,255,255,0.08); color:#cbd5e1;">${p.hasAudio ? '🔊 Audio Shared' : '🔇 Video Only'}</span>
+                </div>
+              </div>
+            </div>
+            <div class="presenter-actions">
+              ${isLive
+                ? `<button type="button" class="btn-stop-cast" onclick="adminSelectPresenter(null)">⏹ Stop TV Output</button>`
+                : `<button type="button" class="btn-cast" onclick="adminSelectPresenter('${p.id}')">📺 Output This Screen to TV</button>`
+              }
+              <button type="button" class="btn-kick" onclick="adminKickPresenter('${p.id}')" title="Disconnect this presenter">✕ Disconnect</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.adminSelectPresenter = async (presenterId) => {
+      await selectActivePresenter(presenterId);
+      const toast = document.getElementById('statusToast');
+      toast.textContent = presenterId
+        ? '✓ Switched HQ TV output to selected staff presenter!'
+        : '✓ Stopped screen share on TV and returned to standby.';
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    };
+
+    window.adminKickPresenter = async (presenterId) => {
+      if (confirm('Disconnect this user from screen sharing?')) {
+        await removePresenter(presenterId);
+      }
+    };
 
     function populateEditorFields(state) {
       const rd = state.remoteDisplay || {};
@@ -500,29 +1280,66 @@
       setTimeout(() => { toast.style.display = 'none'; }, 3500);
     };
 
-    function renderScreensList(state) {
-      const list = document.getElementById('screensList');
-      if (!list) return;
-      const screens = state.remoteDisplay?.screens || [];
-      list.innerHTML = screens.map(s => `
-        <div style="background: rgba(12,25,54,0.65); border: 1px solid var(--cc-border); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-weight: 700; font-size: 0.9rem;">📺 ${s.name}</div>
-            <div style="font-size: 0.76rem; color: #94a3b8;">${s.location}</div>
-          </div>
-          <a href="/display/?mode=receiver${s.assignedMode === 'room-signage' ? '&view=room-signage' : ''}" target="_blank" style="font-size: 0.76rem; color: var(--cc-sky); text-decoration: none; font-weight: 600;">Launch ↗</a>
-        </div>
-      `).join('');
-    }
-
     function renderDisplaySurface(targetEl, mode, state) {
       if (!targetEl) return;
       const rd = state.remoteDisplay || {};
       const nowStr = new Date().toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' });
       const dateStr = new Date().toLocaleDateString('en-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
+      // 1. LIVE SCREEN SHARE MODE
+      if (mode === 'screen-share') {
+        const presenters = rd.presenters || [];
+        const activePres = presenters.find(p => p.id === rd.activePresenterId) || presenters[0];
+
+        if (!activePres) {
+          targetEl.innerHTML = `
+            <div class="receiver-Screen" style="background: radial-gradient(circle at center, #13254c 0%, #050b16 100%); align-items:center; justify-content:center; text-align:center;">
+              <div style="font-size:3.5rem; margin-bottom:14px;">🖥️</div>
+              <h1 style="font-size:2.2rem; font-weight:800; margin-bottom:8px;">Waiting for Presenter Screen Share</h1>
+              <p style="color:#94a3b8; font-size:1.1rem; max-width:560px;">
+                Staff can share their screen & audio from the Careclinics HQ Portal, and the Administrator will select which presenter to display on this TV.
+              </p>
+            </div>
+          `;
+          return;
+        }
+
+        // Keep WebRTC video element persistent if already rendered for this presenter
+        const existingWrap = targetEl.querySelector(`[data-presenter-id="${activePres.id}"]`);
+        if (!existingWrap) {
+          targetEl.innerHTML = `
+            <div data-presenter-id="${activePres.id}" style="width:100%; height:100%; background:#000; position:relative; display:flex; align-items:center; justify-content:center;">
+              <video id="tvLiveStreamVideo" autoplay playsinline style="width:100%; height:100%; object-fit:contain; display:${currentMediaStream ? 'block' : 'none'};"></video>
+              <img id="tvFallbackFrame" src="${activePres.previewFrame || ''}" style="width:100%; height:100%; object-fit:contain; display:${currentMediaStream ? 'none' : 'block'};" alt="Live Screen Share" />
+              <div class="tv-presenter-badge">
+                <span style="width:10px; height:10px; border-radius:50%; background:#10b981; box-shadow:0 0 10px #10b981;"></span>
+                <strong>${activePres.name}</strong>
+                <span style="color:var(--cc-sky); font-weight:700;">(${activePres.department})</span>
+                <span style="opacity:0.8;">— ${activePres.title || 'Screen Share'}</span>
+                ${activePres.hasAudio ? `<span style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:#6ee7b7; padding:2px 8px; border-radius:999px;">🔊 Audio</span>` : ''}
+              </div>
+            </div>
+          `;
+          connectReceiverToPresenter(activePres);
+        } else {
+          // Update fallback frame seamlessly if WebRTC video isn't active yet
+          const fbImg = document.getElementById('tvFallbackFrame');
+          if (fbImg && activePres.previewFrame && !currentMediaStream) {
+            fbImg.src = activePres.previewFrame;
+          }
+          connectReceiverToPresenter(activePres);
+        }
+        return;
+      }
+
+      // Reset WebRTC connection if switched away from screen-share
+      connectedPresenterPeerId = null;
+      currentMediaStream = null;
+
       if (mode === 'meeting-tv') {
-        targetEl.innerHTML = `<iframe src="/meeting/index.html" style="width:100%; height:100%; border:none;"></iframe>`;
+        if (!targetEl.querySelector('iframe[src="/meeting/index.html"]')) {
+          targetEl.innerHTML = `<iframe src="/meeting/index.html" style="width:100%; height:100%; border:none;"></iframe>`;
+        }
         return;
       }
 

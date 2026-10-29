@@ -179,7 +179,9 @@ export const INITIAL_SEED_DATA = {
     }
   ],
   remoteDisplay: {
-    activeMode: "meeting-tv", // 'meeting-tv' | 'room-signage' | 'announcement' | 'welcome-board' | 'custom-url'
+    activeMode: "meeting-tv", // 'screen-share' | 'meeting-tv' | 'room-signage' | 'announcement' | 'welcome-board'
+    activePresenterId: null,
+    presenters: [],
     targetRoomId: "boardroom-main",
     autoRotateSeconds: 15,
     announcement: {
@@ -238,6 +240,7 @@ function deepMergeSeed(raw) {
     remoteDisplay: {
       ...base.remoteDisplay,
       ...(raw.remoteDisplay || {}),
+      presenters: Array.isArray(raw.remoteDisplay?.presenters) ? raw.remoteDisplay.presenters : base.remoteDisplay.presenters,
       announcement: { ...base.remoteDisplay.announcement, ...(raw.remoteDisplay?.announcement || {}) },
       welcomeBoard: { ...base.remoteDisplay.welcomeBoard, ...(raw.remoteDisplay?.welcomeBoard || {}) },
       screens: Array.isArray(raw.remoteDisplay?.screens) ? raw.remoteDisplay.screens : base.remoteDisplay.screens
@@ -375,12 +378,12 @@ function initRealtimeSync() {
 
 initRealtimeSync();
 
-// Poll API gently every 6 seconds when in cloud-api fallback mode so TV displays update automatically
+// Poll API every 2.5 seconds when in cloud-api fallback mode so TV displays & screen share signaling update rapidly
 setInterval(() => {
   if (!firebaseConnected) {
     fetchApiState();
   }
-}, 6000);
+}, 2500);
 
 export function subscribeState(callback) {
   listeners.add(callback);
@@ -510,5 +513,58 @@ export async function updateRemoteDisplay(remoteDisplayPatch) {
     ...remoteDisplayPatch,
     updatedAt: Date.now()
   };
+  return saveFullState(state);
+}
+
+export async function registerPresenter(presenter) {
+  const state = JSON.parse(JSON.stringify(currentState));
+  if (!state.remoteDisplay) state.remoteDisplay = {};
+  const list = Array.isArray(state.remoteDisplay.presenters) ? state.remoteDisplay.presenters : [];
+  const filtered = list.filter((p) => p.id !== presenter.id);
+  filtered.push({
+    ...presenter,
+    startedAt: presenter.startedAt || Date.now(),
+    lastHeartbeat: Date.now()
+  });
+  state.remoteDisplay.presenters = filtered;
+  state.remoteDisplay.updatedAt = Date.now();
+  return saveFullState(state);
+}
+
+export async function updatePresenterStreamData(presenterId, patch) {
+  const state = JSON.parse(JSON.stringify(currentState));
+  if (!state.remoteDisplay || !Array.isArray(state.remoteDisplay.presenters)) return currentState;
+  const idx = state.remoteDisplay.presenters.findIndex((p) => p.id === presenterId);
+  if (idx === -1) return currentState;
+  state.remoteDisplay.presenters[idx] = {
+    ...state.remoteDisplay.presenters[idx],
+    ...patch,
+    lastHeartbeat: Date.now()
+  };
+  state.remoteDisplay.updatedAt = Date.now();
+  return saveFullState(state);
+}
+
+export async function removePresenter(presenterId) {
+  const state = JSON.parse(JSON.stringify(currentState));
+  if (!state.remoteDisplay) return currentState;
+  const list = Array.isArray(state.remoteDisplay.presenters) ? state.remoteDisplay.presenters : [];
+  state.remoteDisplay.presenters = list.filter((p) => p.id !== presenterId);
+  if (state.remoteDisplay.activePresenterId === presenterId) {
+    state.remoteDisplay.activePresenterId = null;
+    if (state.remoteDisplay.activeMode === "screen-share") {
+      state.remoteDisplay.activeMode = "meeting-tv";
+    }
+  }
+  state.remoteDisplay.updatedAt = Date.now();
+  return saveFullState(state);
+}
+
+export async function selectActivePresenter(presenterId) {
+  const state = JSON.parse(JSON.stringify(currentState));
+  if (!state.remoteDisplay) state.remoteDisplay = {};
+  state.remoteDisplay.activePresenterId = presenterId || null;
+  state.remoteDisplay.activeMode = presenterId ? "screen-share" : "meeting-tv";
+  state.remoteDisplay.updatedAt = Date.now();
   return saveFullState(state);
 }
