@@ -1,0 +1,54 @@
+services:
+  # 1. Main Navigation Page (Homarr Dashboard)
+  main-navigation:
+    image: ghcr.io/homarr-labs/homarr
+    container_name: homarr
+    restart: unless-stopped
+    ports:
+      - "80:7575"
+    environment:
+      - SECRET_ENCRYPTION_KEY=1f324693616bec97ba7ac5ca13d29ffc803189fe9e2a68339d63045585967603
+    volumes:
+      #- ./var/run/docker.sock:/var/run/docker.sock
+      - ./homarr/configs:/app/data/configs
+      - ./homarr/icons:/app/public/icons
+      - ./homarr/data:/data
+
+  # 2. Meeting Dashboard
+  meeting-dashboard:
+    build: https://github.com/PandaMerah/CCHSMeetingDashboard.git#main
+    container_name: cchs-meeting-dashboard
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./CCHSMeetingDashboard/data.json:/app/data.json
+
+  # 3. Room Booking System (Uncomment when ready)
+  # room-booking-system:
+  #   image: your-booking-image:latest
+  #   container_name: room-booking-system
+  #   restart: always
+  #   ports:
+  #     - "7777:80"
+
+  # 4. Remote Display Service (Uncomment when ready)
+  # remote-display:
+  #   image: your-remote-display-image:latest
+  #   container_name: remote-display
+  #   restart: always
+  #   ports:
+  #     - "7878:80"
+
+  # 5. Selfhosted PDF Editor / Bento PDF
+  pdf-editor:
+    build:
+      context: https://github.com/alam00000/bentopdf.git
+      args:
+        VITE_BRAND_NAME: Careclinics Healthcare Services
+        VITE_BRAND_LOGO: images/acme-logo.svg
+        VITE_FOOTER_TEXT: © 2026 Careclinics Healthcare Services. Internal use only.
+    container_name: pdf-editor
+    restart: always
+    ports:
+      - "3001:8080"

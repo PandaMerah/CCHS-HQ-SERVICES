@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Careclinics HQ Services — Staff Workspace Portal</title>
+  <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cc-navy: #0c1936;
+      --cc-navy-card: #13254c;
+      --cc-navy-hover: #193164;
+      --cc-blue: #1863dc;
+      --cc-sky: #8ed1fc;
+      --cc-emerald: #10b981;
+      --cc-amber: #f59e0b;
+      --cc-rose: #f43f5e;
+      --cc-purple: #8b5cf6;
+      --cc-text: #f8fafc;
+      --cc-muted: #94a3b8;
+      --cc-border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at 15% 15%, #162e5e 0%, #091328 55%, #060d1b 100%);
+      color: var(--cc-text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Top Header Bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: rgba(12, 25, 54, 0.85);
+      border-bottom: 1px solid var(--cc-border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo {
+      height: 44px;
+      width: auto;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 8px;
+    }
+
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(24, 99, 220, 0.3);
+      border: 1px solid rgba(142, 209, 252, 0.35);
+      color: var(--cc-sky);
+    }
+
+    .brand-sub {
+      font-size: 0.82rem;
+      color: var(--cc-muted);
+    }
+
+    .search-wrapper {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--cc-border);
+      border-radius: 12px;
+      padding: 10px 70px 10px 38px;
+      color: #ffffff;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--cc-sky);
+      background: rgba(255, 255, 255, 0.11);
+      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.25);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--cc-muted);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+
+    .search-kbd {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.72rem;
+      color: var(--cc-muted);
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--cc-border);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .sync-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+
+    .admin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 15px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      transition: all 0.2s;
+    }
+
+    .admin-btn:hover {
+      background: #f59e0b;
+      color: #0f172a;
+    }
+
+    .clock-widget {
+      text-align: right;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--cc-border);
+      padding: 6px 14px;
+      border-radius: 10px;
+    }
+
+    .clock-time {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .clock-date {
+      font-size: 0.74rem;
+      color: var(--cc-sky);
+      font-weight: 500;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 32px 60px;
+    }
+
+    /* Hero Welcome Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(24, 99, 220, 0.28) 0%, rgba(19, 37, 76, 0.85) 100%);
+      border: 1px solid rgba(142, 209, 252, 0.22);
+      border-radius: 20px;
+      padding: 26px 32px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .hero-text h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-text p {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .stat-tile {
+      background: rgba(12, 25, 54, 0.65);
+      border: 1px solid var(--cc-border);
+      border-radius: 14px;
+      padding: 12px 18px;
+      min-width: 130px;
+    }
+
+    .stat-value {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--cc-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Section Headings */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      margin-top: 8px;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cc-sky);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Staff Services Grid (3 Staff Modules) */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .service-card {
+      background: rgba(19, 37, 76, 0.75);
+      border: 1px solid var(--cc-border);
+      border-radius: 18px;
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      transition: all 0.22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card:hover {
+      transform: translateY(-4px);
+      background: rgba(25, 49, 100, 0.9);
+      border-color: rgba(142, 209, 252, 0.45);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .service-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .service-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    .service-info {
+      flex: 1;
+    }
+
+    .service-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .service-name {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .status-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .service-desc {
+      font-size: 0.88rem;
+      color: var(--cc-muted);
+      line-height: 1.48;
+    }
+
+    .service-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      font-size: 0.8rem;
+      color: var(--cc-sky);
+      font-weight: 600;
+    }
+
+    .sub-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip-link {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: var(--cc-blue);
+      color: #ffffff;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .chip-link:hover {
+      background: #2563eb;
+    }
+
+    /* Live Widgets Layout */
+    .widgets-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    .widget-card {
+      background: rgba(19, 37, 76, 0.68);
+      border: 1px solid var(--cc-border);
+      border-radius: 18px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+
+    @media (max-width: 1024px) {
+      .col-6 { grid-column: span 12; }
+    }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .widget-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .widget-action {
+      font-size: 0.8rem;
+      color: var(--cc-sky);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .widget-action:hover {
+      text-decoration: underline;
+    }
+
+    /* Progress Bar */
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cc-blue), var(--cc-emerald));
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    /* Mini List inside Widgets */
+    .mini-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .mini-item {
+      background: rgba(12, 25, 54, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .mini-item-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .mini-item-sub {
+      font-size: 0.78rem;
+      color: var(--cc-muted);
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .badge-blue {
+      background: rgba(24, 99, 220, 0.25);
+      color: var(--cc-sky);
+      border: 1px solid rgba(142, 209, 252, 0.35);
+    }
+
+    .quick-pdf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      gap: 10px;
+    }
+
+    .pdf-shortcut {
+      background: rgba(12, 25, 54, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      text-decoration: none;
+      color: #e2e8f0;
+      font-size: 0.84rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.18s;
+    }
+
+    .pdf-shortcut:hover {
+      background: var(--cc-blue);
+      color: #ffffff;
+      border-color: var(--cc-sky);
+      transform: translateY(-2px);
+    }
+
+    .portal-footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--cc-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--cc-muted);
+      font-size: 0.82rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="topbar">
+    <a href="/" class="brand-box">
+      <img src="/careclinic-logo.webp" alt="Careclinics Logo" class="brand-logo" onerror="this.src='/images/acme-logo.svg'" />
+      <div>
+        <div class="brand-title">
+          Careclinics HQ Services
+          <span class="brand-badge">Staff Portal</span>
+        </div>
+        <div class="brand-sub">Humanising Care — Staff Workspace & Digital Services</div>
+      </div>
+    </a>
+
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        id="serviceSearch"
+        class="search-input"
+        placeholder="Search staff tools, PDF actions, rooms, or departments..."
+      />
+      <kbd class="search-kbd">Ctrl K</kbd>
+    </div>
+
+    <div class="topbar-right">
+      <div class="sync-pill" id="syncStatusPill">
+        <span class="sync-dot"></span>
+        <span id="syncStatusText">Connecting Cloud...</span>
+      </div>
+      <div id="adminNavArea">
+        <a href="/login.html" class="admin-btn">🔒 Admin Login</a>
+      </div>
+      <div class="clock-widget">
+        <div class="clock-time" id="portalClock">--:--:--</div>
+        <div class="clock-date" id="portalDate">Loading...</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Overview Banner -->
+    <section class="hero-banner">
+      <div class="hero-text">
+        <h1>Welcome to Careclinics HQ Staff Workspace</h1>
+        <p id="heroVisionText">
+          Empower patients with the freedom to access quality healthcare services through digital integration anytime, anywhere.
+        </p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-tile">
+          <div class="stat-value" id="statDeptsReady">0 / 15</div>
+          <div class="stat-label">Depts Updated</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-value" id="statRoomsToday">0</div>
+          <div class="stat-label">Bookings Today</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-value">12</div>
+          <div class="stat-label">BentoPDF Tools</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Staff Services Section (Regular Viewing & Staff Actions Only) -->
+    <div class="section-header">
+      <div class="section-title">⚡ Staff Services & Tools</div>
+    </div>
+
+    <section class="services-grid" id="servicesGrid">
+      <!-- 1. Staff Meeting Submission -->
+      <div class="service-card" data-keywords="staff input submission department update question weekly alignment">
+        <div class="service-top">
+          <div class="service-icon" style="background: rgba(16, 185, 129, 0.22); color: #34d399;">📝</div>
+          <div class="service-info">
+            <div class="service-header-row">
+              <span class="service-name">Submit Department Update</span>
+              <span class="status-tag">Active</span>
+            </div>
+            <p class="service-desc">
+              Submit your department's weekly or monthly alignment updates and Q&A questions with live slide preview.
+            </p>
+          </div>
+        </div>
+        <div class="service-footer">
+          <div class="sub-links">
+            <a href="/meeting/input.html" class="chip-link">Submit Update →</a>
+          </div>
+          <span>15 HQ Departments</span>
+        </div>
+      </div>
+
+      <!-- 2. Room Booking System -->
+      <div class="service-card" data-keywords="room booking system boardroom reservation calendar schedule">
+        <div class="service-top">
+          <div class="service-icon" style="background: rgba(139, 92, 246, 0.25); color: #c084fc;">📅</div>
+          <div class="service-info">
+            <div class="service-header-row">
+              <span class="service-name">Book HQ Meeting Room</span>
+              <span class="status-tag">Online</span>
+            </div>
+            <p class="service-desc">
+              Reserve HQ Boardroom, Discussion Rooms, Townhall Suite & Telehealth Pods and check room schedules.
+            </p>
+          </div>
+        </div>
+        <div class="service-footer">
+          <div class="sub-links">
+            <a href="/booking/" class="chip-link">Book a Room →</a>
+          </div>
+          <span>5 HQ Spaces</span>
+        </div>
+      </div>
+
+      <!-- 3. Self-Hosted PDF Editor / BentoPDF -->
+      <div class="service-card" data-keywords="bento pdf studio editor merge split sign compress watermark convert">
+        <div class="service-top">
+          <div class="service-icon" style="background: rgba(14, 165, 233, 0.22); color: #38bdf8;">📄</div>
+          <div class="service-info">
+            <div class="service-header-row">
+              <span class="service-name">Open BentoPDF Studio</span>
+              <span class="status-tag">100% Private</span>
+            </div>
+            <p class="service-desc">
+              Careclinics self-hosted browser PDF toolkit: Merge, Split, Organize, Sign & Stamp, Watermark, and Convert PDFs locally.
+            </p>
+          </div>
+        </div>
+        <div class="service-footer">
+          <div class="sub-links">
+            <a href="/pdf/" class="chip-link">Open PDF Studio →</a>
+          </div>
+          <span>12 PDF Tools</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Staff Status Widgets -->
+    <div class="section-header">
+      <div class="section-title">📊 Live HQ Status & Schedules</div>
+    </div>
+
+    <section class="widgets-grid">
+      <!-- Widget 1: Weekly Meeting Alignment Readiness -->
+      <div class="widget-card col-6">
+        <div class="widget-header">
+          <div class="widget-title">🎯 Weekly Meeting Alignment Readiness</div>
+          <a href="/meeting/input.html" class="widget-action">+ Submit Update</a>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.84rem; color: var(--cc-muted);">
+          <span id="deptProgressLabel">Calculating department readiness...</span>
+          <strong id="deptProgressPct" style="color: #fff;">0%</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="deptProgressBar" style="width: 0%;"></div>
+        </div>
+        <div class="mini-list" id="deptStatusList"></div>
+      </div>
+
+      <!-- Widget 2: HQ Meeting Rooms & Today's Schedule -->
+      <div class="widget-card col-6">
+        <div class="widget-header">
+          <div class="widget-title">🏢 HQ Meeting Rooms & Today's Schedule</div>
+          <a href="/booking/" class="widget-action">+ Book a Room →</a>
+        </div>
+        <div class="mini-list" id="roomWidgetList"></div>
+      </div>
+
+      <!-- Widget 3: Quick BentoPDF Tools -->
+      <div class="widget-card col-12">
+        <div class="widget-header">
+          <div class="widget-title">🛠️ Quick Launch — Careclinics BentoPDF Studio</div>
+          <a href="/pdf/" class="widget-action">Open Full PDF Studio →</a>
+        </div>
+        <div class="quick-pdf-grid">
+          <a href="/pdf/?tool=merge" class="pdf-shortcut"><span>📑</span> Merge PDF</a>
+          <a href="/pdf/?tool=split" class="pdf-shortcut"><span>✂️</span> Split PDF</a>
+          <a href="/pdf/?tool=organize" class="pdf-shortcut"><span>🗂️</span> Organize Pages</a>
+          <a href="/pdf/?tool=sign" class="pdf-shortcut"><span>✍️</span> Sign & Stamp</a>
+          <a href="/pdf/?tool=rotate" class="pdf-shortcut"><span>🔄</span> Rotate PDF</a>
+          <a href="/pdf/?tool=watermark" class="pdf-shortcut"><span>💧</span> Watermark</a>
+          <a href="/pdf/?tool=pagenumbers" class="pdf-shortcut"><span>🔢</span> Page Numbers</a>
+          <a href="/pdf/?tool=img2pdf" class="pdf-shortcut"><span>🖼️</span> Images to PDF</a>
+          <a href="/pdf/?tool=pdf2img" class="pdf-shortcut"><span>📸</span> PDF to Images</a>
+          <a href="/pdf/?tool=extracttext" class="pdf-shortcut"><span>📝</span> Extract Text</a>
+          <a href="/pdf/?tool=compress" class="pdf-shortcut"><span>⚡</span> Optimize PDF</a>
+          <a href="/pdf/?tool=metadata" class="pdf-shortcut"><span>🏷️</span> Edit Metadata</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="portal-footer">
+      <div>© 2026 Careclinics Healthcare Services. Internal use only.</div>
+      <div>Staff Viewing Access • <a href="/login.html" style="color: var(--cc-sky); text-decoration: none;">Administrator Portal Login</a></div>
+    </footer>
+  </main>
+
+  <script type="module">
+    import { subscribeState, subscribeSyncStatus } from '/shared/cloud-store.js';
+    import { isAdminLoggedIn, logoutAdmin } from '/shared/auth.js';
+
+    // Update Admin Login button if already logged in as Admin
+    if (isAdminLoggedIn()) {
+      const adminNavArea = document.getElementById('adminNavArea');
+      adminNavArea.innerHTML = `
+        <a href="/admin/" class="admin-btn" style="background:rgba(16,185,129,0.2); border-color:#10b981; color:#6ee7b7;">🛡️ Admin Portal →</a>
+        <button id="staffTopLogout" class="admin-btn" style="cursor:pointer; background:rgba(244,63,94,0.18); border-color:#f43f5e; color:#fda4af;">Logout</button>
+      `;
+      document.getElementById('staffTopLogout').addEventListener('click', () => logoutAdmin('/'));
+    }
+
+    // Live Malaysia Clock
+    function updatePortalClock() {
+      const now = new Date();
+      document.getElementById('portalClock').textContent = now.toLocaleTimeString('en-MY', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      document.getElementById('portalDate').textContent = now.toLocaleDateString('en-MY', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+    setInterval(updatePortalClock, 1000);
+    updatePortalClock();
+
+    // Search Filter
+    const searchInput = document.getElementById('serviceSearch');
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      document.querySelectorAll('.service-card').forEach(card => {
+        const text = (card.innerText + ' ' + (card.dataset.keywords || '')).toLowerCase();
+        card.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    });
+
+    // Sync status indicator
+    subscribeSyncStatus(({ mode }) => {
+      const textEl = document.getElementById('syncStatusText');
+      if (mode === 'firebase') {
+        textEl.textContent = 'Firebase Cloud Live';
+      } else if (mode === 'cloud-api') {
+        textEl.textContent = 'Vercel Cloud Sync';
+      } else {
+        textEl.textContent = 'Local Realtime Sync';
+      }
+    });
+
+    // Populate live widgets from unified state
+    subscribeState((state) => {
+      if (!state) return;
+
+      if (state.config?.visionText) {
+        document.getElementById('heroVisionText').textContent = state.config.visionText;
+      }
+
+      // 1. Departments readiness
+      const depts = state.departments || {};
+      const deptNames = Object.keys(depts);
+      const updatedDepts = deptNames.filter(d => {
+        const u = (depts[d]?.update || '').trim();
+        return u && u.toLowerCase() !== 'pending update...';
+      });
+
+      const pct = deptNames.length ? Math.round((updatedDepts.length / deptNames.length) * 100) : 0;
+      document.getElementById('statDeptsReady').textContent = `${updatedDepts.length} / ${deptNames.length}`;
+      document.getElementById('deptProgressLabel').textContent = `${updatedDepts.length} of ${deptNames.length} departments submitted updates`;
+      document.getElementById('deptProgressPct').textContent = `${pct}%`;
+      document.getElementById('deptProgressBar').style.width = `${pct}%`;
+
+      const deptStatusList = document.getElementById('deptStatusList');
+      const sortedDepts = [...deptNames].sort((a, b) => {
+        const aReady = updatedDepts.includes(a) ? 0 : 1;
+        const bReady = updatedDepts.includes(b) ? 0 : 1;
+        return aReady - bReady;
+      });
+
+      deptStatusList.innerHTML = sortedDepts.map(d => {
+        const isReady = updatedDepts.includes(d);
+        const snippet = (depts[d]?.update || 'Pending update...').split('\n')[0];
+        return `
+          <div class="mini-item">
+            <div style="min-width: 0;">
+              <div class="mini-item-title">${d}</div>
+              <div class="mini-item-sub" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px;">${snippet}</div>
+            </div>
+            <span class="badge ${isReady ? 'badge-green' : 'badge-amber'}">${isReady ? 'Submitted' : 'Pending'}</span>
+          </div>
+        `;
+      }).join('');
+
+      // 2. HQ Meeting Rooms & Today's Schedule
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const bookings = (state.bookings || []).filter(b => b.date === todayStr);
+      document.getElementById('statRoomsToday').textContent = String(bookings.length);
+
+      const rooms = state.rooms || [];
+      const roomWidgetList = document.getElementById('roomWidgetList');
+      roomWidgetList.innerHTML = rooms.map(room => {
+        const roomBookings = bookings
+          .filter(b => b.roomId === room.id)
+          .sort((a, b) => a.startTime.localeCompare(b.startTime));
+        const nextBooking = roomBookings[0];
+        return `
+          <div class="mini-item">
+            <div>
+              <div class="mini-item-title">${room.name} <span style="font-weight:400; color:var(--cc-muted); font-size:0.78rem;">(${room.capacity} pax)</span></div>
+              <div class="mini-item-sub">
+                ${nextBooking ? `Today: ${roomBookings.map(b => `${b.startTime}–${b.endTime} ${b.title} (${b.department})`).join(' | ')}` : 'Available all day today'}
+              </div>
+            </div>
+            <span class="badge ${nextBooking ? 'badge-blue' : 'badge-green'}">${roomBookings.length ? `${roomBookings.length} Booked` : 'Available'}</span>
+          </div>
+        `;
+      }).join('');
+    });
+  </script>
+</body>
+</html>

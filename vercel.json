@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/api/data", "destination": "/api/data.js" },
+    { "source": "/api/auth", "destination": "/api/auth.js" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/admin/", "destination": "/admin/index.html" },
+    { "source": "/meeting", "destination": "/meeting/index.html" },
+    { "source": "/meeting/", "destination": "/meeting/index.html" },
+    { "source": "/input.html", "destination": "/meeting/input.html" },
+    { "source": "/admin.html", "destination": "/meeting/admin.html" },
+    { "source": "/booking", "destination": "/booking/index.html" },
+    { "source": "/booking/", "destination": "/booking/index.html" },
+    { "source": "/display", "destination": "/display/index.html" },
+    { "source": "/display/", "destination": "/display/index.html" },
+    { "source": "/pdf", "destination": "/pdf/index.html" },
+    { "source": "/pdf/", "destination": "/pdf/index.html" },
+    { "source": "/pdf-editor", "destination": "/pdf/index.html" }
+  ]
+}

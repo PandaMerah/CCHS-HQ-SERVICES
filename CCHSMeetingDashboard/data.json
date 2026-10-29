@@ -1,0 +1,120 @@
+{
+  "config": {
+    "showQnA": false,
+    "showDailyPhrases": true,
+    "showVisionMission": true,
+    "showLastMinuteSpeech": true,
+    "visionText": "Empower patients with the freedom to access quality healthcare services through digital integration anytime, anywhere.",
+    "missionText": "Deliver quality personalised care by merging of best medical practises with modern technology. ",
+    "phrases": [
+      "Humanising Care."
+    ],
+    "lastMinuteSpeechText": "Good afternoon, everyone. Thank you for being here today.As we look back at where we started this year, I want to begin with a simple thank you. We faced real shifts and unexpected hurdles. Because of your hard work, your creativity, and your care for one another, we did not just get through it—we adapted and grew. Every milestone we reached belongs to this team."
+  },
+  "departments": {
+    "IT": {
+      "update": "- This month will start to do inventory asset update for all HQ staff (laptop, monitor)\n- ⁠and the same time we will do IT audit for each laptop user..",
+      "question": "What will be going for this month activity for IT department"
+    },
+    "CEO OFFICE": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "ADMIN": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "BUSINESS LEGAL": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "PMI TEAM": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "BUSINESS DEVELOPMENT": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "CORPORATE HEALTH": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "FINANCE": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "ACCOUNT": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "PROCUREMENT": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "TALENT DEVELOPMENT": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "CLINICAL GOVERNANCE": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "OPERATION": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "HR": {
+      "update": "Pending update...",
+      "question": "N/A"
+    },
+    "TPP SYSTMONE": {
+      "update": "Pending update...",
+      "question": "N/A"
+    }
+  },
+  "history": [
+    {
+      "timestamp": 1786411858134,
+      "dateString": "11/08/2026, 1:30:58 am",
+      "department": "IT",
+      "update": "- Abu test",
+      "question": "Test Abu"
+    },
+    {
+      "timestamp": 1786352693447,
+      "dateString": "10/08/2026, 9:04:53 am",
+      "department": "IT",
+      "update": "- This month will start to do inventory asset update for all HQ staff (laptop, monitor)\n- ⁠and the same time we will do IT audit for each laptop user..",
+      "question": "What will be going for this month activity for IT department"
+    },
+    {
+      "timestamp": 1786347064704,
+      "dateString": "10/08/2026, 3:31:04 pm",
+      "department": "IT",
+      "update": "- This month will start to do inventory asset update for all HQ staff (laptop, monitor)\n- ⁠and the same time we will do IT audit for each laptop user..",
+      "question": "What will be going for this month activity for IT department"
+    },
+    {
+      "timestamp": 1786346705193,
+      "dateString": "10/08/2026, 3:25:05 pm",
+      "department": "IT",
+      "update": "- This month will start to do inventory asset update for all HQ staff (laptop, monitor)\n- ⁠and the same time we will do IT audit for each laptop user..",
+      "question": "What will be going for this month activity for IT department"
+    },
+    {
+      "timestamp": 1786346690858,
+      "dateString": "10/08/2026, 3:24:50 pm",
+      "department": "IT",
+      "update": "- This month will start to do inventory asset update ",
+      "question": "What will be going for this month activity for IT department"
+    },
+    {
+      "timestamp": 1786346613247,
+      "dateString": "10/08/2026, 3:23:33 pm",
+      "department": "IT",
+      "update": "- This month will start to do inventory asset update for all HQ staff (laptop, monitor)\n- ⁠and the same time we will do IT audit for each laptop user..",
+      "question": "What will be going for this month activity for IT department"
+    }
+  ]
+}

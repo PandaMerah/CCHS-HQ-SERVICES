@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Careclinics HQ — Remote Display & Signage Service</title>
+  <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cc-navy: #0c1936;
+      --cc-card: #13254c;
+      --cc-blue: #1863dc;
+      --cc-sky: #8ed1fc;
+      --cc-green: #10b981;
+      --cc-amber: #f59e0b;
+      --cc-red: #ef4444;
+      --cc-border: rgba(255, 255, 255, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #081226;
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+
+    /* Controller Layout */
+    .topbar {
+      background: rgba(12, 25, 54, 0.9);
+      border-bottom: 1px solid var(--cc-border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .brand-left img {
+      height: 40px;
+      background: rgba(255,255,255,0.06);
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      text-decoration: none;
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--cc-border);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover, .nav-btn.primary {
+      background: var(--cc-blue);
+      border-color: var(--cc-sky);
+      color: #ffffff;
+    }
+
+    .controller-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 28px 60px;
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 26px;
+      align-items: start;
+    }
+
+    @media (max-width: 1080px) {
+      .controller-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--cc-card);
+      border: 1px solid var(--cc-border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .card-sub {
+      font-size: 0.84rem;
+      color: #94a3b8;
+      margin-bottom: 18px;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .mode-btn {
+      background: rgba(12, 25, 54, 0.7);
+      border: 2px solid var(--cc-border);
+      border-radius: 14px;
+      padding: 16px 14px;
+      color: #e2e8f0;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-btn:hover {
+      border-color: rgba(142, 209, 252, 0.5);
+    }
+
+    .mode-btn.active {
+      background: rgba(24, 99, 220, 0.28);
+      border-color: var(--cc-sky);
+      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.25);
+    }
+
+    .mode-icon {
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+    }
+
+    .mode-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .mode-desc {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--cc-sky);
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--cc-border);
+      background: rgba(12, 25, 54, 0.8);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    .btn-broadcast {
+      width: 100%;
+      background: var(--cc-blue);
+      color: #ffffff;
+      border: none;
+      padding: 13px 18px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-broadcast:hover {
+      background: #2563eb;
+    }
+
+    /* Live Monitor Frame */
+    .monitor-frame {
+      background: #040914;
+      border: 3px solid #334155;
+      border-radius: 20px;
+      overflow: hidden;
+      height: 560px;
+      position: relative;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Receiver Fullscreen View */
+    body.receiver-mode #controllerRoot {
+      display: none !important;
+    }
+
+    body:not(.receiver-mode) #receiverRoot {
+      display: none !important;
+    }
+
+    #receiverRoot {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .receiver-Screen {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 56px;
+    }
+
+    .receiver-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      display: flex;
+      gap: 8px;
+      opacity: 0.25;
+      transition: opacity 0.2s;
+    }
+
+    .receiver-controls:hover {
+      opacity: 1;
+    }
+
+    .receiver-controls button, .receiver-controls a {
+      background: rgba(15, 23, 42, 0.85);
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- CONTROLLER UI -->
+  <div id="controllerRoot">
+    <header class="topbar">
+      <a href="/" class="brand-left">
+        <img src="/careclinic-logo.webp" alt="Logo" onerror="this.src='/images/acme-logo.svg'" />
+        <div>
+          <div style="font-weight: 800; font-size: 1.1rem;">Careclinics Remote Display Controller</div>
+          <div style="font-size: 0.78rem; color: #94a3b8;">Broadcast live content to HQ TVs, Lobby Screens & Room Door Tablets</div>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="/admin/" class="nav-btn">🛡️ Admin Portal</a>
+        <a href="/" class="nav-btn">Staff View</a>
+        <a href="/booking/" class="nav-btn">📅 Room Booking</a>
+        <a href="/meeting/" class="nav-btn">📺 Meeting Deck</a>
+        <a href="/display/?mode=receiver" target="_blank" class="nav-btn primary">⛶ Launch Fullscreen Receiver ↗</a>
+      </div>
+    </header>
+
+    <main class="controller-container">
+      <!-- Left Column: Mode Selection & Content Editor -->
+      <div>
+        <div class="card">
+          <div class="card-title">1. Select Active Broadcast Channel</div>
+          <div class="card-sub">All HQ screens set to "Follow Master" switch immediately</div>
+
+          <div class="mode-grid">
+            <button type="button" class="mode-btn" data-mode="meeting-tv" onclick="selectMode('meeting-tv')">
+              <div class="mode-icon">📊</div>
+              <div class="mode-name">Meeting TV Deck</div>
+              <div class="mode-desc">Weekly Alignment Slides & Q&A Reel</div>
+            </button>
+
+            <button type="button" class="mode-btn" data-mode="room-signage" onclick="selectMode('room-signage')">
+              <div class="mode-icon">🚪</div>
+              <div class="mode-name">Room Door Signage</div>
+              <div class="mode-desc">Live Room Availability & Schedule</div>
+            </button>
+
+            <button type="button" class="mode-btn" data-mode="announcement" onclick="selectMode('announcement')">
+              <div class="mode-icon">📢</div>
+              <div class="mode-name">HQ Notice Poster</div>
+              <div class="mode-desc">Fullscreen Announcement Banner</div>
+            </button>
+
+            <button type="button" class="mode-btn" data-mode="welcome-board" onclick="selectMode('welcome-board')">
+              <div class="mode-icon">🤝</div>
+              <div class="mode-name">VIP Welcome Board</div>
+              <div class="mode-desc">Lobby Visitor & Event Greeting</div>
+            </button>
+          </div>
+
+          <div id="statusToast" style="display:none; padding:10px 14px; border-radius:10px; background:rgba(16,185,129,0.2); border:1px solid #10b981; color:#6ee7b7; font-size:0.85rem; font-weight:600; margin-bottom:14px;"></div>
+
+          <!-- Dynamic Sub-Settings -->
+          <div id="editorRoomSignage" style="display: none;">
+            <div class="form-group">
+              <label>Target Room for Door Display</label>
+              <select id="targetRoomSelect"></select>
+            </div>
+          </div>
+
+          <div id="editorAnnouncement" style="display: none;">
+            <div class="form-group">
+              <label>Badge Label</label>
+              <input type="text" id="annBadge" placeholder="HQ NOTICE" />
+            </div>
+            <div class="form-group">
+              <label>Announcement Headline</label>
+              <input type="text" id="annTitle" placeholder="Headline..." />
+            </div>
+            <div class="form-group">
+              <label>Message Body</label>
+              <textarea id="annMessage" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Footer / Issuing Department</label>
+              <input type="text" id="annFooter" />
+            </div>
+          </div>
+
+          <div id="editorWelcome" style="display: none;">
+            <div class="form-group">
+              <label>Welcome Headline</label>
+              <input type="text" id="welHeadline" />
+            </div>
+            <div class="form-group">
+              <label>Subtitle / Tagline</label>
+              <input type="text" id="welSubheadline" />
+            </div>
+            <div class="form-group">
+              <label>Today's Highlighted Events / Guests (One per line)</label>
+              <textarea id="welGuests" rows="3"></textarea>
+            </div>
+          </div>
+
+          <button type="button" class="btn-broadcast" onclick="pushBroadcastSettings()">
+            📡 Save & Broadcast to All HQ Screens
+          </button>
+        </div>
+
+        <!-- Registered Screens List -->
+        <div class="card">
+          <div class="card-title">Connected HQ Display Endpoints</div>
+          <div class="card-sub">Open receiver URL on any smart TV or tablet</div>
+          <div id="screensList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+      </div>
+
+      <!-- Right Column: Live 16:9 Screen Monitor Preview -->
+      <div>
+        <div class="card" style="padding: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div>
+              <div class="card-title" style="margin-bottom: 2px;">Live Broadcast Monitor</div>
+              <div style="font-size: 0.8rem; color: #94a3b8;">Real-time mirror of active HQ display feed</div>
+            </div>
+            <a href="/display/?mode=receiver" target="_blank" class="nav-btn primary">Open Fullscreen TV View ↗</a>
+          </div>
+
+          <div class="monitor-frame" id="previewMonitor"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- RECEIVER FULLSCREEN UI -->
+  <div id="receiverRoot">
+    <div id="receiverViewport" style="width: 100%; height: 100%;"></div>
+    <div class="receiver-controls">
+      <a href="/display/">⚙ Controller</a>
+      <a href="/">⌂ HQ Portal</a>
+      <button onclick="document.documentElement.requestFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { subscribeState, updateRemoteDisplay } from '/shared/cloud-store.js';
+    import { requireAdminAuth } from '/shared/auth.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const isReceiver = params.get('mode') === 'receiver';
+    const forcedView = params.get('view'); // optional override e.g. ?mode=receiver&view=room-signage
+
+    if (isReceiver) {
+      document.body.classList.add('receiver-mode');
+    } else if (!requireAdminAuth()) {
+      throw new Error('Redirecting to Admin Login');
+    }
+
+    let currentState = null;
+    let selectedMode = 'meeting-tv';
+    let formInitialized = false;
+
+    subscribeState((state) => {
+      if (!state) return;
+      currentState = state;
+      const rd = state.remoteDisplay || {};
+
+      if (!formInitialized) {
+        selectedMode = rd.activeMode || 'meeting-tv';
+        populateEditorFields(state);
+        formInitialized = true;
+      }
+
+      updateModeButtons();
+      renderScreensList(state);
+      renderDisplaySurface(
+        isReceiver ? document.getElementById('receiverViewport') : document.getElementById('previewMonitor'),
+        forcedView || (isReceiver ? rd.activeMode : selectedMode),
+        state
+      );
+    });
+
+    function populateEditorFields(state) {
+      const rd = state.remoteDisplay || {};
+      const rooms = state.rooms || [];
+      const roomSel = document.getElementById('targetRoomSelect');
+      roomSel.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+      if (rd.targetRoomId) roomSel.value = rd.targetRoomId;
+
+      document.getElementById('annBadge').value = rd.announcement?.badge || 'HQ NOTICE';
+      document.getElementById('annTitle').value = rd.announcement?.title || '';
+      document.getElementById('annMessage').value = rd.announcement?.message || '';
+      document.getElementById('annFooter').value = rd.announcement?.footer || '';
+
+      document.getElementById('welHeadline').value = rd.welcomeBoard?.headline || '';
+      document.getElementById('welSubheadline').value = rd.welcomeBoard?.subheadline || '';
+      document.getElementById('welGuests').value = (rd.welcomeBoard?.guestList || []).join('\n');
+    }
+
+    function updateModeButtons() {
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === selectedMode);
+      });
+      document.getElementById('editorRoomSignage').style.display = selectedMode === 'room-signage' ? 'block' : 'none';
+      document.getElementById('editorAnnouncement').style.display = selectedMode === 'announcement' ? 'block' : 'none';
+      document.getElementById('editorWelcome').style.display = selectedMode === 'welcome-board' ? 'block' : 'none';
+    }
+
+    window.selectMode = (mode) => {
+      selectedMode = mode;
+      updateModeButtons();
+      if (currentState) {
+        renderDisplaySurface(document.getElementById('previewMonitor'), selectedMode, currentState);
+      }
+    };
+
+    window.pushBroadcastSettings = async () => {
+      const patch = {
+        activeMode: selectedMode,
+        targetRoomId: document.getElementById('targetRoomSelect').value,
+        announcement: {
+          badge: document.getElementById('annBadge').value.trim() || 'HQ NOTICE',
+          title: document.getElementById('annTitle').value.trim(),
+          message: document.getElementById('annMessage').value.trim(),
+          footer: document.getElementById('annFooter').value.trim()
+        },
+        welcomeBoard: {
+          headline: document.getElementById('welHeadline').value.trim(),
+          subheadline: document.getElementById('welSubheadline').value.trim(),
+          guestList: document.getElementById('welGuests').value.split('\n').map(s => s.trim()).filter(Boolean)
+        }
+      };
+
+      await updateRemoteDisplay(patch);
+      const toast = document.getElementById('statusToast');
+      toast.textContent = '✓ Live broadcast updated across all HQ screens!';
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    };
+
+    function renderScreensList(state) {
+      const list = document.getElementById('screensList');
+      if (!list) return;
+      const screens = state.remoteDisplay?.screens || [];
+      list.innerHTML = screens.map(s => `
+        <div style="background: rgba(12,25,54,0.65); border: 1px solid var(--cc-border); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">📺 ${s.name}</div>
+            <div style="font-size: 0.76rem; color: #94a3b8;">${s.location}</div>
+          </div>
+          <a href="/display/?mode=receiver${s.assignedMode === 'room-signage' ? '&view=room-signage' : ''}" target="_blank" style="font-size: 0.76rem; color: var(--cc-sky); text-decoration: none; font-weight: 600;">Launch ↗</a>
+        </div>
+      `).join('');
+    }
+
+    function renderDisplaySurface(targetEl, mode, state) {
+      if (!targetEl) return;
+      const rd = state.remoteDisplay || {};
+      const nowStr = new Date().toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' });
+      const dateStr = new Date().toLocaleDateString('en-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+      if (mode === 'meeting-tv') {
+        targetEl.innerHTML = `<iframe src="/meeting/index.html" style="width:100%; height:100%; border:none;"></iframe>`;
+        return;
+      }
+
+      if (mode === 'room-signage') {
+        const roomId = rd.targetRoomId || 'boardroom-main';
+        const room = (state.rooms || []).find(r => r.id === roomId) || (state.rooms || [])[0] || { name: 'HQ Boardroom', floor: 'Level 1', capacity: 20 };
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const hhmm = new Date().toTimeString().slice(0, 5);
+        const roomBookings = (state.bookings || [])
+          .filter(b => b.roomId === room.id && b.date === todayStr)
+          .sort((a, b) => a.startTime.localeCompare(b.startTime));
+        const activeBooking = roomBookings.find(b => b.startTime <= hhmm && b.endTime > hhmm);
+
+        targetEl.innerHTML = `
+          <div class="receiver-Screen" style="background: ${activeBooking ? 'linear-gradient(135deg, #450a0a, #7f1d1d)' : 'linear-gradient(135deg, #064e3b, #0f172a)'};">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <img src="/careclinic-logo.webp" style="height:48px; background:rgba(0,0,0,0.3); padding:6px 12px; border-radius:10px;" onerror="this.src='/images/acme-logo.svg'"/>
+                <div>
+                  <div style="font-size:1.3rem; font-weight:800;">${room.name}</div>
+                  <div style="font-size:0.9rem; opacity:0.8;">${room.floor} • Capacity ${room.capacity} pax</div>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:2rem; font-weight:900;">${nowStr}</div>
+                <div style="font-size:0.85rem; opacity:0.8;">${dateStr}</div>
+              </div>
+            </div>
+
+            <div style="margin: auto 0;">
+              <div style="display:inline-block; padding:8px 20px; border-radius:999px; font-weight:900; letter-spacing:0.08em; background:${activeBooking ? '#ef4444' : '#10b981'}; color:#fff; font-size:1rem; margin-bottom:16px;">
+                ${activeBooking ? '● ROOM IN SESSION' : '● AVAILABLE FOR USE'}
+              </div>
+              <h1 style="font-size:2.8rem; font-weight:900; line-height:1.15; margin-bottom:10px;">
+                ${activeBooking ? activeBooking.title : 'Room is Currently Free'}
+              </h1>
+              <p style="font-size:1.25rem; opacity:0.9;">
+                ${activeBooking ? `${activeBooking.startTime} – ${activeBooking.endTime} • ${activeBooking.department} (${activeBooking.organizer})` : 'Scan or open /booking to reserve this space.'}
+              </p>
+            </div>
+
+            <div style="background:rgba(0,0,0,0.28); border-radius:14px; padding:18px 22px;">
+              <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; opacity:0.75; margin-bottom:8px;">Today's Schedule (${roomBookings.length})</div>
+              <div style="display:flex; gap:14px; overflow-x:auto;">
+                ${roomBookings.length ? roomBookings.map(b => `
+                  <div style="background:rgba(255,255,255,0.1); padding:10px 14px; border-radius:10px; min-width:210px;">
+                    <div style="font-weight:800; font-size:0.9rem;">${b.startTime} – ${b.endTime}</div>
+                    <div style="font-weight:600; font-size:0.85rem; margin-top:2px;">${b.title}</div>
+                    <div style="font-size:0.75rem; opacity:0.75;">${b.department}</div>
+                  </div>
+                `).join('') : '<div style="font-size:0.9rem; opacity:0.8;">No further bookings scheduled for today.</div>'}
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (mode === 'announcement') {
+        const ann = rd.announcement || {};
+        targetEl.innerHTML = `
+          <div class="receiver-Screen" style="background: radial-gradient(circle at top right, #1e3a8a, #091328);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <img src="/careclinic-logo.webp" style="height:52px;" onerror="this.src='/images/acme-logo.svg'"/>
+              <div style="text-align:right;">
+                <div style="font-size:1.8rem; font-weight:800;">${nowStr}</div>
+                <div style="font-size:0.9rem; color:#8ed1fc;">${dateStr}</div>
+              </div>
+            </div>
+            <div style="max-width:900px; margin:auto 0;">
+              <span style="display:inline-block; background:#f59e0b; color:#0f172a; font-weight:900; padding:6px 18px; border-radius:999px; font-size:0.95rem; letter-spacing:0.08em; margin-bottom:20px;">
+                ${ann.badge || 'HQ NOTICE'}
+              </span>
+              <h1 style="font-size:3.2rem; font-weight:900; line-height:1.15; margin-bottom:20px;">
+                ${ann.title || 'Careclinics HQ Announcement'}
+              </h1>
+              <p style="font-size:1.5rem; line-height:1.55; color:#e2e8f0;">
+                ${ann.message || ''}
+              </p>
+            </div>
+            <div style="border-top:1px solid rgba(255,255,255,0.15); padding-top:18px; font-size:1rem; color:#8ed1fc; font-weight:600;">
+              ${ann.footer || 'Careclinics Healthcare Services HQ'}
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Welcome Board mode
+      const wel = rd.welcomeBoard || {};
+      targetEl.innerHTML = `
+        <div class="receiver-Screen" style="background: linear-gradient(135deg, #0c1936 0%, #1863dc 100%);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <img src="/careclinic-logo.webp" style="height:56px;" onerror="this.src='/images/acme-logo.svg'"/>
+            <div style="text-align:right;">
+              <div style="font-size:2rem; font-weight:800;">${nowStr}</div>
+              <div style="font-size:0.95rem; opacity:0.85;">${dateStr}</div>
+            </div>
+          </div>
+          <div style="margin:auto 0;">
+            <div style="font-size:0.95rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:#8ed1fc; margin-bottom:12px;">
+              SALAM CARECLINICS • WELCOME TO HQ
+            </div>
+            <h1 style="font-size:3.1rem; font-weight:900; line-height:1.15; margin-bottom:12px;">
+              ${wel.headline || 'Welcome to Careclinics Healthcare Services HQ'}
+            </h1>
+            <p style="font-size:1.35rem; color:#dbeafe; margin-bottom:28px;">
+              ${wel.subheadline || 'Humanising Care — Merging Best Medical Practices with Modern Technology'}
+            </p>
+            <div style="background:rgba(12, 25, 54, 0.55); border:1px solid rgba(255,255,255,0.2); border-radius:16px; padding:22px;">
+              <div style="font-size:0.85rem; font-weight:700; text-transform:uppercase; color:#8ed1fc; margin-bottom:12px;">Today's HQ Highlights & Sessions</div>
+              ${(wel.guestList || []).map(g => `<div style="font-size:1.15rem; font-weight:600; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08);">• ${g}</div>`).join('')}
+            </div>
+          </div>
+          <div style="font-size:0.9rem; opacity:0.8;">© 2026 Careclinics Healthcare Services • Humanising Care</div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

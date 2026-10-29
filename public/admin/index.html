@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Command Portal — Careclinics HQ Services</title>
+  <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cc-navy: #0c1936;
+      --cc-card: #13254c;
+      --cc-blue: #1863dc;
+      --cc-sky: #8ed1fc;
+      --cc-emerald: #10b981;
+      --cc-amber: #f59e0b;
+      --cc-rose: #f43f5e;
+      --cc-text: #f8fafc;
+      --cc-muted: #94a3b8;
+      --cc-border: rgba(255, 255, 255, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 15% 10%, #1a3668 0%, #091328 55%, #050b16 100%);
+      color: var(--cc-text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: rgba(12, 25, 54, 0.9);
+      border-bottom: 1px solid var(--cc-border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo {
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      padding: 4px 8px;
+    }
+
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-pill {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.22);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fbbf24;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-top {
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--cc-border);
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-top:hover {
+      background: var(--cc-blue);
+      color: #ffffff;
+    }
+
+    .btn-logout {
+      background: rgba(244, 63, 94, 0.2);
+      border-color: rgba(244, 63, 94, 0.4);
+      color: #fda4af;
+    }
+
+    .btn-logout:hover {
+      background: #e11d48;
+      color: #ffffff;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 32px 64px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 24px 0 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cc-sky);
+    }
+
+    /* All 6 Services Grid for Admin */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .service-card {
+      background: rgba(19, 37, 76, 0.78);
+      border: 1px solid var(--cc-border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: all 0.2s;
+    }
+
+    .service-card:hover {
+      border-color: var(--cc-sky);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .service-top {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .service-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.45rem;
+      flex-shrink: 0;
+    }
+
+    .service-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .service-desc {
+      font-size: 0.83rem;
+      color: var(--cc-muted);
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .chip-btn {
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--cc-blue);
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .chip-btn.secondary {
+      background: rgba(255,255,255,0.1);
+      color: #e2e8f0;
+    }
+
+    .chip-btn:hover {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    /* Admin Room Booking Control Table / Cards */
+    .admin-panel {
+      background: rgba(19, 37, 76, 0.78);
+      border: 1px solid var(--cc-border);
+      border-radius: 20px;
+      padding: 26px;
+      margin-bottom: 28px;
+    }
+
+    .panel-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--cc-border);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input, select, textarea {
+      background: rgba(12, 25, 54, 0.85);
+      border: 1px solid var(--cc-border);
+      color: #ffffff;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.88rem;
+    }
+
+    .booking-admin-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .booking-row {
+      background: rgba(12, 25, 54, 0.7);
+      border: 1px solid var(--cc-border);
+      border-left: 5px solid var(--cc-blue);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .booking-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-edit {
+      background: rgba(24, 99, 220, 0.28);
+      border: 1px solid var(--cc-sky);
+      color: var(--cc-sky);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-edit:hover {
+      background: var(--cc-blue);
+      color: #ffffff;
+    }
+
+    .btn-del {
+      background: rgba(244, 63, 94, 0.2);
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      color: #fda4af;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-del:hover {
+      background: #e11d48;
+      color: #ffffff;
+    }
+
+    /* Edit Booking Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 20, 0.8);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #13254c;
+      border: 1px solid var(--cc-sky);
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-field {
+      margin-bottom: 14px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--cc-sky);
+      margin-bottom: 5px;
+    }
+
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%;
+    }
+
+    .toast-msg {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="/admin/" class="brand-box">
+      <img src="/careclinic-logo.webp" alt="Logo" class="brand-logo" onerror="this.src='/images/acme-logo.svg'" />
+      <div>
+        <div class="brand-title">
+          Careclinics HQ Admin Portal
+          <span class="admin-pill">🛡️ Full Administrator Access</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--cc-muted);">
+          Signed in as <strong id="adminUserLabel" style="color: #fff;">admin</strong> • Full control over TV Broadcasts, Departments & Room Bookings
+        </div>
+      </div>
+    </a>
+
+    <div class="topbar-right">
+      <a href="/" class="btn-top">👁️ View Staff Portal</a>
+      <a href="/meeting/" target="_blank" class="btn-top">📺 Launch Meeting TV ↗</a>
+      <a href="/display/?mode=receiver" target="_blank" class="btn-top">📡 Launch Signage Kiosk ↗</a>
+      <button type="button" class="btn-top btn-logout" id="logoutBtn">Logout Admin</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Section 1: All Admin & Staff Application Launchers -->
+    <div class="section-header" style="margin-top: 0;">
+      <div class="section-title">🛡️ Administrator & HQ Service Launchers (Full Access)</div>
+    </div>
+
+    <section class="services-grid">
+      <!-- 1. Alignment Admin Console -->
+      <div class="service-card">
+        <div class="service-top">
+          <div class="service-icon" style="background: rgba(245, 158, 11, 0.22); color: #fbbf24;">⚙️</div>
+          <div>
+            <div class="service-name">Alignment Admin Console</div>
+            <p class="service-desc">Toggle Q&A/Vision/Phrases slides, reorder departments, edit C-Suite closing speech, or reset meeting updates.</p>
+          </div>
+        </div>
+        <div class="chip-row">
+          <a href="/meeting/admin.html" class="chip-btn">Open Alignment Admin →</a>
+          <a href="/meeting/" target="_blank" class="chip-btn secondary">Open TV Deck ↗</a>
+        </div>
+      </div>
+
+      <!-- 2. Remote Display Controller -->
+      <div class="service-card">
+        <div class="service-top">
+          <div class="service-icon" style="background: rgba(244, 63, 94, 0.22); color: #fb7185;">📡</div>
+          <div>
+            <div class="service-name">Remote Display Service</div>
+            <p class="service-desc">Control HQ Lobby TVs, Boardroom 75" Display, and Room Door Tablets in real time.</p>
+          </div>
+        </div>
+        <div class="chip-row">
+          <a href="/display/" class="chip-btn">Display Controller →</a>
+          <a href="/display/?mode=receiver" target="_blank" class="chip-btn secondary">TV Receiver ↗</a>
+        </div>
+      </div>
+
+      <!-- 3. Meeting TV Dashboard -->
+      <div class="service-card">
+        <div class="service-top">
+          <div class="service-icon" style="background: rgba(24, 99, 220, 0.25); color: #60a5fa;">📺</div>
+          <div>
+            <div class="service-name">Meeting TV Presentation</div>
+            <p class="service-desc">1920×1080 Weekly Alignment TV Slide Deck with Forza Q&A Slot Reel and Department Updates.</p>
+          </div>
+        </div>
+        <div class="chip-row">
+          <a href="/meeting/" class="chip-btn">Launch TV Presentation →</a>
+          <a href="/meeting/input.html" class="chip-btn secondary">Staff Input Form</a>
+        </div>
+      </div>
+
+      <!-- 4. Room Booking Management -->
+      <div class="service-card">
+        <div class="service-top">
+          <div class="service-icon" style="background: rgba(139, 92, 246, 0.25); color: #c084fc;">📅</div>
+          <div>
+            <div class="service-name">Room Booking System (Admin Mode)</div>
+            <p class="service-desc">Create new bookings or modify and delete existing & upcoming room reservations across 5 HQ spaces.</p>
+          </div>
+        </div>
+        <div class="chip-row">
+          <a href="#bookingControlSection" class="chip-btn">Manage Bookings Below ↓</a>
+          <a href="/booking/" class="chip-btn secondary">Open Booking Page →</a>
+        </div>
+      </div>
+
+      <!-- 5. Department Update Portal -->
+      <div class="service-card">
+        <div class="service-top">
+          <div class="service-icon" style="background: rgba(16, 185, 129, 0.22); color: #34d399;">📝</div>
+          <div>
+            <div class="service-name">Department Update Portal</div>
+            <p class="service-desc">Submit or edit department weekly updates and Q&A questions with live slide preview.</p>
+          </div>
+        </div>
+        <div class="chip-row">
+          <a href="/meeting/input.html" class="chip-btn">Open Input Portal →</a>
+        </div>
+      </div>
+
+      <!-- 6. BentoPDF Studio -->
+      <div class="service-card">
+        <div class="service-top">
+          <div class="service-icon" style="background: rgba(14, 165, 233, 0.22); color: #38bdf8;">📄</div>
+          <div>
+            <div class="service-name">BentoPDF Studio</div>
+            <p class="service-desc">100% browser-based private PDF toolkit: Merge, Split, Organize, Sign & Stamp, Watermark, Convert.</p>
+          </div>
+        </div>
+        <div class="chip-row">
+          <a href="/pdf/" class="chip-btn">Open PDF Studio →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Admin Room Booking Control Center (Update & Delete Existing/Upcoming Bookings) -->
+    <div class="section-header" id="bookingControlSection">
+      <div class="section-title">📅 Admin Room Booking Control — Update & Delete Existing / Upcoming Reservations</div>
+      <a href="/booking/" class="btn-top">+ Create New Room Booking</a>
+    </div>
+
+    <section class="admin-panel">
+      <div id="adminBookingToast" class="toast-msg"></div>
+
+      <div class="panel-toolbar">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 800;">All Existing & Upcoming Room Bookings</h3>
+          <p style="font-size: 0.84rem; color: var(--cc-muted);">As an administrator, you can modify times, reassign rooms, edit details, or delete any reservation.</p>
+        </div>
+        <div class="filter-group">
+          <select id="adminRoomFilter">
+            <option value="ALL">All HQ Rooms</option>
+          </select>
+          <select id="adminScopeFilter">
+            <option value="ALL">All Existing & Upcoming</option>
+            <option value="UPCOMING">Today & Upcoming Only</option>
+            <option value="TODAY">Today Only</option>
+          </select>
+          <input type="text" id="adminSearchBooking" placeholder="Search title, dept, person..." />
+        </div>
+      </div>
+
+      <div id="adminBookingList" class="booking-admin-list"></div>
+    </section>
+
+    <!-- Section 3: Admin Security & Credentials Management -->
+    <div class="section-header">
+      <div class="section-title">🔐 Admin Login Credentials Settings</div>
+    </div>
+
+    <section class="admin-panel" style="max-width: 680px;">
+      <div id="credToast" class="toast-msg"></div>
+      <form id="credForm">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>New Admin Username</label>
+            <input type="text" id="newAdminUser" value="admin" required />
+          </div>
+          <div class="form-field">
+            <label>Current Password *</label>
+            <input type="password" id="curAdminPass" placeholder="Enter current password" required />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>New Admin Password *</label>
+          <input type="password" id="newAdminPass" placeholder="Enter new password" required />
+        </div>
+        <button type="submit" class="chip-btn" style="padding: 10px 18px; font-size: 0.88rem;">Update Admin Credentials</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Edit Booking Modal -->
+  <div class="modal-backdrop" id="editBookingModal">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <h3 style="font-size:1.2rem; font-weight:800;">✎ Edit Room Reservation</h3>
+        <button type="button" onclick="closeEditModal()" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer;">&times;</button>
+      </div>
+
+      <div id="modalError" class="toast-msg" style="background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#fca5a5;"></div>
+
+      <form id="editBookingForm">
+        <input type="hidden" id="editBookingId" />
+        <div class="form-field">
+          <label>HQ Room</label>
+          <select id="editRoomId" required></select>
+        </div>
+        <div class="form-field">
+          <label>Meeting Title</label>
+          <input type="text" id="editTitle" required />
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Department</label>
+            <select id="editDepartment" required></select>
+          </div>
+          <div class="form-field">
+            <label>Booked By</label>
+            <input type="text" id="editOrganizer" required />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Date</label>
+          <input type="date" id="editDate" required />
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Start Time</label>
+            <input type="time" id="editStartTime" required />
+          </div>
+          <div class="form-field">
+            <label>End Time</label>
+            <input type="time" id="editEndTime" required />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Notes</label>
+          <textarea id="editNotes" rows="2"></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+          <button type="button" class="btn-top" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="chip-btn" style="padding:10px 20px; font-size:0.9rem;">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAdminAuth, getAdminSession, logoutAdmin, updateAdminCredentials } from '/shared/auth.js';
+    import { subscribeState, updateRoomBooking, deleteRoomBooking } from '/shared/cloud-store.js';
+
+    // Guard route immediately
+    if (!requireAdminAuth()) {
+      throw new Error('Redirecting to Admin Login');
+    }
+
+    const session = getAdminSession();
+    if (session?.username) {
+      document.getElementById('adminUserLabel').textContent = session.username;
+      document.getElementById('newAdminUser').value = session.username;
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => logoutAdmin('/'));
+
+    let currentState = null;
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    function showToast(elId, msg, isError = false) {
+      const el = document.getElementById(elId);
+      el.textContent = msg;
+      el.style.display = 'block';
+      el.style.background = isError ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)';
+      el.style.border = `1px solid ${isError ? '#ef4444' : '#10b981'}`;
+      el.style.color = isError ? '#fca5a5' : '#6ee7b7';
+      setTimeout(() => { el.style.display = 'none'; }, 4000);
+    }
+
+    subscribeState((state) => {
+      if (!state) return;
+      currentState = state;
+      populateFiltersAndModal(state);
+      renderAdminBookings();
+    });
+
+    function populateFiltersAndModal(state) {
+      const rooms = state.rooms || [];
+      const depts = Object.keys(state.departments || {});
+
+      const roomFilter = document.getElementById('adminRoomFilter');
+      const prevFilter = roomFilter.value || 'ALL';
+      roomFilter.innerHTML = `<option value="ALL">All HQ Rooms (${rooms.length})</option>` +
+        rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+      roomFilter.value = prevFilter;
+
+      const editRoom = document.getElementById('editRoomId');
+      editRoom.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+
+      const editDept = document.getElementById('editDepartment');
+      editDept.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+    }
+
+    function renderAdminBookings() {
+      if (!currentState) return;
+      const rooms = currentState.rooms || [];
+      const roomMap = Object.fromEntries(rooms.map(r => [r.id, r]));
+      const roomFilter = document.getElementById('adminRoomFilter').value;
+      const scopeFilter = document.getElementById('adminScopeFilter').value;
+      const searchQ = document.getElementById('adminSearchBooking').value.trim().toLowerCase();
+
+      let list = [...(currentState.bookings || [])];
+      if (roomFilter !== 'ALL') {
+        list = list.filter(b => b.roomId === roomFilter);
+      }
+      if (scopeFilter === 'TODAY') {
+        list = list.filter(b => b.date === todayStr);
+      } else if (scopeFilter === 'UPCOMING') {
+        list = list.filter(b => b.date >= todayStr);
+      }
+      if (searchQ) {
+        list = list.filter(b =>
+          `${b.title} ${b.department} ${b.organizer} ${b.notes || ''}`.toLowerCase().includes(searchQ)
+        );
+      }
+
+      list.sort((a, b) => {
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return a.startTime.localeCompare(b.startTime);
+      });
+
+      const container = document.getElementById('adminBookingList');
+      if (list.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:32px; color:var(--cc-muted);">No room reservations match the current filter.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(b => {
+        const room = roomMap[b.roomId] || { name: b.roomId, color: '#1863dc' };
+        return `
+          <div class="booking-row" style="border-left-color: ${room.color || '#1863dc'};">
+            <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+              <div style="background:rgba(255,255,255,0.06); padding:10px 14px; border-radius:10px; min-width:130px; text-align:center;">
+                <div style="font-weight:800; font-size:0.95rem; color:#fff;">${b.startTime} – ${b.endTime}</div>
+                <div style="font-size:0.76rem; color:var(--cc-sky);">${b.date}</div>
+              </div>
+              <div>
+                <div style="font-weight:700; font-size:1.02rem; color:#fff;">${b.title}</div>
+                <div style="font-size:0.82rem; color:var(--cc-muted); margin-top:3px;">
+                  📍 <strong style="color:#e2e8f0;">${room.name}</strong> • 🏷️ ${b.department} • 👤 ${b.organizer || 'HQ Staff'}
+                </div>
+                ${b.notes ? `<div style="font-size:0.78rem; color:#94a3b8; margin-top:4px;">💬 ${b.notes}</div>` : ''}
+              </div>
+            </div>
+            <div class="booking-actions">
+              <button type="button" class="btn-edit" onclick="openEditModal('${b.id}')">✎ Edit / Update</button>
+              <button type="button" class="btn-del" onclick="adminDeleteBooking('${b.id}')">🗑 Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('adminRoomFilter').addEventListener('change', renderAdminBookings);
+    document.getElementById('adminScopeFilter').addEventListener('change', renderAdminBookings);
+    document.getElementById('adminSearchBooking').addEventListener('input', renderAdminBookings);
+
+    window.openEditModal = (bookingId) => {
+      const b = (currentState?.bookings || []).find(item => item.id === bookingId);
+      if (!b) return;
+      document.getElementById('modalError').style.display = 'none';
+      document.getElementById('editBookingId').value = b.id;
+      document.getElementById('editRoomId').value = b.roomId;
+      document.getElementById('editTitle').value = b.title || '';
+      document.getElementById('editDepartment').value = b.department || 'IT';
+      document.getElementById('editOrganizer').value = b.organizer || '';
+      document.getElementById('editDate').value = b.date || todayStr;
+      document.getElementById('editStartTime').value = b.startTime || '09:00';
+      document.getElementById('editEndTime').value = b.endTime || '10:00';
+      document.getElementById('editNotes').value = b.notes || '';
+      document.getElementById('editBookingModal').style.display = 'flex';
+    };
+
+    window.closeEditModal = () => {
+      document.getElementById('editBookingModal').style.display = 'none';
+    };
+
+    document.getElementById('editBookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editBookingId').value;
+      const roomId = document.getElementById('editRoomId').value;
+      const title = document.getElementById('editTitle').value.trim();
+      const department = document.getElementById('editDepartment').value;
+      const organizer = document.getElementById('editOrganizer').value.trim();
+      const date = document.getElementById('editDate').value;
+      const startTime = document.getElementById('editStartTime').value;
+      const endTime = document.getElementById('editEndTime').value;
+      const notes = document.getElementById('editNotes').value.trim();
+
+      if (endTime <= startTime) {
+        const errEl = document.getElementById('modalError');
+        errEl.textContent = 'End time must be after start time.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      // Conflict check against other bookings
+      const conflict = (currentState?.bookings || []).find(
+        b => b.id !== id && b.roomId === roomId && b.date === date && startTime < b.endTime && endTime > b.startTime
+      );
+      if (conflict) {
+        const errEl = document.getElementById('modalError');
+        errEl.textContent = `Conflict with "${conflict.title}" (${conflict.startTime}–${conflict.endTime}).`;
+        errEl.style.display = 'block';
+        return;
+      }
+
+      await updateRoomBooking(id, { roomId, title, department, organizer, date, startTime, endTime, notes });
+      window.closeEditModal();
+      showToast('adminBookingToast', '✓ Room booking updated and broadcasted!');
+    });
+
+    window.adminDeleteBooking = async (bookingId) => {
+      if (confirm('Are you sure you want to permanently delete this room reservation?')) {
+        await deleteRoomBooking(bookingId);
+        showToast('adminBookingToast', '✓ Room reservation deleted.');
+      }
+    };
+
+    document.getElementById('credForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const curPass = document.getElementById('curAdminPass').value;
+      const newUser = document.getElementById('newAdminUser').value.trim();
+      const newPass = document.getElementById('newAdminPass').value;
+
+      const res = await updateAdminCredentials(curPass, newUser, newPass);
+      if (res.ok) {
+        document.getElementById('adminUserLabel').textContent = newUser;
+        document.getElementById('curAdminPass').value = '';
+        document.getElementById('newAdminPass').value = '';
+        showToast('credToast', '✓ Admin username and password updated!');
+      } else {
+        showToast('credToast', res.error || 'Failed to update credentials.', true);
+      }
+    });
+  </script>
+</body>
+</html>

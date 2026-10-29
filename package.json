@@ -1,0 +1,15 @@
+{
+  "name": "careclinics-hq-services",
+  "version": "2.0.0",
+  "description": "Unified Careclinics Healthcare Services HQ Portal (Main Navigation, CCHS Meeting Dashboard, Room Booking System, Remote Display Service, and BentoPDF Editor Suite) configured for Vercel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo \"Careclinics HQ Unified Services ready for Vercel deployment\""
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "license": "ISC"
+}

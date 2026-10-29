@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Careclinics HQ — Room Booking System</title>
+  <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cc-navy: #112349;
+      --cc-blue: #1863dc;
+      --cc-sky: #8ed1fc;
+      --cc-bg: #f1f5f9;
+      --cc-card: #ffffff;
+      --cc-text: #0f172a;
+      --cc-muted: #64748b;
+      --cc-border: #e2e8f0;
+      --cc-green: #10b981;
+      --cc-red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--cc-bg);
+      color: var(--cc-text);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--cc-navy);
+      color: #ffffff;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 4px 16px rgba(17, 35, 73, 0.15);
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .brand-left img {
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      padding: 4px 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .nav-btn {
+      text-decoration: none;
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover {
+      background: var(--cc-blue);
+      color: #ffffff;
+    }
+
+    .nav-btn.admin-login {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fbbf24;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+    }
+
+    /* Room Status Cards Row */
+    .rooms-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .room-card {
+      background: var(--cc-card);
+      border: 2px solid var(--cc-border);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .room-card:hover, .room-card.selected {
+      border-color: var(--cc-blue);
+      box-shadow: 0 10px 24px rgba(24, 99, 220, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .room-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .room-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--cc-navy);
+    }
+
+    .room-floor {
+      font-size: 0.78rem;
+      color: var(--cc-muted);
+      margin-top: 2px;
+    }
+
+    .occ-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .occ-free {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .occ-busy {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .amenities-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .amenity-tag {
+      font-size: 0.72rem;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .room-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid var(--cc-border);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--cc-blue);
+    }
+
+    /* Main Workspace Grid */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--cc-card);
+      border: 1px solid var(--cc-border);
+      border-radius: 18px;
+      padding: 26px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .panel-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--cc-navy);
+      margin-bottom: 4px;
+    }
+
+    .panel-sub {
+      font-size: 0.85rem;
+      color: var(--cc-muted);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--cc-navy);
+      margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      background: #ffffff;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--cc-blue);
+      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.15);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--cc-blue);
+      color: #ffffff;
+      border: none;
+      padding: 13px 18px;
+      border-radius: 10px;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 6px;
+    }
+
+    .btn-primary:hover {
+      background: #114fb3;
+    }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .alert.success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .alert.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    /* Schedule Filter Bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--cc-border);
+    }
+
+    .filter-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-controls input, .filter-controls select {
+      width: auto;
+      padding: 8px 12px;
+    }
+
+    .btn-chip {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: var(--cc-navy);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-chip:hover, .btn-chip.active {
+      background: var(--cc-navy);
+      color: #ffffff;
+      border-color: var(--cc-navy);
+    }
+
+    /* Bookings List */
+    .booking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .booking-item {
+      border: 1px solid var(--cc-border);
+      border-left: 5px solid var(--cc-blue);
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: #ffffff;
+      transition: box-shadow 0.2s;
+      flex-wrap: wrap;
+    }
+
+    .booking-item:hover {
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .booking-time-box {
+      min-width: 120px;
+      text-align: center;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1px solid var(--cc-border);
+    }
+
+    .booking-time {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--cc-navy);
+    }
+
+    .booking-date {
+      font-size: 0.75rem;
+      color: var(--cc-muted);
+      margin-top: 2px;
+    }
+
+    .booking-details {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .booking-title {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: var(--cc-text);
+      margin-bottom: 4px;
+    }
+
+    .booking-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: var(--cc-muted);
+      align-items: center;
+    }
+
+    .dept-pill {
+      background: rgba(24, 99, 220, 0.1);
+      color: var(--cc-blue);
+      font-weight: 700;
+      font-size: 0.74rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .btn-edit {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-edit:hover {
+      background: var(--cc-blue);
+      color: #ffffff;
+    }
+
+    .btn-delete {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-delete:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .staff-lock-note {
+      font-size: 0.75rem;
+      color: #64748b;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 5px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .staff-lock-note:hover {
+      border-color: var(--cc-blue);
+      color: var(--cc-blue);
+    }
+
+    .empty-box {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--cc-muted);
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px dashed #cbd5e1;
+    }
+
+    /* Admin Edit Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 28px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 24px 48px rgba(15, 23, 42, 0.25);
+      border: 1px solid var(--cc-border);
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand-left">
+      <img src="/careclinic-logo.webp" alt="Logo" onerror="this.src='/images/acme-logo.svg'" />
+      <div>
+        <div style="font-weight: 800; font-size: 1.1rem;">Careclinics HQ Room Booking System</div>
+        <div style="font-size: 0.78rem; color: #94a3b8;">Boardroom, Discussion Rooms, Townhall & Telehealth Pods</div>
+      </div>
+    </a>
+    <div class="nav-links" id="bookingNavLinks">
+      <a href="/" class="nav-btn">← Staff Portal</a>
+      <a href="/meeting/input.html" class="nav-btn">📝 Dept Update</a>
+      <a href="/pdf/" class="nav-btn">📄 BentoPDF</a>
+      <a href="/login.html?redirect=/booking/" class="nav-btn admin-login" id="adminLoginBtn">🔒 Admin Login</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Top Live Room Cards -->
+    <section class="rooms-row" id="roomsRow"></section>
+
+    <div class="workspace-grid">
+      <!-- Left: Create Reservation Form -->
+      <section class="panel">
+        <div class="panel-title">Reserve a Meeting Space</div>
+        <div class="panel-sub">Instant sync with HQ Schedules</div>
+
+        <div id="bookingAlert" class="alert"></div>
+
+        <form id="bookingForm">
+          <div class="form-group">
+            <label for="roomId">Select HQ Room *</label>
+            <select id="roomId" required></select>
+          </div>
+
+          <div class="form-group">
+            <label for="title">Meeting Title / Purpose *</label>
+            <input type="text" id="title" placeholder="e.g. Monthly Clinical Governance Review" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="department">Department *</label>
+              <select id="department" required></select>
+            </div>
+            <div class="form-group">
+              <label for="organizer">Booked By *</label>
+              <input type="text" id="organizer" placeholder="Your Name" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="date">Date *</label>
+            <input type="date" id="date" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startTime">Start Time *</label>
+              <input type="time" id="startTime" value="10:00" required />
+            </div>
+            <div class="form-group">
+              <label for="endTime">End Time *</label>
+              <input type="time" id="endTime" value="11:00" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="notes">Equipment / Catering / Notes (Optional)</label>
+            <textarea id="notes" rows="2" placeholder="e.g. Require Zoom link on 75&quot; TV"></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary">Confirm Room Reservation</button>
+        </form>
+      </section>
+
+      <!-- Right: Room Schedule & Timeline -->
+      <section class="panel">
+        <div class="filter-bar">
+          <div>
+            <div class="panel-title">HQ Room Schedule</div>
+            <div class="panel-sub" style="margin-bottom: 0;" id="scheduleSubtitle">Showing reservations</div>
+          </div>
+          <div class="filter-controls">
+            <button type="button" class="btn-chip active" id="btnShowToday">Today</button>
+            <button type="button" class="btn-chip" id="btnShowAllDates">All Upcoming</button>
+            <input type="date" id="filterDate" />
+            <select id="filterRoom">
+              <option value="ALL">All HQ Rooms</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="bookingsContainer" class="booking-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Admin Edit Booking Modal -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="color:var(--cc-navy); font-weight:800;">✎ Edit Room Booking (Admin)</h3>
+        <button type="button" onclick="closeEditBooking()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:#64748b;">&times;</button>
+      </div>
+      <div id="editModalAlert" class="alert error"></div>
+      <form id="editBookingForm">
+        <input type="hidden" id="editId" />
+        <div class="form-group">
+          <label>Select HQ Room</label>
+          <select id="editRoomId" required></select>
+        </div>
+        <div class="form-group">
+          <label>Meeting Title</label>
+          <input type="text" id="editTitle" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Department</label>
+            <select id="editDepartment" required></select>
+          </div>
+          <div class="form-group">
+            <label>Booked By</label>
+            <input type="text" id="editOrganizer" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="editDate" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start Time</label>
+            <input type="time" id="editStartTime" required />
+          </div>
+          <div class="form-group">
+            <label>End Time</label>
+            <input type="time" id="editEndTime" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="editNotes" rows="2"></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:12px;">
+          <button type="button" class="btn-chip" onclick="closeEditBooking()">Cancel</button>
+          <button type="submit" class="btn-primary" style="width:auto; margin-top:0; padding:10px 20px;">Save Booking Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { subscribeState, addRoomBooking, updateRoomBooking, deleteRoomBooking } from '/shared/cloud-store.js';
+    import { isAdminLoggedIn, logoutAdmin } from '/shared/auth.js';
+
+    const isAdmin = isAdminLoggedIn();
+    if (isAdmin) {
+      const navLinks = document.getElementById('bookingNavLinks');
+      navLinks.innerHTML = `
+        <a href="/admin/" class="nav-btn" style="background:rgba(16,185,129,0.22); border:1px solid #10b981; color:#6ee7b7;">🛡️ Admin Portal</a>
+        <a href="/" class="nav-btn">Staff View</a>
+        <a href="/meeting/" class="nav-btn">📺 Meeting TV</a>
+        <a href="/pdf/" class="nav-btn">📄 BentoPDF</a>
+        <button id="bookingLogoutBtn" class="nav-btn" style="background:rgba(244,63,94,0.2); color:#fda4af;">Logout</button>
+      `;
+      document.getElementById('bookingLogoutBtn').addEventListener('click', () => logoutAdmin('/booking/'));
+    }
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    document.getElementById('date').value = todayStr;
+    document.getElementById('filterDate').value = todayStr;
+
+    let showAllDates = false;
+    let currentState = null;
+
+    const alertEl = document.getElementById('bookingAlert');
+    function showAlert(msg, isError = false) {
+      alertEl.textContent = msg;
+      alertEl.className = `alert ${isError ? 'error' : 'success'}`;
+      alertEl.style.display = 'block';
+      setTimeout(() => { alertEl.style.display = 'none'; }, 4500);
+    }
+
+    function isRoomBusyNow(roomId, bookings) {
+      const now = new Date();
+      const dStr = now.toISOString().slice(0, 10);
+      const hhmm = now.toTimeString().slice(0, 5);
+      return bookings.some(b => b.roomId === roomId && b.date === dStr && b.startTime <= hhmm && b.endTime > hhmm);
+    }
+
+    subscribeState((state) => {
+      if (!state) return;
+      currentState = state;
+      renderAll();
+    });
+
+    function renderAll() {
+      const rooms = currentState.rooms || [];
+      const bookings = currentState.bookings || [];
+      const depts = Object.keys(currentState.departments || {});
+
+      // Populate Room Select & Filter
+      const roomSelect = document.getElementById('roomId');
+      const editRoomSelect = document.getElementById('editRoomId');
+      const filterRoom = document.getElementById('filterRoom');
+      const prevRoom = roomSelect.value;
+      const prevFilterRoom = filterRoom.value || 'ALL';
+
+      const roomOpts = rooms.map(r => `<option value="${r.id}">${r.name} (${r.capacity} pax)</option>`).join('');
+      roomSelect.innerHTML = roomOpts;
+      editRoomSelect.innerHTML = roomOpts;
+      if (prevRoom && rooms.some(r => r.id === prevRoom)) roomSelect.value = prevRoom;
+
+      filterRoom.innerHTML = `<option value="ALL">All HQ Rooms (${rooms.length})</option>` +
+        rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+      filterRoom.value = prevFilterRoom;
+
+      // Populate Department Select
+      const deptSelect = document.getElementById('department');
+      const editDeptSelect = document.getElementById('editDepartment');
+      const prevDept = deptSelect.value;
+      const deptOpts = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+      deptSelect.innerHTML = deptOpts;
+      editDeptSelect.innerHTML = deptOpts;
+      if (prevDept && depts.includes(prevDept)) deptSelect.value = prevDept;
+
+      // Render Top Room Cards
+      const roomsRow = document.getElementById('roomsRow');
+      roomsRow.innerHTML = rooms.map(room => {
+        const busy = isRoomBusyNow(room.id, bookings);
+        const todayCount = bookings.filter(b => b.roomId === room.id && b.date === todayStr).length;
+        const isSelected = filterRoom.value === room.id;
+
+        return `
+          <div class="room-card ${isSelected ? 'selected' : ''}" onclick="selectRoomCard('${room.id}')">
+            <div>
+              <div class="room-top">
+                <div>
+                  <div class="room-name">${room.name}</div>
+                  <div class="room-floor">${room.floor} • Up to ${room.capacity} pax</div>
+                </div>
+                <span class="occ-badge ${busy ? 'occ-busy' : 'occ-free'}">${busy ? 'In Session' : 'Available'}</span>
+              </div>
+              <div class="amenities-list" style="margin-top: 10px;">
+                ${(room.amenities || []).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
+              </div>
+            </div>
+            <div class="room-footer">
+              <span>${todayCount} booking${todayCount === 1 ? '' : 's'} today</span>
+              <span>Select Room →</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      renderSchedule();
+    }
+
+    function renderSchedule() {
+      if (!currentState) return;
+      const rooms = currentState.rooms || [];
+      const roomMap = Object.fromEntries(rooms.map(r => [r.id, r]));
+      const filterDateVal = document.getElementById('filterDate').value;
+      const filterRoomVal = document.getElementById('filterRoom').value;
+
+      let filtered = [...(currentState.bookings || [])];
+      if (!showAllDates && filterDateVal) {
+        filtered = filtered.filter(b => b.date === filterDateVal);
+      }
+      if (filterRoomVal && filterRoomVal !== 'ALL') {
+        filtered = filtered.filter(b => b.roomId === filterRoomVal);
+      }
+
+      filtered.sort((a, b) => {
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return a.startTime.localeCompare(b.startTime);
+      });
+
+      document.getElementById('scheduleSubtitle').textContent = showAllDates
+        ? `Showing all ${filtered.length} scheduled reservations`
+        : `Showing ${filtered.length} reservation(s) for ${filterDateVal}`;
+
+      const container = document.getElementById('bookingsContainer');
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-box">
+            <div style="font-size: 2rem; margin-bottom: 8px;">📅</div>
+            <div style="font-weight: 700; color: var(--cc-navy);">No room reservations found for this filter</div>
+            <div style="font-size: 0.85rem; margin-top: 4px;">Use the form on the left to book a room.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(b => {
+        const room = roomMap[b.roomId] || { name: b.roomId, color: '#1863dc' };
+        const adminActions = isAdmin
+          ? `<div style="display:flex; gap:8px;">
+               <button type="button" class="btn-edit" onclick="openEditBooking('${b.id}')">✎ Edit</button>
+               <button type="button" class="btn-delete" onclick="cancelBooking('${b.id}')">🗑 Delete</button>
+             </div>`
+          : `<a href="/login.html?redirect=/booking/" class="staff-lock-note" title="Administrator login required to edit or delete existing bookings">🔒 Admin Control</a>`;
+
+        return `
+          <div class="booking-item" style="border-left-color: ${room.color || '#1863dc'};">
+            <div class="booking-time-box">
+              <div class="booking-time">${b.startTime} – ${b.endTime}</div>
+              <div class="booking-date">${b.date}</div>
+            </div>
+            <div class="booking-details">
+              <div class="booking-title">${b.title}</div>
+              <div class="booking-meta">
+                <strong>📍 ${room.name}</strong>
+                <span class="dept-pill">${b.department}</span>
+                <span>👤 ${b.organizer || 'HQ Staff'}</span>
+              </div>
+              ${b.notes ? `<div style="font-size: 0.8rem; color: #475569; margin-top: 6px;">💬 ${b.notes}</div>` : ''}
+            </div>
+            ${adminActions}
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.selectRoomCard = (roomId) => {
+      document.getElementById('roomId').value = roomId;
+      const filterRoom = document.getElementById('filterRoom');
+      filterRoom.value = filterRoom.value === roomId ? 'ALL' : roomId;
+      renderAll();
+    };
+
+    window.openEditBooking = (id) => {
+      if (!isAdmin) return;
+      const b = (currentState?.bookings || []).find(item => item.id === id);
+      if (!b) return;
+      document.getElementById('editModalAlert').style.display = 'none';
+      document.getElementById('editId').value = b.id;
+      document.getElementById('editRoomId').value = b.roomId;
+      document.getElementById('editTitle').value = b.title || '';
+      document.getElementById('editDepartment').value = b.department || 'IT';
+      document.getElementById('editOrganizer').value = b.organizer || '';
+      document.getElementById('editDate').value = b.date || todayStr;
+      document.getElementById('editStartTime').value = b.startTime || '09:00';
+      document.getElementById('editEndTime').value = b.endTime || '10:00';
+      document.getElementById('editNotes').value = b.notes || '';
+      document.getElementById('editModal').style.display = 'flex';
+    };
+
+    window.closeEditBooking = () => {
+      document.getElementById('editModal').style.display = 'none';
+    };
+
+    document.getElementById('editBookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!isAdmin) return;
+      const id = document.getElementById('editId').value;
+      const roomId = document.getElementById('editRoomId').value;
+      const title = document.getElementById('editTitle').value.trim();
+      const department = document.getElementById('editDepartment').value;
+      const organizer = document.getElementById('editOrganizer').value.trim();
+      const date = document.getElementById('editDate').value;
+      const startTime = document.getElementById('editStartTime').value;
+      const endTime = document.getElementById('editEndTime').value;
+      const notes = document.getElementById('editNotes').value.trim();
+
+      if (endTime <= startTime) {
+        const err = document.getElementById('editModalAlert');
+        err.textContent = 'End time must be after start time.';
+        err.style.display = 'block';
+        return;
+      }
+
+      const conflict = (currentState?.bookings || []).find(
+        b => b.id !== id && b.roomId === roomId && b.date === date && startTime < b.endTime && endTime > b.startTime
+      );
+      if (conflict) {
+        const err = document.getElementById('editModalAlert');
+        err.textContent = `Time conflict with "${conflict.title}" (${conflict.startTime}–${conflict.endTime}).`;
+        err.style.display = 'block';
+        return;
+      }
+
+      await updateRoomBooking(id, { roomId, title, department, organizer, date, startTime, endTime, notes });
+      window.closeEditBooking();
+      showAlert('Reservation updated by Administrator!');
+    });
+
+    window.cancelBooking = async (id) => {
+      if (!isAdmin) return;
+      if (confirm('Cancel and delete this room reservation?')) {
+        await deleteRoomBooking(id);
+        showAlert('Reservation deleted.');
+      }
+    };
+
+    document.getElementById('btnShowToday').addEventListener('click', () => {
+      showAllDates = false;
+      document.getElementById('filterDate').value = todayStr;
+      document.getElementById('btnShowToday').classList.add('active');
+      document.getElementById('btnShowAllDates').classList.remove('active');
+      renderSchedule();
+    });
+
+    document.getElementById('btnShowAllDates').addEventListener('click', () => {
+      showAllDates = true;
+      document.getElementById('btnShowAllDates').classList.add('active');
+      document.getElementById('btnShowToday').classList.remove('active');
+      renderSchedule();
+    });
+
+    document.getElementById('filterDate').addEventListener('change', () => {
+      showAllDates = false;
+      document.getElementById('btnShowToday').classList.remove('active');
+      document.getElementById('btnShowAllDates').classList.remove('active');
+      renderSchedule();
+    });
+
+    document.getElementById('filterRoom').addEventListener('change', renderAll);
+
+    // Handle New Booking with Overlap / Conflict Detection
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const roomId = document.getElementById('roomId').value;
+      const title = document.getElementById('title').value.trim();
+      const department = document.getElementById('department').value;
+      const organizer = document.getElementById('organizer').value.trim();
+      const date = document.getElementById('date').value;
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const notes = document.getElementById('notes').value.trim();
+
+      if (endTime <= startTime) {
+        showAlert('End time must be after start time.', true);
+        return;
+      }
+
+      // Check for time conflicts in the same room & date
+      const existing = (currentState?.bookings || []).filter(
+        b => b.roomId === roomId && b.date === date
+      );
+      const conflict = existing.find(
+        b => startTime < b.endTime && endTime > b.startTime
+      );
+
+      if (conflict) {
+        showAlert(
+          `Time conflict! This room is already booked from ${conflict.startTime} to ${conflict.endTime} for "${conflict.title}" (${conflict.department}).`,
+          true
+        );
+        return;
+      }
+
+      await addRoomBooking({
+        roomId,
+        title,
+        department,
+        organizer,
+        date,
+        startTime,
+        endTime,
+        notes
+      });
+
+      document.getElementById('title').value = '';
+      document.getElementById('notes').value = '';
+      document.getElementById('filterDate').value = date;
+      showAllDates = false;
+      showAlert('Room booked and broadcasted to HQ schedules!');
+    });
+  </script>
+</body>
+</html>

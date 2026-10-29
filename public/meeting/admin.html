@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Care Clinics - Admin Control Panel</title>
+    <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg">
+    <style>
+        :root {
+            --cc-navy: #112349;
+            --cc-blue: #1863dc;
+            --cc-light-bg: #f0f4f8;
+            --cc-border: #d1d5db;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--cc-light-bg);
+            color: #111827;
+            padding: 32px 20px;
+            margin: 0;
+        }
+
+        .top-nav {
+            max-width: 900px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .top-nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill {
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--cc-navy);
+            border: 1px solid var(--cc-border);
+            transition: all 0.2s;
+        }
+
+        .nav-pill:hover {
+            background: var(--cc-navy);
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 900px;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            margin: auto;
+            box-shadow: 0 10px 25px rgba(17, 35, 73, 0.08);
+            border: 1px solid var(--cc-border);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--cc-light-bg);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        h2 { color: var(--cc-navy); margin: 0; }
+        h3 { color: var(--cc-blue); margin-top: 0; margin-bottom: 15px; }
+
+        .section {
+            background: var(--cc-light-bg);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .toggle-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .toggle-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .toggle-item {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--cc-border);
+            font-weight: 600;
+        }
+
+        .toggle-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        label { display: block; margin-top: 14px; font-weight: 600; color: var(--cc-navy); }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid var(--cc-border);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        button {
+            background: var(--cc-blue);
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 12px 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+
+        button:hover { background: #114fb3; }
+        button.btn-secondary { background: #4b5563; }
+        button.btn-secondary:hover { background: #374151; }
+        button.danger { background: #dc2626; }
+        button.danger:hover { background: #b91c1c; }
+
+        .dept-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            background: #ffffff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--cc-border);
+        }
+
+        .dept-item input[type="text"] {
+            margin-top: 0;
+            flex-grow: 1;
+        }
+
+        #status {
+            font-weight: bold;
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .sync-badge {
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="/careclinic-logo.webp" alt="Logo" style="height: 38px; background: var(--cc-navy); padding: 4px 10px; border-radius: 8px;" onerror="this.src='/images/acme-logo.svg'">
+            <strong style="color: var(--cc-navy);">Careclinics Weekly Alignment — Admin Panel</strong>
+        </div>
+        <div class="top-nav-links">
+            <a href="/admin/" class="nav-pill" style="background: var(--cc-navy); color: #fff;">🛡️ Admin Portal</a>
+            <a href="/" class="nav-pill">Staff View</a>
+            <a href="/meeting/" class="nav-pill">📺 Open TV Display</a>
+            <a href="/meeting/input.html" class="nav-pill">✎ Staff Input</a>
+            <button type="button" id="adminPanelLogout" class="nav-pill" style="cursor:pointer; background:#fee2e2; color:#991b1b; border-color:#fecaca;">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h2>Admin Control Panel</h2>
+                <span style="color: #6b7280;">Care Clinics TV Presentation Management</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span id="syncBadge" class="sync-badge">Connecting...</span>
+                <a href="/meeting/" target="_blank" style="color: var(--cc-blue); font-weight: bold; text-decoration: none;">Open TV Display ↗</a>
+            </div>
+        </div>
+
+        <div id="status"></div>
+
+        <!-- Slide Visibility Controls -->
+        <div class="section">
+            <h3>Slide Visibility Controls (ON / OFF)</h3>
+            <div class="toggle-group">
+                <div class="toggle-item">
+                    <input type="checkbox" id="showQnA">
+                    <label for="showQnA" style="margin:0; cursor:pointer;">Department Q&A Slides</label>
+                </div>
+                <div class="toggle-item">
+                    <input type="checkbox" id="showDailyPhrases">
+                    <label for="showDailyPhrases" style="margin:0; cursor:pointer;">Care Quality Phrases Slide</label>
+                </div>
+                <div class="toggle-item">
+                    <input type="checkbox" id="showVisionMission">
+                    <label for="showVisionMission" style="margin:0; cursor:pointer;">Vision & Mission Slide</label>
+                </div>
+                <div class="toggle-item">
+                    <input type="checkbox" id="showSpeech">
+                    <label for="showSpeech" style="margin:0; cursor:pointer;">C-Suite Closing Remarks Slide</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Management & Ordering -->
+        <div class="section">
+            <h3>Department List & Order Management</h3>
+            <p style="font-size: 0.9rem; color: #6b7280; margin-top: -8px; margin-bottom: 12px;">
+                Edit department names directly or use ▲ ▼ to reorder presentation sequence.
+            </p>
+            <div id="deptList"></div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <input type="text" id="newDeptName" placeholder="Enter New Department Name">
+                <button type="button" onclick="addDepartment()" style="white-space: nowrap;">+ Add Dept</button>
+            </div>
+        </div>
+
+        <!-- Vision, Mission -->
+        <div class="section">
+            <h3>Vision & Mission Text</h3>
+            <label>Vision Text:</label>
+            <input type="text" id="visionText">
+
+            <label>Mission Text:</label>
+            <input type="text" id="missionText">
+        </div>
+
+        <!-- C-Suite Closing Remarks Editor -->
+        <div class="section">
+            <h3>C-Suite Closing Remarks</h3>
+            <label>Speech Content:</label>
+            <textarea id="speechText" rows="3"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <button onclick="saveAdminSettings()" style="flex: 2; font-size: 1.05rem; padding: 14px;">Save & Broadcast Live to TV</button>
+            <button onclick="resetMeeting()" class="danger" style="flex: 1; padding: 14px;">Reset Meeting Updates</button>
+            <button onclick="restoreSeedData()" class="btn-secondary" style="padding: 14px;" title="Restore from initial data.json seed">Restore Seed Data</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { requireAdminAuth, logoutAdmin } from '/shared/auth.js';
+        import {
+            subscribeState,
+            subscribeSyncStatus,
+            saveAdminConfig,
+            resetMeetingSession,
+            resetToInitialSeed
+        } from '/shared/cloud-store.js';
+
+        if (!requireAdminAuth()) {
+            throw new Error('Redirecting to Admin Login');
+        }
+        document.getElementById('adminPanelLogout').addEventListener('click', () => logoutAdmin('/'));
+
+        let departmentList = [];
+        let initialLoaded = false;
+
+        subscribeSyncStatus(({ mode }) => {
+            const badge = document.getElementById('syncBadge');
+            if (mode === 'firebase') {
+                badge.textContent = '● Firebase Cloud Sync';
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#166534';
+            } else {
+                badge.textContent = '● Vercel Cloud Sync';
+                badge.style.background = '#e0f2fe';
+                badge.style.color = '#0369a1';
+            }
+        });
+
+        subscribeState((data) => {
+            if (!data) return;
+            // Only overwrite form inputs on initial load or when explicitly refreshed
+            if (!initialLoaded) {
+                applyStateToForm(data);
+                initialLoaded = true;
+            }
+        });
+
+        function applyStateToForm(data) {
+            const depts = data.departments || {};
+            departmentList = Object.keys(depts).map(key => ({
+                originalKey: key,
+                name: key,
+                update: depts[key].update || "",
+                question: depts[key].question || ""
+            }));
+
+            const cfg = data.config || {};
+            document.getElementById('showQnA').checked = cfg.showQnA !== false;
+            document.getElementById('showDailyPhrases').checked = cfg.showDailyPhrases !== false;
+            document.getElementById('showVisionMission').checked = cfg.showVisionMission !== false;
+            document.getElementById('showSpeech').checked = cfg.showLastMinuteSpeech === true;
+
+            document.getElementById('visionText').value = cfg.visionText || "";
+            document.getElementById('missionText').value = cfg.missionText || "";
+            document.getElementById('speechText').value = cfg.lastMinuteSpeechText || "";
+
+            renderDepartments();
+        }
+
+        function renderDepartments() {
+            const list = document.getElementById('deptList');
+            list.innerHTML = '';
+
+            departmentList.forEach((item, index) => {
+                list.innerHTML += `
+                    <div class="dept-item">
+                        <button type="button" class="btn-secondary" onclick="moveDept(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                        <button type="button" class="btn-secondary" onclick="moveDept(${index}, 1)" ${index === departmentList.length - 1 ? 'disabled' : ''}>▼</button>
+                        <input type="text" value="${item.name.replace(/"/g, '&quot;')}" oninput="updateDeptName(${index}, this.value)" placeholder="Department Name">
+                        <button type="button" class="danger" onclick="removeDepartment(${index})">Remove</button>
+                    </div>`;
+            });
+        }
+
+        function updateDeptName(index, newName) {
+            departmentList[index].name = newName;
+        }
+
+        function moveDept(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex >= 0 && targetIndex < departmentList.length) {
+                const temp = departmentList[index];
+                departmentList[index] = departmentList[targetIndex];
+                departmentList[targetIndex] = temp;
+                renderDepartments();
+            }
+        }
+
+        function addDepartment() {
+            const nameInput = document.getElementById('newDeptName');
+            const name = nameInput.value.trim().toUpperCase();
+            if (name) {
+                departmentList.push({
+                    originalKey: name,
+                    name: name,
+                    update: "Pending update...",
+                    question: "N/A"
+                });
+                nameInput.value = '';
+                renderDepartments();
+            }
+        }
+
+        function removeDepartment(index) {
+            departmentList.splice(index, 1);
+            renderDepartments();
+        }
+
+        async function saveAdminSettings() {
+            const newDepartments = {};
+            departmentList.forEach(item => {
+                const cleanName = item.name.trim();
+                if (cleanName) {
+                    newDepartments[cleanName] = {
+                        update: item.update,
+                        question: item.question
+                    };
+                }
+            });
+
+            const config = {
+                showQnA: document.getElementById('showQnA').checked,
+                showDailyPhrases: document.getElementById('showDailyPhrases').checked,
+                showVisionMission: document.getElementById('showVisionMission').checked,
+                showLastMinuteSpeech: document.getElementById('showSpeech').checked,
+                visionText: document.getElementById('visionText').value,
+                missionText: document.getElementById('missionText').value,
+                lastMinuteSpeechText: document.getElementById('speechText').value
+            };
+
+            try {
+                const nextState = await saveAdminConfig({ config, departments: newDepartments });
+                applyStateToForm(nextState);
+                showStatus("Admin settings saved and broadcasted live to TV!", false);
+            } catch (err) {
+                showStatus("Error saving admin settings: " + err.message, true);
+            }
+        }
+
+        async function resetMeeting() {
+            if (confirm("Are you sure you want to reset all department updates for a new meeting?")) {
+                try {
+                    const nextState = await resetMeetingSession();
+                    applyStateToForm(nextState);
+                    showStatus("Meeting session reset for all departments!", false);
+                } catch (err) {
+                    showStatus("Error resetting meeting session.", true);
+                }
+            }
+        }
+
+        async function restoreSeedData() {
+            if (confirm("Restore initial CCHSMeetingDashboard/data.json seed data and push to Cloud?")) {
+                try {
+                    const nextState = await resetToInitialSeed();
+                    applyStateToForm(nextState);
+                    showStatus("Initial data.json seed restored and broadcasted!", false);
+                } catch (err) {
+                    showStatus("Error restoring seed data.", true);
+                }
+            }
+        }
+
+        function showStatus(msg, isError) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerText = msg;
+            statusEl.style.display = 'block';
+            statusEl.style.background = isError ? '#fde8e8' : '#e6f4ea';
+            statusEl.style.color = isError ? '#9b1c1c' : '#0e6251';
+            statusEl.style.border = `1px solid ${isError ? '#f8b4b4' : '#a3e0b5'}`;
+
+            setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+        }
+
+        window.updateDeptName = updateDeptName;
+        window.moveDept = moveDept;
+        window.addDepartment = addDepartment;
+        window.removeDepartment = removeDepartment;
+        window.saveAdminSettings = saveAdminSettings;
+        window.resetMeeting = resetMeeting;
+        window.restoreSeedData = restoreSeedData;
+    </script>
+</body>
+</html>

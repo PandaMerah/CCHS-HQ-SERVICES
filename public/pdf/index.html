@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Tools — Careclinics Healthcare Services (BentoPDF)</title>
+  <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- pdf-lib & pdf.js for 100% browser-based private PDF processing -->
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #26354d;
+      --cc-navy: #112349;
+      --cc-blue: #1863dc;
+      --cc-sky: #8ed1fc;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* BentoPDF Simple Mode Navbar */
+    .navbar {
+      background: #111827;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .brand-link img {
+      height: 36px;
+      width: auto;
+    }
+
+    .brand-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-pill {
+      text-decoration: none;
+      color: #e2e8f0;
+      background: #1e293b;
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .nav-pill:hover {
+      background: var(--cc-blue);
+      border-color: var(--cc-sky);
+      color: #ffffff;
+    }
+
+    .main-wrap {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 36px 24px 64px;
+      flex: 1;
+    }
+
+    /* Simple Mode Header */
+    .tools-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .tools-header h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .tools-header p {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .search-box {
+      max-width: 520px;
+      margin: 22px auto 0;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 13px 18px 13px 42px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--cc-sky);
+      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.25);
+    }
+
+    .search-box .icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+    }
+
+    /* Bento Tool Grid */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+      gap: 18px;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tool-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--cc-sky);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3);
+    }
+
+    .tool-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.45rem;
+      background: rgba(24, 99, 220, 0.2);
+      border: 1px solid rgba(142, 209, 252, 0.25);
+    }
+
+    .tool-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .tool-desc {
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* Active Tool Workspace */
+    .tool-workspace {
+      display: none;
+      max-width: 920px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--cc-sky);
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .back-btn:hover {
+      text-decoration: underline;
+    }
+
+    .dropzone {
+      border: 2px dashed #475569;
+      border-radius: 16px;
+      padding: 36px 24px;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.55);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 18px 0;
+    }
+
+    .dropzone:hover {
+      border-color: var(--cc-sky);
+      background: rgba(24, 99, 220, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-family: inherit;
+    }
+
+    .btn-action {
+      background: var(--cc-blue);
+      color: #ffffff;
+      border: none;
+      padding: 13px 24px;
+      border-radius: 10px;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action:hover {
+      background: #2563eb;
+    }
+
+    .btn-action:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .file-pill {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+    }
+
+    .pages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .page-thumb {
+      background: #0f172a;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    .page-thumb.deleted {
+      opacity: 0.35;
+      border-color: #ef4444;
+    }
+
+    .page-thumb canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      background: #ffffff;
+    }
+
+    .thumb-actions {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .thumb-btn {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: #e2e8f0;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .thumb-btn:hover {
+      background: var(--cc-blue);
+    }
+
+    .sig-canvas-wrap {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 8px;
+      display: inline-block;
+      border: 2px solid var(--cc-sky);
+    }
+
+    .status-banner {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    /* BentoPDF Branded Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      background: #0b1120;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Simple Mode Branded Navbar -->
+  <nav class="navbar" data-simple-nav="true">
+    <a href="/pdf/" class="brand-link" onclick="closeTool(event)">
+      <img src="/images/acme-logo.svg" alt="Careclinics Healthcare Services Logo" />
+      <img src="/careclinic-logo.webp" alt="Careclinics" style="height:32px;" onerror="this.style.display='none'" />
+      <span class="brand-name">Careclinics Healthcare Services</span>
+    </a>
+    <div class="nav-actions">
+      <span style="font-size:0.76rem; color:#34d399; background:rgba(16,185,129,0.14); border:1px solid rgba(16,185,129,0.3); padding:4px 10px; border-radius:999px; font-weight:600;">
+        🔒 100% Client-Side Private Processing
+      </span>
+      <a href="/" class="nav-pill">← Staff Portal</a>
+      <a href="/meeting/input.html" class="nav-pill">📝 Dept Update</a>
+      <a href="/booking/" class="nav-pill">📅 Room Booking</a>
+      <a href="/login.html" class="nav-pill" id="pdfAdminNavLink">🔒 Admin Login</a>
+    </div>
+  </nav>
+
+  <main class="main-wrap">
+    <!-- Grid View -->
+    <div id="gridView">
+      <div class="tools-header">
+        <h1>PDF Tools</h1>
+        <p>Select a tool to get started — 100% browser-based, no files ever leave your computer.</p>
+        <div class="search-box">
+          <span class="icon">🔍</span>
+          <input type="text" id="toolSearch" placeholder="Search for a tool (e.g., 'merge', 'split', 'sign', 'watermark'...)" />
+        </div>
+      </div>
+
+      <div class="tool-grid" id="toolGrid"></div>
+    </div>
+
+    <!-- Active Tool Interface -->
+    <div id="toolWorkspace" class="tool-workspace">
+      <button type="button" class="back-btn" onclick="closeTool()">← Back to PDF Tools</button>
+      <div id="toolHeader" style="margin-bottom: 18px;"></div>
+      <div id="toolBody"></div>
+      <div id="toolStatus" class="status-banner"></div>
+    </div>
+  </main>
+
+  <!-- Simple Mode Footer with docker-compose.yml branding -->
+  <footer class="footer" data-simple-footer="true">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="/images/acme-logo.svg" alt="Logo" style="height: 28px;" />
+      <div>
+        <div style="color: #ffffff; font-weight: 700;">Careclinics Healthcare Services</div>
+        <div>© 2026 Careclinics Healthcare Services. Internal use only.</div>
+      </div>
+    </div>
+    <div>BentoPDF Self-Hosted Engine v2.8 • Zero-Upload Browser Processing</div>
+  </footer>
+
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    const TOOLS = [
+      { id: 'merge', icon: '📑', name: 'Merge PDF', desc: 'Combine multiple PDF documents into a single unified file in any order.' },
+      { id: 'split', icon: '✂️', name: 'Split / Extract PDF', desc: 'Extract specific page ranges or split a PDF into separate documents.' },
+      { id: 'organize', icon: '🗂️', name: 'Organize & Delete Pages', desc: 'Visual page thumbnail editor to rotate, reorder, or remove PDF pages.' },
+      { id: 'sign', icon: '✍️', name: 'Sign & Stamp PDF', desc: 'Draw your handwritten signature or add an official Careclinics approval stamp.' },
+      { id: 'rotate', icon: '🔄', name: 'Rotate PDF', desc: 'Rotate all pages in a PDF document 90°, 180°, or 270° permanently.' },
+      { id: 'watermark', icon: '💧', name: 'Add Watermark', desc: 'Stamp confidential or internal-use text watermarks across all PDF pages.' },
+      { id: 'pagenumbers', icon: '🔢', name: 'Add Page Numbers', desc: 'Insert formatted Page X of Y numbering into headers or footers.' },
+      { id: 'img2pdf', icon: '🖼️', name: 'Images to PDF', desc: 'Convert JPG, PNG, or WebP images into a clean multi-page PDF document.' },
+      { id: 'pdf2img', icon: '📸', name: 'PDF to Images (PNG)', desc: 'Render and export PDF pages as high-resolution PNG images.' },
+      { id: 'extracttext', icon: '📝', name: 'Extract Text from PDF', desc: 'Extract readable text content from every page of your PDF file.' },
+      { id: 'compress', icon: '⚡', name: 'Optimize / Compress PDF', desc: 'Re-pack PDF object streams and strip unused metadata to reduce size.' },
+      { id: 'metadata', icon: '🏷️', name: 'Edit PDF Metadata', desc: 'Inspect and update PDF Title, Author, Subject, and Keywords properties.' }
+    ];
+
+    const toolGrid = document.getElementById('toolGrid');
+    const gridView = document.getElementById('gridView');
+    const toolWorkspace = document.getElementById('toolWorkspace');
+    const toolHeader = document.getElementById('toolHeader');
+    const toolBody = document.getElementById('toolBody');
+    const toolStatus = document.getElementById('toolStatus');
+
+    function renderGrid(filter = '') {
+      const q = filter.trim().toLowerCase();
+      const list = TOOLS.filter(t => (t.name + ' ' + t.desc).toLowerCase().includes(q));
+      toolGrid.innerHTML = list.map(t => `
+        <div class="tool-card" onclick="openTool('${t.id}')">
+          <div class="tool-icon">${t.icon}</div>
+          <div class="tool-name">${t.name}</div>
+          <div class="tool-desc">${t.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    renderGrid();
+    document.getElementById('toolSearch').addEventListener('input', (e) => renderGrid(e.target.value));
+
+    function setStatus(msg, isError = false) {
+      toolStatus.textContent = msg;
+      toolStatus.style.display = 'block';
+      toolStatus.style.background = isError ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)';
+      toolStatus.style.border = `1px solid ${isError ? '#ef4444' : '#10b981'}`;
+      toolStatus.style.color = isError ? '#fca5a5' : '#6ee7b7';
+    }
+
+    function downloadBytes(bytes, filename, mime = 'application/pdf') {
+      const blob = new Blob([bytes], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    function closeTool(e) {
+      if (e) e.preventDefault();
+      toolWorkspace.style.display = 'none';
+      gridView.style.display = 'block';
+      toolStatus.style.display = 'none';
+      window.history.replaceState({}, '', '/pdf/');
+    }
+
+    let stateFiles = [];
+    let organizePageOps = []; // [{ pageIndex, rotate: 0, deleted: false }]
+    let currentPdfBuffer = null;
+
+    function openTool(toolId) {
+      const tool = TOOLS.find(t => t.id === toolId);
+      if (!tool) return;
+      stateFiles = [];
+      organizePageOps = [];
+      currentPdfBuffer = null;
+      toolStatus.style.display = 'none';
+
+      gridView.style.display = 'none';
+      toolWorkspace.style.display = 'block';
+      window.history.replaceState({}, '', `/pdf/?tool=${toolId}`);
+
+      toolHeader.innerHTML = `
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div class="tool-icon" style="width:52px; height:52px; font-size:1.6rem;">${tool.icon}</div>
+          <div>
+            <h2 style="font-size:1.5rem; font-weight:800;">${tool.name}</h2>
+            <p style="color:var(--muted); font-size:0.9rem;">${tool.desc}</p>
+          </div>
+        </div>
+      `;
+
+      if (toolId === 'merge') renderMergeTool();
+      else if (toolId === 'split') renderSplitTool();
+      else if (toolId === 'organize') renderOrganizeTool();
+      else if (toolId === 'sign') renderSignTool();
+      else if (toolId === 'rotate') renderRotateTool();
+      else if (toolId === 'watermark') renderWatermarkTool();
+      else if (toolId === 'pagenumbers') renderPageNumbersTool();
+      else if (toolId === 'img2pdf') renderImg2PdfTool();
+      else if (toolId === 'pdf2img') renderPdf2ImgTool();
+      else if (toolId === 'extracttext') renderExtractTextTool();
+      else if (toolId === 'compress') renderCompressTool();
+      else if (toolId === 'metadata') renderMetadataTool();
+    }
+
+    // 1. MERGE PDF
+    function renderMergeTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('mergeInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">📂</div>
+          <div style="font-weight:700; font-size:1.05rem;">Click to select multiple PDF files to merge</div>
+          <div style="color:var(--muted); font-size:0.84rem; margin-top:4px;">Select 2 or more PDFs — you can reorder them before merging</div>
+          <input type="file" id="mergeInput" accept="application/pdf" multiple style="display:none" />
+        </div>
+        <div id="mergeList" class="file-list"></div>
+        <button class="btn-action" id="btnRunMerge" disabled onclick="runMerge()">📑 Merge & Download PDF</button>
+      `;
+      document.getElementById('mergeInput').addEventListener('change', (e) => {
+        for (const f of e.target.files) stateFiles.push(f);
+        updateMergeList();
+      });
+    }
+
+    function updateMergeList() {
+      const list = document.getElementById('mergeList');
+      list.innerHTML = stateFiles.map((f, i) => `
+        <div class="file-pill">
+          <span><strong>#${i + 1}</strong> — ${f.name} <small style="color:var(--muted)">(${(f.size / 1024).toFixed(1)} KB)</small></span>
+          <div style="display:flex; gap:6px;">
+            <button class="thumb-btn" onclick="moveFile(${i}, -1)" ${i === 0 ? 'disabled' : ''}>▲</button>
+            <button class="thumb-btn" onclick="moveFile(${i}, 1)" ${i === stateFiles.length - 1 ? 'disabled' : ''}>▼</button>
+            <button class="thumb-btn" onclick="removeFile(${i})">✕</button>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('btnRunMerge').disabled = stateFiles.length < 2;
+    }
+
+    window.moveFile = (idx, dir) => {
+      const t = idx + dir;
+      if (t >= 0 && t < stateFiles.length) {
+        [stateFiles[idx], stateFiles[t]] = [stateFiles[t], stateFiles[idx]];
+        updateMergeList();
+      }
+    };
+    window.removeFile = (idx) => {
+      stateFiles.splice(idx, 1);
+      updateMergeList();
+    };
+
+    window.runMerge = async () => {
+      try {
+        setStatus('Merging PDF documents...');
+        const { PDFDocument } = PDFLib;
+        const mergedPdf = await PDFDocument.create();
+        for (const file of stateFiles) {
+          const buf = await file.arrayBuffer();
+          const pdf = await PDFDocument.load(buf);
+          const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+          copiedPages.forEach(p => mergedPdf.addPage(p));
+        }
+        const outBytes = await mergedPdf.save();
+        downloadBytes(outBytes, 'Careclinics-Merged.pdf');
+        setStatus(`✓ Successfully merged ${stateFiles.length} PDF files!`);
+      } catch (err) {
+        setStatus('Error merging PDFs: ' + err.message, true);
+      }
+    };
+
+    // 2. SPLIT PDF
+    function renderSplitTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('splitInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">✂️</div>
+          <div id="splitFileLabel" style="font-weight:700;">Click to select a PDF file</div>
+          <input type="file" id="splitInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-group">
+          <label>Page Range to Extract (e.g. <code>1-3, 5</code>)</label>
+          <input type="text" id="splitRange" placeholder="1-2" value="1" />
+        </div>
+        <button class="btn-action" id="btnRunSplit" disabled onclick="runSplit()">✂️ Extract Selected Pages</button>
+      `;
+      document.getElementById('splitInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        const pdf = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        const count = pdf.getPageCount();
+        document.getElementById('splitFileLabel').textContent = `${f.name} (${count} pages)`;
+        document.getElementById('splitRange').value = `1-${Math.min(count, 2)}`;
+        document.getElementById('btnRunSplit').disabled = false;
+      });
+    }
+
+    window.runSplit = async () => {
+      try {
+        const srcDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        const maxPage = srcDoc.getPageCount();
+        const raw = document.getElementById('splitRange').value;
+        const indices = [];
+        raw.split(',').forEach(part => {
+          const p = part.trim();
+          if (p.includes('-')) {
+            const [s, e] = p.split('-').map(n => parseInt(n.trim(), 10));
+            for (let i = s; i <= e; i++) {
+              if (i >= 1 && i <= maxPage) indices.push(i - 1);
+            }
+          } else {
+            const n = parseInt(p, 10);
+            if (n >= 1 && n <= maxPage) indices.push(n - 1);
+          }
+        });
+        if (indices.length === 0) {
+          setStatus('Please enter a valid page range between 1 and ' + maxPage, true);
+          return;
+        }
+        const newDoc = await PDFLib.PDFDocument.create();
+        const copied = await newDoc.copyPages(srcDoc, indices);
+        copied.forEach(p => newDoc.addPage(p));
+        const bytes = await newDoc.save();
+        downloadBytes(bytes, 'Careclinics-Split.pdf');
+        setStatus(`✓ Extracted ${indices.length} page(s) into Careclinics-Split.pdf!`);
+      } catch (err) {
+        setStatus('Split failed: ' + err.message, true);
+      }
+    };
+
+    // 3. ORGANIZE / ROTATE / DELETE PAGES
+    function renderOrganizeTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('orgInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">🗂️</div>
+          <div id="orgLabel" style="font-weight:700;">Select a PDF to visually organize, rotate, or delete pages</div>
+          <input type="file" id="orgInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div id="orgGrid" class="pages-grid"></div>
+        <button class="btn-action" id="btnRunOrg" disabled onclick="runOrganize()">💾 Save Organized PDF</button>
+      `;
+      document.getElementById('orgInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('orgLabel').textContent = f.name;
+        await buildOrganizeThumbnails();
+        document.getElementById('btnRunOrg').disabled = false;
+      });
+    }
+
+    async function buildOrganizeThumbnails() {
+      const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+      organizePageOps = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        organizePageOps.push({ pageNumber: i, rotate: 0, deleted: false });
+      }
+      await renderOrganizeGrid(pdf);
+    }
+
+    async function renderOrganizeGrid(pdfDoc) {
+      const grid = document.getElementById('orgGrid');
+      grid.innerHTML = '';
+      for (let idx = 0; idx < organizePageOps.length; idx++) {
+        const op = organizePageOps[idx];
+        const card = document.createElement('div');
+        card.className = `page-thumb ${op.deleted ? 'deleted' : ''}`;
+        card.innerHTML = `
+          <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px;">Page ${op.pageNumber} ${op.rotate ? `(${op.rotate}°)` : ''}</div>
+          <canvas id="thumbCanvas-${idx}"></canvas>
+          <div class="thumb-actions">
+            <button class="thumb-btn" onclick="orgMove(${idx}, -1)" title="Move Left">◀</button>
+            <button class="thumb-btn" onclick="orgRotate(${idx})" title="Rotate 90°">🔄</button>
+            <button class="thumb-btn" onclick="orgDelete(${idx})" title="Toggle Delete">${op.deleted ? '↩' : '🗑️'}</button>
+            <button class="thumb-btn" onclick="orgMove(${idx}, 1)" title="Move Right">▶</button>
+          </div>
+        `;
+        grid.appendChild(card);
+
+        const page = await pdfDoc.getPage(op.pageNumber);
+        const viewport = page.getViewport({ scale: 0.3, rotation: op.rotate });
+        const canvas = card.querySelector('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+      }
+    }
+
+    window.orgRotate = async (idx) => {
+      organizePageOps[idx].rotate = (organizePageOps[idx].rotate + 90) % 360;
+      const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+      renderOrganizeGrid(pdf);
+    };
+    window.orgDelete = async (idx) => {
+      organizePageOps[idx].deleted = !organizePageOps[idx].deleted;
+      const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+      renderOrganizeGrid(pdf);
+    };
+    window.orgMove = async (idx, dir) => {
+      const t = idx + dir;
+      if (t >= 0 && t < organizePageOps.length) {
+        [organizePageOps[idx], organizePageOps[t]] = [organizePageOps[t], organizePageOps[idx]];
+        const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+        renderOrganizeGrid(pdf);
+      }
+    };
+
+    window.runOrganize = async () => {
+      try {
+        const activeOps = organizePageOps.filter(o => !o.deleted);
+        if (activeOps.length === 0) {
+          setStatus('Cannot delete all pages in the PDF!', true);
+          return;
+        }
+        const srcDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        const outDoc = await PDFLib.PDFDocument.create();
+        for (const op of activeOps) {
+          const [copied] = await outDoc.copyPages(srcDoc, [op.pageNumber - 1]);
+          if (op.rotate) {
+            const currentRot = copied.getRotation().angle;
+            copied.setRotation(PDFLib.degrees((currentRot + op.rotate) % 360));
+          }
+          outDoc.addPage(copied);
+        }
+        const bytes = await outDoc.save();
+        downloadBytes(bytes, 'Careclinics-Organized.pdf');
+        setStatus('✓ Saved organized PDF!');
+      } catch (err) {
+        setStatus('Failed: ' + err.message, true);
+      }
+    };
+
+    // 4. SIGN & STAMP PDF
+    function renderSignTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('signInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">✍️</div>
+          <div id="signLabel" style="font-weight:700;">Select a PDF file to sign or stamp</div>
+          <input type="file" id="signInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-row" style="align-items: start; margin-bottom: 16px;">
+          <div>
+            <label>Draw Handwritten Signature</label>
+            <div class="sig-canvas-wrap">
+              <canvas id="sigPad" width="340" height="130" style="cursor:crosshair;"></canvas>
+            </div>
+            <div style="margin-top:6px;">
+              <button type="button" class="thumb-btn" onclick="clearSigPad()">Clear Signature Pad</button>
+            </div>
+          </div>
+          <div>
+            <div class="form-group">
+              <label>Optional Approval Stamp / Signer Name</label>
+              <input type="text" id="signStampText" placeholder="e.g. APPROVED — CARECLINICS HQ" />
+            </div>
+            <div class="form-group">
+              <label>Target Page</label>
+              <select id="signPageSelect">
+                <option value="last">Last Page</option>
+                <option value="first">First Page</option>
+                <option value="all">Every Page</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Placement Position</label>
+              <select id="signPosition">
+                <option value="br">Bottom Right</option>
+                <option value="bl">Bottom Left</option>
+                <option value="bc">Bottom Center</option>
+                <option value="tr">Top Right</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <button class="btn-action" id="btnRunSign" disabled onclick="runSignPdf()">✍️ Apply Signature & Download PDF</button>
+      `;
+
+      const canvas = document.getElementById('sigPad');
+      const ctx = canvas.getContext('2d');
+      ctx.strokeStyle = '#0c1936';
+      ctx.lineWidth = 2.6;
+      ctx.lineCap = 'round';
+      let drawing = false;
+
+      const getPos = (e) => {
+        const r = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - r.left, y: clientY - r.top };
+      };
+
+      canvas.addEventListener('mousedown', (e) => { drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+      canvas.addEventListener('mousemove', (e) => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
+      window.addEventListener('mouseup', () => { drawing = false; });
+
+      window.clearSigPad = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      document.getElementById('signInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('signLabel').textContent = f.name;
+        document.getElementById('btnRunSign').disabled = false;
+      });
+    }
+
+    window.runSignPdf = async () => {
+      try {
+        const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        const canvas = document.getElementById('sigPad');
+        const pngDataUrl = canvas.toDataURL('image/png');
+        const pngImage = await pdfDoc.embedPng(pngDataUrl);
+        const font = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+        const stampText = document.getElementById('signStampText').value.trim();
+        const target = document.getElementById('signPageSelect').value;
+        const pos = document.getElementById('signPosition').value;
+
+        const pages = pdfDoc.getPages();
+        const targetPages = target === 'first' ? [pages[0]] : target === 'last' ? [pages[pages.length - 1]] : pages;
+
+        for (const page of targetPages) {
+          const { width, height } = page.getSize();
+          const sigW = 150;
+          const sigH = 58;
+          let x = width - sigW - 45;
+          let y = 45;
+          if (pos === 'bl') x = 45;
+          if (pos === 'bc') x = (width - sigW) / 2;
+          if (pos === 'tr') { x = width - sigW - 45; y = height - sigH - 55; }
+
+          page.drawImage(pngImage, { x, y, width: sigW, height: sigH });
+          if (stampText) {
+            page.drawText(stampText, {
+              x,
+              y: y - 14,
+              size: 9,
+              font,
+              color: PDFLib.rgb(0.09, 0.38, 0.86)
+            });
+          }
+        }
+
+        const out = await pdfDoc.save();
+        downloadBytes(out, 'Careclinics-Signed.pdf');
+        setStatus('✓ Signature applied and downloaded!');
+      } catch (err) {
+        setStatus('Error signing PDF: ' + err.message, true);
+      }
+    };
+
+    // 5. ROTATE PDF
+    function renderRotateTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('rotInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">🔄</div>
+          <div id="rotLabel" style="font-weight:700;">Select a PDF file to rotate</div>
+          <input type="file" id="rotInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-group">
+          <label>Rotation Angle</label>
+          <select id="rotAngle">
+            <option value="90">90° Clockwise</option>
+            <option value="180">180° Upside Down</option>
+            <option value="270">270° Counter-Clockwise</option>
+          </select>
+        </div>
+        <button class="btn-action" id="btnRunRot" disabled onclick="runRotate()">🔄 Rotate & Download PDF</button>
+      `;
+      document.getElementById('rotInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('rotLabel').textContent = f.name;
+        document.getElementById('btnRunRot').disabled = false;
+      });
+    }
+
+    window.runRotate = async () => {
+      const deg = parseInt(document.getElementById('rotAngle').value, 10);
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      pdfDoc.getPages().forEach(p => {
+        const cur = p.getRotation().angle;
+        p.setRotation(PDFLib.degrees((cur + deg) % 360));
+      });
+      const bytes = await pdfDoc.save();
+      downloadBytes(bytes, 'Careclinics-Rotated.pdf');
+      setStatus(`✓ Rotated all pages by ${deg}°!`);
+    };
+
+    // 6. WATERMARK PDF
+    function renderWatermarkTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('wmInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">💧</div>
+          <div id="wmLabel" style="font-weight:700;">Select a PDF file to watermark</div>
+          <input type="file" id="wmInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Watermark Text</label>
+            <input type="text" id="wmText" value="CARECLINICS INTERNAL USE ONLY" />
+          </div>
+          <div class="form-group">
+            <label>Opacity (0.1 to 0.8)</label>
+            <input type="number" id="wmOpacity" value="0.22" min="0.05" max="0.9" step="0.05" />
+          </div>
+        </div>
+        <button class="btn-action" id="btnRunWm" disabled onclick="runWatermark()">💧 Apply Watermark & Download</button>
+      `;
+      document.getElementById('wmInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('wmLabel').textContent = f.name;
+        document.getElementById('btnRunWm').disabled = false;
+      });
+    }
+
+    window.runWatermark = async () => {
+      const text = document.getElementById('wmText').value.trim() || 'CONFIDENTIAL';
+      const opacity = parseFloat(document.getElementById('wmOpacity').value) || 0.22;
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      const font = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+
+      pdfDoc.getPages().forEach(p => {
+        const { width, height } = p.getSize();
+        p.drawText(text, {
+          x: width * 0.14,
+          y: height * 0.35,
+          size: 36,
+          font,
+          color: PDFLib.rgb(0.09, 0.25, 0.55),
+          opacity,
+          rotate: PDFLib.degrees(35)
+        });
+      });
+      const bytes = await pdfDoc.save();
+      downloadBytes(bytes, 'Careclinics-Watermarked.pdf');
+      setStatus('✓ Watermark stamped across all pages!');
+    };
+
+    // 7. PAGE NUMBERS
+    function renderPageNumbersTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('pnInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">🔢</div>
+          <div id="pnLabel" style="font-weight:700;">Select a PDF file to add page numbers</div>
+          <input type="file" id="pnInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Position</label>
+            <select id="pnPos">
+              <option value="bc">Bottom Center</option>
+              <option value="br">Bottom Right</option>
+              <option value="tr">Top Right</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Format</label>
+            <select id="pnFmt">
+              <option value="page-of">Page X of Y</option>
+              <option value="slash">X / Y</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-action" id="btnRunPn" disabled onclick="runPageNumbers()">🔢 Add Page Numbers & Download</button>
+      `;
+      document.getElementById('pnInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('pnLabel').textContent = f.name;
+        document.getElementById('btnRunPn').disabled = false;
+      });
+    }
+
+    window.runPageNumbers = async () => {
+      const pos = document.getElementById('pnPos').value;
+      const fmt = document.getElementById('pnFmt').value;
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+      const pages = pdfDoc.getPages();
+      const total = pages.length;
+
+      pages.forEach((p, idx) => {
+        const { width, height } = p.getSize();
+        const label = fmt === 'page-of' ? `Page ${idx + 1} of ${total}` : `${idx + 1} / ${total}`;
+        const textW = font.widthOfTextAtSize(label, 10);
+        let x = (width - textW) / 2;
+        let y = 24;
+        if (pos === 'br') x = width - textW - 36;
+        if (pos === 'tr') { x = width - textW - 36; y = height - 28; }
+        p.drawText(label, { x, y, size: 10, font, color: PDFLib.rgb(0.25, 0.3, 0.38) });
+      });
+
+      const bytes = await pdfDoc.save();
+      downloadBytes(bytes, 'Careclinics-Numbered.pdf');
+      setStatus(`✓ Numbered all ${total} pages!`);
+    };
+
+    // 8. IMAGES TO PDF
+    function renderImg2PdfTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('imgInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">🖼️</div>
+          <div id="imgLabel" style="font-weight:700;">Select JPG or PNG images to convert into a PDF</div>
+          <input type="file" id="imgInput" accept="image/jpeg,image/png" multiple style="display:none" />
+        </div>
+        <div id="imgList" class="file-list"></div>
+        <button class="btn-action" id="btnRunImg2Pdf" disabled onclick="runImg2Pdf()">🖼️ Convert Images to PDF</button>
+      `;
+      document.getElementById('imgInput').addEventListener('change', (e) => {
+        for (const f of e.target.files) stateFiles.push(f);
+        document.getElementById('imgList').innerHTML = stateFiles.map((f, i) => `<div class="file-pill"><span>#${i+1} — ${f.name}</span></div>`).join('');
+        document.getElementById('btnRunImg2Pdf').disabled = stateFiles.length === 0;
+      });
+    }
+
+    window.runImg2Pdf = async () => {
+      try {
+        const pdfDoc = await PDFLib.PDFDocument.create();
+        for (const f of stateFiles) {
+          const buf = await f.arrayBuffer();
+          const img = f.type.includes('png') ? await pdfDoc.embedPng(buf) : await pdfDoc.embedJpg(buf);
+          const page = pdfDoc.addPage([img.width, img.height]);
+          page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+        }
+        const bytes = await pdfDoc.save();
+        downloadBytes(bytes, 'Careclinics-Images.pdf');
+        setStatus(`✓ Converted ${stateFiles.length} image(s) to PDF!`);
+      } catch (err) {
+        setStatus('Image conversion error: ' + err.message, true);
+      }
+    };
+
+    // 9. PDF TO IMAGES
+    function renderPdf2ImgTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('p2iInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">📸</div>
+          <div id="p2iLabel" style="font-weight:700;">Select a PDF to render pages as high-res PNG images</div>
+          <input type="file" id="p2iInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div id="p2iGallery" class="pages-grid"></div>
+      `;
+      document.getElementById('p2iInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('p2iLabel').textContent = f.name;
+        const gallery = document.getElementById('p2iGallery');
+        gallery.innerHTML = '';
+        setStatus('Rendering high-res pages...');
+        const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 1.8 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+          const dataUrl = canvas.toDataURL('image/png');
+
+          const div = document.createElement('div');
+          div.className = 'page-thumb';
+          div.innerHTML = `
+            <div style="font-size:0.8rem; font-weight:700; margin-bottom:6px;">Page ${i}</div>
+            <img src="${dataUrl}" style="max-width:100%; border-radius:6px;" />
+            <div class="thumb-actions">
+              <a href="${dataUrl}" download="page-${i}.png" class="thumb-btn" style="text-decoration:none;">⬇ Download PNG</a>
+            </div>
+          `;
+          gallery.appendChild(div);
+        }
+        setStatus(`✓ Rendered ${pdf.numPages} page(s)! Click any page to download PNG.`);
+      });
+    }
+
+    // 10. EXTRACT TEXT
+    function renderExtractTextTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('txtInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">📝</div>
+          <div id="txtLabel" style="font-weight:700;">Select a PDF to extract all text</div>
+          <input type="file" id="txtInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-group">
+          <label>Extracted Document Text</label>
+          <textarea id="extractedArea" rows="10" placeholder="Extracted text will appear here..."></textarea>
+        </div>
+        <button class="btn-action" onclick="navigator.clipboard.writeText(document.getElementById('extractedArea').value); setStatus('✓ Copied text to clipboard!')">📋 Copy Text</button>
+      `;
+      document.getElementById('txtInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('txtLabel').textContent = f.name;
+        const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const strings = content.items.map(item => item.str).join(' ');
+          fullText += `--- Page ${i} ---\n${strings}\n\n`;
+        }
+        document.getElementById('extractedArea').value = fullText.trim();
+        setStatus(`✓ Extracted text from ${pdf.numPages} page(s)!`);
+      });
+    }
+
+    // 11. COMPRESS / OPTIMIZE PDF
+    function renderCompressTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('cmpInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">⚡</div>
+          <div id="cmpLabel" style="font-weight:700;">Select a PDF file to optimize object streams</div>
+          <input type="file" id="cmpInput" accept="application/pdf" style="display:none" />
+        </div>
+        <button class="btn-action" id="btnRunCmp" disabled onclick="runCompress()">⚡ Optimize & Download PDF</button>
+      `;
+      document.getElementById('cmpInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('cmpLabel').textContent = `${f.name} (${(f.size / 1024).toFixed(1)} KB)`;
+        document.getElementById('btnRunCmp').disabled = false;
+      });
+    }
+
+    window.runCompress = async () => {
+      const origKB = (currentPdfBuffer.byteLength / 1024).toFixed(1);
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      const bytes = await pdfDoc.save({ useObjectStreams: true, addDefaultPage: false });
+      const newKB = (bytes.byteLength / 1024).toFixed(1);
+      downloadBytes(bytes, 'Careclinics-Optimized.pdf');
+      setStatus(`✓ Optimized PDF saved (${origKB} KB → ${newKB} KB)!`);
+    };
+
+    // 12. EDIT METADATA
+    function renderMetadataTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('metaInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">🏷️</div>
+          <div id="metaLabel" style="font-weight:700;">Select a PDF to inspect and edit metadata</div>
+          <input type="file" id="metaInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="metaTitle" />
+          </div>
+          <div class="form-group">
+            <label>Author</label>
+            <input type="text" id="metaAuthor" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" id="metaSubject" />
+          </div>
+          <div class="form-group">
+            <label>Creator</label>
+            <input type="text" id="metaCreator" value="Careclinics Healthcare Services" />
+          </div>
+        </div>
+        <button class="btn-action" id="btnRunMeta" disabled onclick="runMetadata()">🏷️ Save Metadata & Download</button>
+      `;
+      document.getElementById('metaInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('metaLabel').textContent = f.name;
+        const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        document.getElementById('metaTitle').value = pdfDoc.getTitle() || f.name.replace(/\.pdf$/i, '');
+        document.getElementById('metaAuthor').value = pdfDoc.getAuthor() || 'Careclinics Healthcare Services';
+        document.getElementById('metaSubject').value = pdfDoc.getSubject() || '';
+        document.getElementById('btnRunMeta').disabled = false;
+      });
+    }
+
+    window.runMetadata = async () => {
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      pdfDoc.setTitle(document.getElementById('metaTitle').value.trim());
+      pdfDoc.setAuthor(document.getElementById('metaAuthor').value.trim());
+      pdfDoc.setSubject(document.getElementById('metaSubject').value.trim());
+      pdfDoc.setCreator(document.getElementById('metaCreator').value.trim());
+      pdfDoc.setProducer('Careclinics BentoPDF Engine');
+      const bytes = await pdfDoc.save();
+      downloadBytes(bytes, 'Careclinics-Metadata.pdf');
+      setStatus('✓ Updated PDF metadata and downloaded!');
+    };
+
+    // Auto-open tool if ?tool=... is present in URL
+    const urlTool = new URLSearchParams(window.location.search).get('tool');
+    if (urlTool) {
+      openTool(urlTool);
+    }
+  </script>
+</body>
+</html>

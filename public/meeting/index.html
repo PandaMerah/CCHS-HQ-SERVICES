@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+    <title>Care Clinics Group - Weekly Alignment</title>
+    <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg">
+    <link rel="stylesheet" href="/meeting/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Left Navy Sidebar with Logo, Clock & Date -->
+        <div class="sidebar">
+            <div>
+                <div class="brand-header">
+                    <img src="/careclinic-logo.webp" alt="Care Clinics Logo" class="sidebar-logo" onerror="this.src='/images/acme-logo.svg'">
+                    <div class="brand-subtitle">Weekly Alignment</div>
+                    
+                    <div class="sidebar-clock-container">
+                        <div class="sidebar-time" id="sidebar-time">--:--:--</div>
+                        <div class="sidebar-date" id="sidebar-date">-----, -- ---- ----</div>
+                    </div>
+                </div>
+
+                <!-- Auto-generating Slide Navigation -->
+                <div class="dept-pill-list" id="sidebar-menu"></div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-nav-links">
+                    <a href="/">⌂ Staff Portal</a>
+                    <a href="/meeting/input.html">✎ Staff Input</a>
+                    <a href="/admin/">🛡️ Admin Portal</a>
+                </div>
+                <div>Careclinics Healthcare Services HQ</div>
+            </div>
+        </div>
+
+        <!-- Right Main Viewport -->
+        <div class="main-viewport">
+            <div id="slides-container"></div>
+        </div>
+    </div>
+
+    <!-- On-Screen TV Navigation Overlay -->
+    <div class="tv-controls">
+        <button onclick="window.location.href='/'" title="Return to HQ Portal">⌂ HQ</button>
+        <button onclick="changeSlide(-1)">❮</button>
+        <span id="slide-indicator">1 / 1</span>
+        <button onclick="changeSlide(1)">❯</button>
+        <button onclick="toggleFullScreen()">⛶</button>
+        <button id="btn-autoplay" onclick="toggleAutoPlay()">▶ Auto</button>
+    </div>
+
+    <script type="module" src="/meeting/app.js"></script>
+</body>
+</html>
