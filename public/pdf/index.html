@@ -3,298 +3,377 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PDF Tools — Careclinics Healthcare Services (BentoPDF)</title>
-  <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
+  <title>BentoPDF Full Editing Suite — CareClinics HQ</title>
+  <link rel="icon" type="image/webp" href="/careclinic-logo.webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <!-- pdf-lib & pdf.js for 100% browser-based private PDF processing -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/shared/theme.css" />
+  <!-- pdf-lib & pdf.js for 100% browser-based client-side PDF editing & rendering -->
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     :root {
-      --bg-dark: #0f172a;
-      --bg-card: #1e293b;
-      --bg-card-hover: #26354d;
-      --cc-navy: #112349;
-      --cc-blue: #1863dc;
-      --cc-sky: #8ed1fc;
-      --border: #334155;
-      --text: #f8fafc;
-      --muted: #94a3b8;
+      --bg-dark: #F8FAFC;
+      --bg-panel: #F1F5F9;
+      --bg-card: #FFFFFF;
+      --bg-card-hover: #F8FBFF;
+      --cc-navy: #0F172A;
+      --cc-blue: #1863DC;
+      --cc-sky: #1863DC;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --muted: #475569;
+      --green: #16A34A;
+      --amber: #D97706;
+      --red: #DC2626;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-dark);
-      color: var(--text);
+      background: var(--bg-page);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    /* BentoPDF Simple Mode Navbar */
-    .navbar {
-      background: #111827;
-      border-bottom: 1px solid var(--border);
-      padding: 14px 32px;
-      position: sticky;
-      top: 0;
-      z-index: 40;
+    .nav-pill {
+      text-decoration: none;
+      color: var(--text-primary);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      min-height: 40px;
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .nav-pill:hover, .nav-pill.primary {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #FFFFFF;
+    }
+
+    .main-wrap {
+      max-width: var(--container-max);
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3.5rem;
+      flex: 1;
+    }
+
+    /* Hero Banner for Full Visual PDF Editor */
+    .studio-hero {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 1.75rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-sm);
     }
 
-    .brand-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: #ffffff;
+    .studio-hero-left {
+      max-width: 720px;
     }
 
-    .brand-link img {
-      height: 36px;
-      width: auto;
+    .studio-badge {
+      display: inline-block;
+      background: var(--color-primary-soft);
+      border: 1px solid var(--color-primary-border);
+      color: var(--color-primary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.65rem;
     }
 
-    .brand-name {
-      font-size: 1.15rem;
+    .studio-hero h1 {
+      font-size: 1.65rem;
       font-weight: 800;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
     }
 
-    .nav-actions {
+    .studio-hero p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .btn-launch-studio {
+      background: var(--color-primary);
+      color: #FFFFFF;
+      border: none;
+      min-height: 46px;
+      padding: 0.75rem 1.35rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      box-shadow: var(--shadow-xs);
+      transition: background 0.15s ease;
+    }
+
+    .btn-launch-studio:hover {
+      background: var(--color-primary-hover);
+    }
+
+    /* Search & Category Filter Bar */
+    .filter-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
     }
 
-    .nav-pill {
-      text-decoration: none;
-      color: #e2e8f0;
-      background: #1e293b;
-      border: 1px solid var(--border);
-      padding: 7px 14px;
-      border-radius: 10px;
-      font-size: 0.84rem;
+    .cat-tabs {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    .cat-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      min-height: 40px;
+      padding: 0.45rem 0.95rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.82rem;
       font-weight: 600;
-      transition: all 0.2s;
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
 
-    .nav-pill:hover {
-      background: var(--cc-blue);
-      border-color: var(--cc-sky);
-      color: #ffffff;
-    }
-
-    .main-wrap {
-      max-width: 1280px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 36px 24px 64px;
-      flex: 1;
-    }
-
-    /* Simple Mode Header */
-    .tools-header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .tools-header h1 {
-      font-size: 2.25rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-
-    .tools-header p {
-      color: var(--muted);
-      font-size: 1rem;
+    .cat-btn:hover, .cat-btn.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #FFFFFF;
     }
 
     .search-box {
-      max-width: 520px;
-      margin: 22px auto 0;
+      width: 340px;
+      max-width: 100%;
       position: relative;
     }
 
     .search-box input {
       width: 100%;
-      padding: 13px 18px 13px 42px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      min-height: 44px;
+      padding: 0.55rem 0.9rem 0.55rem 2.35rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
       background: var(--bg-card);
-      color: #ffffff;
-      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-size: 0.88rem;
       outline: none;
     }
 
     .search-box input:focus {
-      border-color: var(--cc-sky);
-      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.25);
+      border-color: var(--color-primary);
+      box-shadow: var(--focus-ring);
     }
 
     .search-box .icon {
       position: absolute;
-      left: 14px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--muted);
+      color: var(--text-muted);
     }
 
     /* Bento Tool Grid */
     .tool-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.15rem;
     }
 
     .tool-card {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 22px 20px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 0.55rem;
+      position: relative;
+      box-shadow: var(--shadow-xs);
     }
 
     .tool-card:hover {
       background: var(--bg-card-hover);
-      border-color: var(--cc-sky);
-      transform: translateY(-3px);
-      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3);
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .tool-card.featured {
+      border-color: var(--color-primary-border);
+      background: #F8FBFF;
+    }
+
+    .tool-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .tool-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.45rem;
-      background: rgba(24, 99, 220, 0.2);
-      border: 1px solid rgba(142, 209, 252, 0.25);
+      font-size: 1.35rem;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .tool-cat-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-pill);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      text-transform: uppercase;
     }
 
     .tool-name {
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--text-primary);
     }
 
     .tool-desc {
-      font-size: 0.83rem;
-      color: var(--muted);
-      line-height: 1.45;
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
     }
 
     /* Active Tool Workspace */
     .tool-workspace {
       display: none;
-      max-width: 920px;
+      max-width: 1380px;
       margin: 0 auto;
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 32px;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
     }
 
     .back-btn {
-      background: none;
-      border: none;
-      color: var(--cc-sky);
-      font-size: 0.92rem;
-      font-weight: 700;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      min-height: 40px;
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 20px;
+      margin-bottom: 1.15rem;
     }
 
     .back-btn:hover {
-      text-decoration: underline;
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #ffffff;
     }
 
     .dropzone {
-      border: 2px dashed #475569;
-      border-radius: 16px;
-      padding: 36px 24px;
+      border: 2px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.5rem;
       text-align: center;
-      background: rgba(15, 23, 42, 0.55);
+      background: var(--bg-subtle);
       cursor: pointer;
-      transition: all 0.2s;
-      margin: 18px 0;
+      transition: all 0.15s ease;
+      margin: 1rem 0;
     }
 
     .dropzone:hover {
-      border-color: var(--cc-sky);
-      background: rgba(24, 99, 220, 0.1);
+      border-color: var(--color-primary);
+      background: var(--color-primary-soft);
     }
 
-    .form-group {
-      margin-bottom: 16px;
-    }
-
+    .form-group { margin-bottom: 1rem; }
     .form-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
     }
 
     label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
-      color: #cbd5e1;
-      margin-bottom: 6px;
+      color: var(--text-primary);
+      margin-bottom: 0.35rem;
     }
 
     input[type="text"], input[type="number"], select, textarea {
       width: 100%;
-      padding: 11px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #0f172a;
-      color: #ffffff;
-      font-size: 0.92rem;
+      min-height: 44px;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 0.9rem;
       font-family: inherit;
     }
 
     .btn-action {
-      background: var(--cc-blue);
+      background: var(--color-primary);
       color: #ffffff;
       border: none;
-      padding: 13px 24px;
-      border-radius: 10px;
-      font-size: 0.96rem;
-      font-weight: 700;
+      min-height: 44px;
+      padding: 0.65rem 1.35rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.15s ease;
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
 
-    .btn-action:hover {
-      background: #2563eb;
-    }
-
-    .btn-action:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .btn-action:hover:not(:disabled) { background: var(--color-primary-hover); }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .file-list {
       display: flex;
@@ -304,26 +383,26 @@
     }
 
     .file-pill {
-      background: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
       padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
     }
 
     .pages-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
       gap: 14px;
-      margin: 18px 0;
+      margin: 16px 0;
     }
 
     .page-thumb {
-      background: #0f172a;
-      border: 2px solid var(--border);
+      background: var(--bg-subtle);
+      border: 2px solid var(--border-subtle);
       border-radius: 12px;
       padding: 10px;
       text-align: center;
@@ -345,22 +424,164 @@
     .thumb-actions {
       display: flex;
       justify-content: center;
-      gap: 6px;
+      flex-wrap: wrap;
+      gap: 5px;
       margin-top: 8px;
     }
 
     .thumb-btn {
-      background: #1e293b;
-      border: 1px solid var(--border);
-      color: #e2e8f0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
       padding: 4px 8px;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
+      font-weight: 600;
       cursor: pointer;
     }
 
-    .thumb-btn:hover {
-      background: var(--cc-blue);
+    .thumb-btn:hover { background: var(--color-primary); color: #fff; }
+
+    /* =========================================================================
+       INTERACTIVE VISUAL PDF EDITOR STUDIO STYLES
+       ========================================================================= */
+    .editor-ribbon {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .ribbon-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .ribbon-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      min-height: 38px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+
+    .ribbon-btn:hover, .ribbon-btn.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .editor-subbar {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+      font-size: 0.8rem;
+    }
+
+    .editor-subbar select, .editor-subbar input[type="text"], .editor-subbar input[type="number"] {
+      width: auto;
+      min-height: 36px;
+      padding: 5px 9px;
+      font-size: 0.8rem;
+    }
+
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 190px 1fr 260px;
+      gap: 14px;
+      height: 720px;
+    }
+
+    @media (max-width: 1100px) {
+      .editor-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    .editor-sidebar {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .editor-page-item {
+      border: 2px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 6px;
+      cursor: pointer;
+      text-align: center;
+      background: var(--bg-card);
+      transition: border-color 0.15s;
+    }
+
+    .editor-page-item.active {
+      border-color: var(--color-primary);
+      background: var(--color-primary-soft);
+    }
+
+    .editor-page-item canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+    }
+
+    .editor-stage {
+      background: #1E293B;
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      overflow: auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .canvas-stack {
+      position: relative;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      background: #ffffff;
+      user-select: none;
+    }
+
+    #pdfBgCanvas {
+      display: block;
+    }
+
+    #pdfOverlayCanvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      cursor: crosshair;
     }
 
     .sig-canvas-wrap {
@@ -368,61 +589,88 @@
       border-radius: 12px;
       padding: 8px;
       display: inline-block;
-      border: 2px solid var(--cc-sky);
+      border: 2px solid var(--color-primary);
     }
 
     .status-banner {
       margin-top: 16px;
       padding: 12px 16px;
       border-radius: 10px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       display: none;
     }
 
-    /* BentoPDF Branded Footer */
     .footer {
-      border-top: 1px solid var(--border);
-      background: #0b1120;
-      padding: 24px 32px;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      padding: 1.25rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 16px;
-      color: var(--muted);
-      font-size: 0.85rem;
+      gap: 1rem;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
     }
   </style>
 </head>
 <body>
-  <!-- Simple Mode Branded Navbar -->
-  <nav class="navbar" data-simple-nav="true">
-    <a href="/pdf/" class="brand-link" onclick="closeTool(event)">
-      <img src="/images/acme-logo.svg" alt="Careclinics Healthcare Services Logo" />
-      <img src="/careclinic-logo.webp" alt="Careclinics" style="height:32px;" onerror="this.style.display='none'" />
-      <span class="brand-name">Careclinics Healthcare Services</span>
-    </a>
-    <div class="nav-actions">
-      <span style="font-size:0.76rem; color:#34d399; background:rgba(16,185,129,0.14); border:1px solid rgba(16,185,129,0.3); padding:4px 10px; border-radius:999px; font-weight:600;">
-        🔒 100% Client-Side Private Processing
-      </span>
-      <a href="/" class="nav-pill">← Staff Portal</a>
-      <a href="/meeting/input.html" class="nav-pill">📝 Dept Update</a>
-      <a href="/booking/" class="nav-pill">📅 Room Booking</a>
-      <a href="/login.html" class="nav-pill" id="pdfAdminNavLink">🔒 Admin Login</a>
+  <nav class="cchs-navbar">
+    <div class="cchs-navbar-inner">
+      <a href="/pdf/" class="cchs-brand" onclick="closeTool(event)">
+        <img src="/careclinic-logo.webp" alt="CareClinics Logo" />
+        <div class="cchs-brand-text">
+          <span class="cchs-brand-title">CareClinics HQ</span>
+          <span class="cchs-brand-subtitle">BentoPDF Full Editing Suite</span>
+        </div>
+      </a>
+      <div class="cchs-nav-links">
+        <a href="/" class="cchs-nav-link">Portal Home</a>
+        <a href="/booking/" class="cchs-nav-link">Room Booking</a>
+        <a href="/meeting/input.html" class="cchs-nav-link">Dept Update</a>
+        <a href="/display/?mode=share" class="cchs-nav-link">Share Screen</a>
+        <a href="/pdf/" class="cchs-nav-link active" onclick="closeTool(event)">PDF Studio</a>
+      </div>
+      <div class="cchs-nav-right">
+        <button type="button" class="nav-pill primary" onclick="openTool('editor')">🎨 Open Visual PDF Editor</button>
+        <a href="/login.html" class="nav-pill" id="pdfAdminNavLink">🔒 Admin</a>
+      </div>
     </div>
   </nav>
 
   <main class="main-wrap">
     <!-- Grid View -->
     <div id="gridView">
-      <div class="tools-header">
-        <h1>PDF Tools</h1>
-        <p>Select a tool to get started — 100% browser-based, no files ever leave your computer.</p>
+      <!-- Featured Full Visual PDF Editor Hero -->
+      <div class="studio-hero">
+        <div class="studio-hero-left">
+          <span class="studio-badge">✨ Full BentoPDF Editing Suite v3.0</span>
+          <h1>Interactive Visual PDF Editor & 23 Pro PDF Tools</h1>
+          <p>
+            Edit PDFs directly on a visual canvas — add & replace text, whiteout content, highlight, redact sensitive info, draw freehand ink, insert images/stamps/signatures, fill interactive forms, merge, split, crop, and convert 100% privately in your browser.
+          </p>
+        </div>
+        <div>
+          <button type="button" class="btn-launch-studio" onclick="openTool('editor')">
+            <span style="font-size:1.3rem;">🎨</span> Launch Full Visual PDF Editor
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Tabs + Search -->
+      <div class="filter-row">
+        <div class="cat-tabs" id="catTabs">
+          <button type="button" class="cat-btn active" data-cat="ALL" onclick="selectCategory('ALL')">All 23 Tools</button>
+          <button type="button" class="cat-btn" data-cat="EDIT" onclick="selectCategory('EDIT')">✏️ Edit & Annotate</button>
+          <button type="button" class="cat-btn" data-cat="ORGANIZE" onclick="selectCategory('ORGANIZE')">🗂️ Organize & Merge</button>
+          <button type="button" class="cat-btn" data-cat="SECURITY" onclick="selectCategory('SECURITY')">🛡️ Sign, Stamp & Redact</button>
+          <button type="button" class="cat-btn" data-cat="CONVERT" onclick="selectCategory('CONVERT')">🔄 Convert & Export</button>
+          <button type="button" class="cat-btn" data-cat="OPTIMIZE" onclick="selectCategory('OPTIMIZE')">⚡ Layout & Optimize</button>
+        </div>
         <div class="search-box">
           <span class="icon">🔍</span>
-          <input type="text" id="toolSearch" placeholder="Search for a tool (e.g., 'merge', 'split', 'sign', 'watermark'...)" />
+          <input type="text" id="toolSearch" placeholder="Search 23 PDF tools (e.g. 'edit', 'forms', 'redact', 'crop')..." />
         </div>
       </div>
 
@@ -431,23 +679,25 @@
 
     <!-- Active Tool Interface -->
     <div id="toolWorkspace" class="tool-workspace">
-      <button type="button" class="back-btn" onclick="closeTool()">← Back to PDF Tools</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <button type="button" class="back-btn" style="margin-bottom:0;" onclick="closeTool()">← Back to All 23 PDF Tools</button>
+        <div style="font-size:0.78rem; color:#34d399; font-weight:600;">🔒 100% Local Browser Processing — Files Never Leave Your Device</div>
+      </div>
       <div id="toolHeader" style="margin-bottom: 18px;"></div>
       <div id="toolBody"></div>
       <div id="toolStatus" class="status-banner"></div>
     </div>
   </main>
 
-  <!-- Simple Mode Footer with docker-compose.yml branding -->
-  <footer class="footer" data-simple-footer="true">
+  <footer class="footer">
     <div style="display: flex; align-items: center; gap: 10px;">
       <img src="/images/acme-logo.svg" alt="Logo" style="height: 28px;" />
       <div>
         <div style="color: #ffffff; font-weight: 700;">Careclinics Healthcare Services</div>
-        <div>© 2026 Careclinics Healthcare Services. Internal use only.</div>
+        <div>© 2026 Careclinics Healthcare Services. Internal HQ Suite.</div>
       </div>
     </div>
-    <div>BentoPDF Self-Hosted Engine v2.8 • Zero-Upload Browser Processing</div>
+    <div>BentoPDF Full Editing Suite v3.0 • 23 Client-Side PDF Tools</div>
   </footer>
 
   <script>
@@ -456,20 +706,36 @@
     }
 
     const TOOLS = [
-      { id: 'merge', icon: '📑', name: 'Merge PDF', desc: 'Combine multiple PDF documents into a single unified file in any order.' },
-      { id: 'split', icon: '✂️', name: 'Split / Extract PDF', desc: 'Extract specific page ranges or split a PDF into separate documents.' },
-      { id: 'organize', icon: '🗂️', name: 'Organize & Delete Pages', desc: 'Visual page thumbnail editor to rotate, reorder, or remove PDF pages.' },
-      { id: 'sign', icon: '✍️', name: 'Sign & Stamp PDF', desc: 'Draw your handwritten signature or add an official Careclinics approval stamp.' },
-      { id: 'rotate', icon: '🔄', name: 'Rotate PDF', desc: 'Rotate all pages in a PDF document 90°, 180°, or 270° permanently.' },
-      { id: 'watermark', icon: '💧', name: 'Add Watermark', desc: 'Stamp confidential or internal-use text watermarks across all PDF pages.' },
-      { id: 'pagenumbers', icon: '🔢', name: 'Add Page Numbers', desc: 'Insert formatted Page X of Y numbering into headers or footers.' },
-      { id: 'img2pdf', icon: '🖼️', name: 'Images to PDF', desc: 'Convert JPG, PNG, or WebP images into a clean multi-page PDF document.' },
-      { id: 'pdf2img', icon: '📸', name: 'PDF to Images (PNG)', desc: 'Render and export PDF pages as high-resolution PNG images.' },
-      { id: 'extracttext', icon: '📝', name: 'Extract Text from PDF', desc: 'Extract readable text content from every page of your PDF file.' },
-      { id: 'compress', icon: '⚡', name: 'Optimize / Compress PDF', desc: 'Re-pack PDF object streams and strip unused metadata to reduce size.' },
-      { id: 'metadata', icon: '🏷️', name: 'Edit PDF Metadata', desc: 'Inspect and update PDF Title, Author, Subject, and Keywords properties.' }
+      { id: 'editor', cat: 'EDIT', featured: true, icon: '🎨', name: 'Visual PDF Canvas Editor', desc: 'Full WYSIWYG PDF Studio: add text, whiteout/replace text, highlight, draw freehand ink, shapes, stamps, signatures & images on any page.' },
+      { id: 'forms', cat: 'EDIT', featured: true, icon: '📋', name: 'Fill & Flatten PDF Forms', desc: 'Inspect and fill interactive PDF form fields (text boxes, checkboxes, dropdowns) and flatten into a permanent document.' },
+      { id: 'whiteout', cat: 'EDIT', icon: '⬜', name: 'Whiteout & Replace Text', desc: 'Cover existing text or typos on any PDF page with a clean whiteout patch and type replacement text over it.' },
+      { id: 'headerfooter', cat: 'EDIT', icon: '📄', name: 'Header & Footer Builder', desc: 'Insert customizable left, center, and right headers and footers across all pages of your PDF.' },
+      { id: 'pagenumbers', cat: 'EDIT', icon: '🔢', name: 'Page & Bates Numbering', desc: 'Insert Page X of Y, X/Y, or legal/clinical Bates numbering (e.g. CCHS-0001) into headers or footers.' },
+      { id: 'metadata', cat: 'EDIT', icon: '🏷️', name: 'Edit PDF Metadata', desc: 'View and modify PDF Title, Author, Subject, Keywords, Creator, and Producer properties.' },
+
+      { id: 'merge', cat: 'ORGANIZE', icon: '📑', name: 'Merge Multiple PDFs', desc: 'Combine 2 or more PDF files into a single document in your exact preferred sequence.' },
+      { id: 'split', cat: 'ORGANIZE', icon: '✂️', name: 'Split & Extract Pages', desc: 'Extract custom page ranges (e.g. 1-3, 5) or burst every page into separate standalone PDF files.' },
+      { id: 'organize', cat: 'ORGANIZE', icon: '🗂️', name: 'Organize, Duplicate & Delete', desc: 'Visual page thumbnail manager to reorder, rotate, duplicate, or delete specific pages.' },
+      { id: 'insertblank', cat: 'ORGANIZE', icon: '➕', name: 'Insert Blank Pages', desc: 'Insert blank A4 pages at specific positions or interleave blank note pages after every page.' },
+      { id: 'reverse', cat: 'ORGANIZE', icon: '🔃', name: 'Reverse Page Order', desc: 'Flip the page sequence of a scanned PDF document (Page N down to Page 1) in one click.' },
+      { id: 'rotate', cat: 'ORGANIZE', icon: '🔄', name: 'Rotate PDF Pages', desc: 'Rotate all pages, odd pages, or even pages by 90°, 180°, or 270° permanently.' },
+
+      { id: 'sign', cat: 'SECURITY', icon: '✍️', name: 'Sign & Official Stamp PDF', desc: 'Draw your handwritten signature, upload a signature PNG, or apply official Careclinics HQ approval stamps.' },
+      { id: 'redact', cat: 'SECURITY', icon: '██', name: 'Redact Sensitive Content', desc: 'Permanently black out confidential patient, IC, or financial details with solid redaction blocks.' },
+      { id: 'watermark', cat: 'SECURITY', icon: '💧', name: 'Add Custom Watermark', desc: 'Stamp CONFIDENTIAL, DRAFT, or custom text watermarks with adjustable color, angle, and opacity.' },
+      { id: 'flatten', cat: 'SECURITY', icon: '🔒', name: 'Flatten PDF Layers & Forms', desc: 'Lock and flatten interactive form fields and annotations so they cannot be altered.' },
+
+      { id: 'img2pdf', cat: 'CONVERT', icon: '🖼️', name: 'Images to PDF Converter', desc: 'Convert JPG, PNG, or WebP images into a multi-page PDF with A4 or Fit-to-Image formatting.' },
+      { id: 'pdf2img', cat: 'CONVERT', icon: '📸', name: 'PDF to High-Res PNG / JPG', desc: 'Render and export every PDF page as crisp high-resolution PNG or JPEG images.' },
+      { id: 'extracttext', cat: 'CONVERT', icon: '📝', name: 'Extract Text & Word Count', desc: 'Extract all text content page-by-page with word/character counts, copy, or export to .TXT.' },
+      { id: 'grayscale', cat: 'CONVERT', icon: '⚫', name: 'Grayscale / B&W PDF', desc: 'Convert full-color PDF pages into clean grayscale for economical monochrome office printing.' },
+
+      { id: 'crop', cat: 'OPTIMIZE', icon: '📐', name: 'Crop & Margin Adjuster', desc: 'Trim page margins or add extra white padding around all pages in points/millimeters.' },
+      { id: 'nup', cat: 'OPTIMIZE', icon: '📖', name: '2-Up Handout / Booklet', desc: 'Place 2 PDF pages side-by-side onto each landscape A4 sheet for compact meeting handouts.' },
+      { id: 'compress', cat: 'OPTIMIZE', icon: '⚡', name: 'Compress & Optimize PDF', desc: 'Repack PDF object streams, strip redundant metadata, or downsample heavy pages to shrink size.' }
     ];
 
+    let activeCategory = 'ALL';
     const toolGrid = document.getElementById('toolGrid');
     const gridView = document.getElementById('gridView');
     const toolWorkspace = document.getElementById('toolWorkspace');
@@ -477,12 +743,27 @@
     const toolBody = document.getElementById('toolBody');
     const toolStatus = document.getElementById('toolStatus');
 
+    window.selectCategory = (cat) => {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.cat === cat);
+      });
+      renderGrid(document.getElementById('toolSearch').value);
+    };
+
     function renderGrid(filter = '') {
       const q = filter.trim().toLowerCase();
-      const list = TOOLS.filter(t => (t.name + ' ' + t.desc).toLowerCase().includes(q));
+      const list = TOOLS.filter(t => {
+        const matchCat = activeCategory === 'ALL' || t.cat === activeCategory;
+        const matchQ = !q || (t.name + ' ' + t.desc + ' ' + t.cat).toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
       toolGrid.innerHTML = list.map(t => `
-        <div class="tool-card" onclick="openTool('${t.id}')">
-          <div class="tool-icon">${t.icon}</div>
+        <div class="tool-card ${t.featured ? 'featured' : ''}" onclick="openTool('${t.id}')">
+          <div class="tool-top">
+            <div class="tool-icon">${t.icon}</div>
+            <span class="tool-cat-tag">${t.cat}</span>
+          </div>
           <div class="tool-name">${t.name}</div>
           <div class="tool-desc">${t.desc}</div>
         </div>
@@ -512,6 +793,16 @@
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     }
 
+    function hexToRgb01(hex) {
+      const clean = (hex || '#000000').replace('#', '');
+      const num = parseInt(clean, 16);
+      return {
+        r: ((num >> 16) & 255) / 255,
+        g: ((num >> 8) & 255) / 255,
+        b: (num & 255) / 255
+      };
+    }
+
     function closeTool(e) {
       if (e) e.preventDefault();
       toolWorkspace.style.display = 'none';
@@ -521,7 +812,7 @@
     }
 
     let stateFiles = [];
-    let organizePageOps = []; // [{ pageIndex, rotate: 0, deleted: false }]
+    let organizePageOps = [];
     let currentPdfBuffer = null;
 
     function openTool(toolId) {
@@ -540,33 +831,807 @@
         <div style="display:flex; align-items:center; gap:14px;">
           <div class="tool-icon" style="width:52px; height:52px; font-size:1.6rem;">${tool.icon}</div>
           <div>
-            <h2 style="font-size:1.5rem; font-weight:800;">${tool.name}</h2>
-            <p style="color:var(--muted); font-size:0.9rem;">${tool.desc}</p>
+            <h2 style="font-size:1.45rem; font-weight:800;">${tool.name}</h2>
+            <p style="color:var(--muted); font-size:0.88rem;">${tool.desc}</p>
           </div>
         </div>
       `;
 
-      if (toolId === 'merge') renderMergeTool();
-      else if (toolId === 'split') renderSplitTool();
-      else if (toolId === 'organize') renderOrganizeTool();
-      else if (toolId === 'sign') renderSignTool();
-      else if (toolId === 'rotate') renderRotateTool();
-      else if (toolId === 'watermark') renderWatermarkTool();
-      else if (toolId === 'pagenumbers') renderPageNumbersTool();
-      else if (toolId === 'img2pdf') renderImg2PdfTool();
-      else if (toolId === 'pdf2img') renderPdf2ImgTool();
-      else if (toolId === 'extracttext') renderExtractTextTool();
-      else if (toolId === 'compress') renderCompressTool();
-      else if (toolId === 'metadata') renderMetadataTool();
+      const handlers = {
+        editor: renderVisualEditorTool,
+        forms: renderFormsTool,
+        whiteout: () => renderVisualEditorTool('whiteout'),
+        redact: () => renderVisualEditorTool('redact'),
+        merge: renderMergeTool,
+        split: renderSplitTool,
+        organize: renderOrganizeTool,
+        sign: renderSignTool,
+        rotate: renderRotateTool,
+        watermark: renderWatermarkTool,
+        pagenumbers: renderPageNumbersTool,
+        headerfooter: renderHeaderFooterTool,
+        crop: renderCropTool,
+        insertblank: renderInsertBlankTool,
+        reverse: renderReverseTool,
+        nup: renderNupTool,
+        img2pdf: renderImg2PdfTool,
+        pdf2img: renderPdf2ImgTool,
+        grayscale: renderGrayscaleTool,
+        flatten: renderFlattenTool,
+        extracttext: renderExtractTextTool,
+        compress: renderCompressTool,
+        metadata: renderMetadataTool
+      };
+
+      if (handlers[toolId]) handlers[toolId]();
     }
 
-    // 1. MERGE PDF
+    // =========================================================================
+    // 1. FULL INTERACTIVE VISUAL PDF CANVAS EDITOR (editor / whiteout / redact)
+    // =========================================================================
+    let edPdfJsDoc = null;
+    let edCurrentPage = 1;
+    let edScale = 1.25;
+    let edActiveMode = 'select'; // 'select' | 'text' | 'whiteout' | 'highlight' | 'redact' | 'draw' | 'rect' | 'stamp' | 'image'
+    let edAnnotations = {}; // { [pageNum]: [ { id, type, x, y, w, h, text, color, bgColor, fontSize, fontFamily, points, imgDataUrl, stampLabel } ] }
+    let edSelectedId = null;
+    let edIsDragging = false;
+    let edStartPos = { x: 0, y: 0 };
+    let edCurrentPath = [];
+    let edPendingImageUrl = null;
+
+    function renderVisualEditorTool(initialMode = 'text') {
+      edActiveMode = initialMode;
+      edAnnotations = {};
+      edSelectedId = null;
+      edCurrentPage = 1;
+
+      toolBody.innerHTML = `
+        <div id="edUploadStep" class="dropzone" onclick="document.getElementById('edFileInput').click()">
+          <div style="font-size:2.4rem; margin-bottom:8px;">🎨</div>
+          <div style="font-weight:800; font-size:1.1rem;">Open a PDF in the Full Visual Canvas Editor</div>
+          <div style="color:var(--muted); font-size:0.86rem; margin-top:4px;">
+            Add text, whiteout & replace existing text, highlight, redact, draw freehand ink, insert images, or stamp & sign anywhere on any page.
+          </div>
+          <div style="margin-top:14px;">
+            <button type="button" class="btn-action" onclick="event.stopPropagation(); createBlankPdfForEditor()">📄 Or Start with a New Blank A4 PDF</button>
+          </div>
+          <input type="file" id="edFileInput" accept="application/pdf" style="display:none" />
+        </div>
+
+        <div id="edStudioWrap" style="display:none;">
+          <!-- Main Editing Ribbon -->
+          <div class="editor-ribbon">
+            <div class="ribbon-group">
+              <button type="button" class="ribbon-btn" data-edmode="select" onclick="setEditorMode('select')">↖ Select / Move</button>
+              <button type="button" class="ribbon-btn" data-edmode="text" onclick="setEditorMode('text')">🔤 Add Text</button>
+              <button type="button" class="ribbon-btn" data-edmode="whiteout" onclick="setEditorMode('whiteout')">⬜ Whiteout & Replace</button>
+              <button type="button" class="ribbon-btn" data-edmode="highlight" onclick="setEditorMode('highlight')">🖍️ Highlight</button>
+              <button type="button" class="ribbon-btn" data-edmode="redact" onclick="setEditorMode('redact')">██ Redact</button>
+              <button type="button" class="ribbon-btn" data-edmode="draw" onclick="setEditorMode('draw')">✏️ Freehand Ink</button>
+              <button type="button" class="ribbon-btn" data-edmode="rect" onclick="setEditorMode('rect')">▭ Box / Shape</button>
+              <button type="button" class="ribbon-btn" data-edmode="stamp" onclick="setEditorMode('stamp')">💮 Stamp</button>
+              <button type="button" class="ribbon-btn" onclick="document.getElementById('edImgUpload').click()">🖼️ Insert Image/Sign</button>
+              <input type="file" id="edImgUpload" accept="image/png,image/jpeg,image/webp" style="display:none" />
+            </div>
+            <div class="ribbon-group">
+              <button type="button" class="ribbon-btn" onclick="undoLastAnnotation()" title="Undo last item on page">↩ Undo</button>
+              <button type="button" class="ribbon-btn" onclick="deleteSelectedAnnotation()" title="Delete selected item">🗑️ Delete</button>
+              <button type="button" class="btn-action" style="padding:8px 16px; font-size:0.84rem; background:#10b981;" onclick="exportEditedPdf()">💾 Export & Download PDF</button>
+            </div>
+          </div>
+
+          <!-- Context Properties Sub-bar -->
+          <div class="editor-subbar">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <label style="margin:0;">Text / Label:</label>
+              <input type="text" id="edPropText" value="Sample Text" placeholder="Type text here..." style="width:190px;" oninput="updateSelectedAnnotationProp()" />
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <label style="margin:0;">Size:</label>
+              <input type="number" id="edPropSize" value="14" min="6" max="72" style="width:64px;" oninput="updateSelectedAnnotationProp()" />
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <label style="margin:0;">Color:</label>
+              <input type="color" id="edPropColor" value="#0f172a" style="width:36px; height:30px; padding:2px; background:#0f172a; border:1px solid var(--border); border-radius:6px;" oninput="updateSelectedAnnotationProp()" />
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <label style="margin:0;">Stamp Preset:</label>
+              <select id="edStampPreset" onchange="document.getElementById('edPropText').value = this.value; updateSelectedAnnotationProp();">
+                <option value="APPROVED — CARECLINICS HQ">APPROVED — CARECLINICS HQ</option>
+                <option value="CONFIDENTIAL — INTERNAL USE">CONFIDENTIAL — INTERNAL USE</option>
+                <option value="VERIFIED & SIGNED">VERIFIED & SIGNED</option>
+                <option value="RECEIVED — CARECLINICS">RECEIVED — CARECLINICS</option>
+                <option value="DRAFT COPY">DRAFT COPY</option>
+              </select>
+            </div>
+            <div style="margin-left:auto; display:flex; align-items:center; gap:6px;">
+              <button type="button" class="thumb-btn" onclick="changeEditorZoom(-0.2)">🔍 -</button>
+              <span id="edZoomLabel" style="font-weight:700;">125%</span>
+              <button type="button" class="thumb-btn" onclick="changeEditorZoom(0.2)">🔍 +</button>
+            </div>
+          </div>
+
+          <!-- 3-Pane Studio Workspace -->
+          <div class="editor-layout">
+            <!-- Left: Page Thumbnails -->
+            <div class="editor-sidebar" id="edPageThumbList"></div>
+
+            <!-- Center: Interactive PDF Canvas Stage -->
+            <div class="editor-stage">
+              <div class="canvas-stack" id="edCanvasStack">
+                <canvas id="pdfBgCanvas"></canvas>
+                <canvas id="pdfOverlayCanvas"></canvas>
+              </div>
+            </div>
+
+            <!-- Right: Active Page Layers & Quick Page Actions -->
+            <div class="editor-sidebar">
+              <div style="font-weight:800; font-size:0.85rem; color:var(--cc-sky);">Page <span id="edCurPageNum">1</span> Actions</div>
+              <button type="button" class="ribbon-btn" style="width:100%; justify-content:center;" onclick="edAddBlankPageAfterCurrent()">➕ Insert Blank Page</button>
+              <div style="border-top:1px solid var(--border); margin:4px 0;"></div>
+              <div style="font-weight:800; font-size:0.82rem; color:#cbd5e1;">Added Elements on Page</div>
+              <div id="edLayersList" style="display:flex; flex-direction:column; gap:6px; font-size:0.78rem;"></div>
+              <div style="margin-top:auto; background:rgba(24,99,220,0.15); border:1px solid rgba(142,209,252,0.3); border-radius:8px; padding:10px; font-size:0.75rem; color:#dbeafe; line-height:1.4;">
+                💡 <strong>Tip:</strong> Click or drag directly on the PDF page to add text, whiteout existing words, highlight, redact, or place stamps. Use <strong>↖ Select / Move</strong> to drag any added item.
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('edFileInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        await initVisualEditorWithBuffer();
+      });
+
+      document.getElementById('edImgUpload').addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          edPendingImageUrl = reader.result;
+          setEditorMode('image');
+          setStatus('Click or drag on the PDF page to place your uploaded image/signature!');
+        };
+        reader.readAsDataURL(f);
+      });
+    }
+
+    window.createBlankPdfForEditor = async () => {
+      const doc = await PDFLib.PDFDocument.create();
+      doc.addPage([595.28, 841.89]); // Standard A4
+      const bytes = await doc.save();
+      currentPdfBuffer = bytes.buffer;
+      await initVisualEditorWithBuffer();
+    };
+
+    async function initVisualEditorWithBuffer() {
+      document.getElementById('edUploadStep').style.display = 'none';
+      document.getElementById('edStudioWrap').style.display = 'block';
+      edPdfJsDoc = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+      edCurrentPage = 1;
+      setEditorMode(edActiveMode);
+      await renderEditorThumbnails();
+      await renderEditorMainPage();
+      setupOverlayCanvasEvents();
+    }
+
+    window.setEditorMode = (mode) => {
+      edActiveMode = mode;
+      document.querySelectorAll('[data-edmode]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.edmode === mode);
+      });
+      if (mode === 'highlight') {
+        document.getElementById('edPropColor').value = '#facc15';
+      } else if (mode === 'redact') {
+        document.getElementById('edPropColor').value = '#000000';
+      } else if (mode === 'stamp') {
+        document.getElementById('edPropColor').value = '#1863dc';
+        document.getElementById('edPropText').value = document.getElementById('edStampPreset').value;
+      } else if (mode === 'text' || mode === 'whiteout') {
+        document.getElementById('edPropColor').value = '#0f172a';
+      }
+    };
+
+    window.changeEditorZoom = async (delta) => {
+      edScale = Math.max(0.6, Math.min(2.4, +(edScale + delta).toFixed(2)));
+      document.getElementById('edZoomLabel').textContent = `${Math.round(edScale * 100)}%`;
+      await renderEditorMainPage();
+    };
+
+    async function renderEditorThumbnails() {
+      const list = document.getElementById('edPageThumbList');
+      list.innerHTML = '';
+      for (let i = 1; i <= edPdfJsDoc.numPages; i++) {
+        const item = document.createElement('div');
+        item.className = `editor-page-item ${i === edCurrentPage ? 'active' : ''}`;
+        item.innerHTML = `
+          <div style="font-size:0.74rem; font-weight:700; margin-bottom:4px;">Page ${i}</div>
+          <canvas id="edThumb-${i}"></canvas>
+        `;
+        item.onclick = async () => {
+          edCurrentPage = i;
+          edSelectedId = null;
+          document.querySelectorAll('.editor-page-item').forEach((el, idx) => el.classList.toggle('active', idx + 1 === i));
+          await renderEditorMainPage();
+        };
+        list.appendChild(item);
+
+        const page = await edPdfJsDoc.getPage(i);
+        const vp = page.getViewport({ scale: 0.22 });
+        const c = item.querySelector('canvas');
+        c.width = vp.width;
+        c.height = vp.height;
+        await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+      }
+    }
+
+    async function renderEditorMainPage() {
+      if (!edPdfJsDoc) return;
+      document.getElementById('edCurPageNum').textContent = edCurrentPage;
+      const page = await edPdfJsDoc.getPage(edCurrentPage);
+      const viewport = page.getViewport({ scale: edScale });
+
+      const bgCanvas = document.getElementById('pdfBgCanvas');
+      const ovCanvas = document.getElementById('pdfOverlayCanvas');
+      bgCanvas.width = viewport.width;
+      bgCanvas.height = viewport.height;
+      ovCanvas.width = viewport.width;
+      ovCanvas.height = viewport.height;
+
+      await page.render({ canvasContext: bgCanvas.getContext('2d'), viewport }).promise;
+      drawEditorAnnotations();
+    }
+
+    function getPageAnns() {
+      if (!edAnnotations[edCurrentPage]) edAnnotations[edCurrentPage] = [];
+      return edAnnotations[edCurrentPage];
+    }
+
+    function drawEditorAnnotations() {
+      const ovCanvas = document.getElementById('pdfOverlayCanvas');
+      if (!ovCanvas) return;
+      const ctx = ovCanvas.getContext('2d');
+      ctx.clearRect(0, 0, ovCanvas.width, ovCanvas.height);
+
+      const anns = getPageAnns();
+      for (const a of anns) {
+        ctx.save();
+        const sx = a.x * edScale;
+        const sy = a.y * edScale;
+        const sw = (a.w || 140) * edScale;
+        const sh = (a.h || 32) * edScale;
+
+        if (a.type === 'whiteout') {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(sx, sy, sw, sh);
+          if (a.text) {
+            ctx.fillStyle = a.color || '#0f172a';
+            ctx.font = `600 ${Math.round((a.fontSize || 13) * edScale)}px Inter, sans-serif`;
+            ctx.textBaseline = 'top';
+            ctx.fillText(a.text, sx + 4, sy + 4);
+          }
+        } else if (a.type === 'text') {
+          ctx.fillStyle = a.color || '#0f172a';
+          ctx.font = `600 ${Math.round((a.fontSize || 15) * edScale)}px Inter, sans-serif`;
+          ctx.textBaseline = 'top';
+          ctx.fillText(a.text || 'Text', sx, sy);
+        } else if (a.type === 'highlight') {
+          ctx.fillStyle = a.color || '#facc15';
+          ctx.globalAlpha = 0.38;
+          ctx.fillRect(sx, sy, sw, sh);
+        } else if (a.type === 'redact') {
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(sx, sy, sw, sh);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = `700 ${Math.max(9, Math.round(10 * edScale))}px Inter, sans-serif`;
+          ctx.fillText('REDACTED', sx + 6, sy + sh / 2 - 5);
+        } else if (a.type === 'rect') {
+          ctx.strokeStyle = a.color || '#1863dc';
+          ctx.lineWidth = 2.2 * edScale;
+          ctx.strokeRect(sx, sy, sw, sh);
+        } else if (a.type === 'stamp') {
+          ctx.strokeStyle = a.color || '#1863dc';
+          ctx.lineWidth = 2.5 * edScale;
+          ctx.fillStyle = 'rgba(24, 99, 220, 0.08)';
+          ctx.fillRect(sx, sy, sw, sh);
+          ctx.strokeRect(sx, sy, sw, sh);
+          ctx.fillStyle = a.color || '#1863dc';
+          ctx.font = `800 ${Math.round(11 * edScale)}px Inter, sans-serif`;
+          ctx.textBaseline = 'middle';
+          ctx.fillText(a.text || 'APPROVED', sx + 10 * edScale, sy + sh / 2);
+        } else if (a.type === 'draw' && Array.isArray(a.points) && a.points.length > 1) {
+          ctx.strokeStyle = a.color || '#1863dc';
+          ctx.lineWidth = (a.strokeWidth || 2.5) * edScale;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.beginPath();
+          ctx.moveTo(a.points[0].x * edScale, a.points[0].y * edScale);
+          for (let i = 1; i < a.points.length; i++) {
+            ctx.lineTo(a.points[i].x * edScale, a.points[i].y * edScale);
+          }
+          ctx.stroke();
+        } else if (a.type === 'image' && a.imgEl) {
+          ctx.drawImage(a.imgEl, sx, sy, sw, sh);
+        }
+
+        if (a.id === edSelectedId) {
+          ctx.globalAlpha = 1;
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 3]);
+          ctx.strokeRect(sx - 3, sy - 3, sw + 6, sh + 6);
+        }
+        ctx.restore();
+      }
+      renderLayersSidebar();
+    }
+
+    function renderLayersSidebar() {
+      const list = document.getElementById('edLayersList');
+      if (!list) return;
+      const anns = getPageAnns();
+      if (anns.length === 0) {
+        list.innerHTML = `<div style="color:var(--muted);">No edits on this page yet.</div>`;
+        return;
+      }
+      list.innerHTML = anns.map((a, idx) => `
+        <div onclick="selectLayerItem('${a.id}')" style="padding:6px 8px; border-radius:6px; background:${a.id === edSelectedId ? 'rgba(24,99,220,0.35)' : '#1e293b'}; border:1px solid ${a.id === edSelectedId ? '#8ed1fc' : '#334155'}; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+          <span>#${idx + 1} ${a.type.toUpperCase()}${a.text ? ': ' + a.text.slice(0, 14) : ''}</span>
+          <button type="button" onclick="event.stopPropagation(); removeLayerById('${a.id}')" style="background:none; border:none; color:#fca5a5; cursor:pointer;">✕</button>
+        </div>
+      `).join('');
+    }
+
+    window.selectLayerItem = (id) => {
+      edSelectedId = id;
+      const a = getPageAnns().find(item => item.id === id);
+      if (a) {
+        if (a.text !== undefined) document.getElementById('edPropText').value = a.text;
+        if (a.fontSize) document.getElementById('edPropSize').value = a.fontSize;
+        if (a.color) document.getElementById('edPropColor').value = a.color;
+      }
+      drawEditorAnnotations();
+    };
+
+    window.removeLayerById = (id) => {
+      edAnnotations[edCurrentPage] = getPageAnns().filter(a => a.id !== id);
+      if (edSelectedId === id) edSelectedId = null;
+      drawEditorAnnotations();
+    };
+
+    window.undoLastAnnotation = () => {
+      const anns = getPageAnns();
+      anns.pop();
+      edSelectedId = null;
+      drawEditorAnnotations();
+    };
+
+    window.deleteSelectedAnnotation = () => {
+      if (!edSelectedId) return;
+      window.removeLayerById(edSelectedId);
+    };
+
+    window.updateSelectedAnnotationProp = () => {
+      if (!edSelectedId) return;
+      const a = getPageAnns().find(item => item.id === edSelectedId);
+      if (!a) return;
+      a.text = document.getElementById('edPropText').value;
+      a.fontSize = parseInt(document.getElementById('edPropSize').value, 10) || 14;
+      a.color = document.getElementById('edPropColor').value;
+      drawEditorAnnotations();
+    };
+
+    function setupOverlayCanvasEvents() {
+      const ovCanvas = document.getElementById('pdfOverlayCanvas');
+      if (!ovCanvas) return;
+
+      const getUnscaledCoords = (e) => {
+        const rect = ovCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: (clientX - rect.left) / edScale,
+          y: (clientY - rect.top) / edScale
+        };
+      };
+
+      ovCanvas.onmousedown = (e) => {
+        const pos = getUnscaledCoords(e);
+        edStartPos = pos;
+        edIsDragging = true;
+
+        const anns = getPageAnns();
+        const color = document.getElementById('edPropColor').value;
+        const fontSize = parseInt(document.getElementById('edPropSize').value, 10) || 14;
+        const propText = document.getElementById('edPropText').value;
+
+        if (edActiveMode === 'select') {
+          const hit = [...anns].reverse().find(a =>
+            pos.x >= a.x && pos.x <= a.x + (a.w || 150) &&
+            pos.y >= a.y && pos.y <= a.y + (a.h || 32)
+          );
+          edSelectedId = hit ? hit.id : null;
+          if (hit) window.selectLayerItem(hit.id);
+          else drawEditorAnnotations();
+          return;
+        }
+
+        const id = 'ann-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5);
+        if (edActiveMode === 'text') {
+          const entered = prompt('Enter text to place on page:', propText || 'Sample Text');
+          edIsDragging = false;
+          if (entered === null) return;
+          document.getElementById('edPropText').value = entered;
+          anns.push({
+            id,
+            type: 'text',
+            x: pos.x,
+            y: pos.y,
+            w: Math.max(80, entered.length * (fontSize * 0.55)),
+            h: fontSize + 8,
+            text: entered,
+            fontSize,
+            color
+          });
+          edSelectedId = id;
+          drawEditorAnnotations();
+        } else if (edActiveMode === 'whiteout') {
+          const entered = prompt('Enter replacement text (or leave blank for pure whiteout):', '');
+          if (entered === null) { edIsDragging = false; return; }
+          anns.push({
+            id,
+            type: 'whiteout',
+            x: pos.x,
+            y: pos.y,
+            w: Math.max(120, (entered.length || 8) * (fontSize * 0.6) + 16),
+            h: fontSize + 14,
+            text: entered,
+            fontSize,
+            color
+          });
+          edSelectedId = id;
+          edIsDragging = false;
+          drawEditorAnnotations();
+        } else if (edActiveMode === 'stamp') {
+          const stampTxt = document.getElementById('edStampPreset').value || propText || 'APPROVED';
+          anns.push({
+            id,
+            type: 'stamp',
+            x: pos.x,
+            y: pos.y,
+            w: Math.max(180, stampTxt.length * 7.5 + 24),
+            h: 34,
+            text: stampTxt,
+            color
+          });
+          edSelectedId = id;
+          edIsDragging = false;
+          drawEditorAnnotations();
+        } else if (edActiveMode === 'image' && edPendingImageUrl) {
+          const imgEl = new Image();
+          imgEl.onload = () => {
+            const aspect = imgEl.height / (imgEl.width || 1);
+            const w = 150;
+            const h = Math.round(w * aspect);
+            anns.push({
+              id,
+              type: 'image',
+              x: pos.x,
+              y: pos.y,
+              w,
+              h,
+              imgDataUrl: edPendingImageUrl,
+              imgEl
+            });
+            edSelectedId = id;
+            drawEditorAnnotations();
+          };
+          imgEl.src = edPendingImageUrl;
+          edIsDragging = false;
+        } else if (edActiveMode === 'draw') {
+          edCurrentPath = [{ x: pos.x, y: pos.y }];
+          anns.push({
+            id,
+            type: 'draw',
+            x: pos.x,
+            y: pos.y,
+            w: 40,
+            h: 40,
+            points: edCurrentPath,
+            color,
+            strokeWidth: 2.5
+          });
+          edSelectedId = id;
+        } else if (edActiveMode === 'highlight' || edActiveMode === 'redact' || edActiveMode === 'rect') {
+          anns.push({
+            id,
+            type: edActiveMode,
+            x: pos.x,
+            y: pos.y,
+            w: 10,
+            h: 22,
+            color
+          });
+          edSelectedId = id;
+        }
+      };
+
+      ovCanvas.onmousemove = (e) => {
+        if (!edIsDragging || !edSelectedId) return;
+        const pos = getUnscaledCoords(e);
+        const a = getPageAnns().find(item => item.id === edSelectedId);
+        if (!a) return;
+
+        if (edActiveMode === 'select') {
+          const dx = pos.x - edStartPos.x;
+          const dy = pos.y - edStartPos.y;
+          a.x += dx;
+          a.y += dy;
+          edStartPos = pos;
+          drawEditorAnnotations();
+        } else if (a.type === 'draw') {
+          a.points.push({ x: pos.x, y: pos.y });
+          drawEditorAnnotations();
+        } else if (a.type === 'highlight' || a.type === 'redact' || a.type === 'rect') {
+          a.w = Math.max(12, pos.x - edStartPos.x);
+          a.h = Math.max(12, pos.y - edStartPos.y);
+          drawEditorAnnotations();
+        }
+      };
+
+      window.addEventListener('mouseup', () => {
+        edIsDragging = false;
+      });
+    }
+
+    window.edAddBlankPageAfterCurrent = async () => {
+      if (!currentPdfBuffer) return;
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      const refPage = pdfDoc.getPage(edCurrentPage - 1);
+      const { width, height } = refPage.getSize();
+      pdfDoc.insertPage(edCurrentPage, [width, height]);
+      const saved = await pdfDoc.save();
+      currentPdfBuffer = saved.buffer;
+      edPdfJsDoc = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+      edCurrentPage++;
+      await renderEditorThumbnails();
+      await renderEditorMainPage();
+      setStatus(`✓ Inserted blank page at Page ${edCurrentPage}!`);
+    };
+
+    window.exportEditedPdf = async () => {
+      try {
+        setStatus('Baking all visual edits, text, whiteouts, redactions & stamps into PDF...');
+        const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        const fontRegular = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+        const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+        const pages = pdfDoc.getPages();
+
+        for (let pNum = 1; pNum <= pages.length; pNum++) {
+          const anns = edAnnotations[pNum] || [];
+          if (anns.length === 0) continue;
+          const page = pages[pNum - 1];
+          const { height } = page.getSize();
+
+          for (const a of anns) {
+            const c = hexToRgb01(a.color || '#0f172a');
+            const pdfColor = PDFLib.rgb(c.r, c.g, c.b);
+            const w = a.w || 120;
+            const h = a.h || 24;
+            const pdfY = height - a.y - h;
+
+            if (a.type === 'whiteout') {
+              page.drawRectangle({
+                x: a.x,
+                y: pdfY,
+                width: w,
+                height: h,
+                color: PDFLib.rgb(1, 1, 1)
+              });
+              if (a.text) {
+                page.drawText(a.text, {
+                  x: a.x + 4,
+                  y: height - a.y - (a.fontSize || 13) - 2,
+                  size: a.fontSize || 13,
+                  font: fontBold,
+                  color: pdfColor
+                });
+              }
+            } else if (a.type === 'text') {
+              page.drawText(a.text || '', {
+                x: a.x,
+                y: height - a.y - (a.fontSize || 15),
+                size: a.fontSize || 15,
+                font: fontBold,
+                color: pdfColor
+              });
+            } else if (a.type === 'highlight') {
+              page.drawRectangle({
+                x: a.x,
+                y: pdfY,
+                width: w,
+                height: h,
+                color: pdfColor,
+                opacity: 0.36
+              });
+            } else if (a.type === 'redact') {
+              page.drawRectangle({
+                x: a.x,
+                y: pdfY,
+                width: w,
+                height: h,
+                color: PDFLib.rgb(0, 0, 0)
+              });
+            } else if (a.type === 'rect') {
+              page.drawRectangle({
+                x: a.x,
+                y: pdfY,
+                width: w,
+                height: h,
+                borderColor: pdfColor,
+                borderWidth: 2
+              });
+            } else if (a.type === 'stamp') {
+              page.drawRectangle({
+                x: a.x,
+                y: pdfY,
+                width: w,
+                height: h,
+                color: PDFLib.rgb(0.09, 0.38, 0.86),
+                opacity: 0.08,
+                borderColor: pdfColor,
+                borderWidth: 2
+              });
+              page.drawText(a.text || 'APPROVED', {
+                x: a.x + 10,
+                y: pdfY + h / 2 - 4,
+                size: 11,
+                font: fontBold,
+                color: pdfColor
+              });
+            } else if (a.type === 'draw' && Array.isArray(a.points) && a.points.length > 1) {
+              for (let i = 1; i < a.points.length; i++) {
+                const p0 = a.points[i - 1];
+                const p1 = a.points[i];
+                page.drawLine({
+                  start: { x: p0.x, y: height - p0.y },
+                  end: { x: p1.x, y: height - p1.y },
+                  thickness: a.strokeWidth || 2.2,
+                  color: pdfColor
+                });
+              }
+            } else if (a.type === 'image' && a.imgDataUrl) {
+              const embedded = a.imgDataUrl.includes('image/png')
+                ? await pdfDoc.embedPng(a.imgDataUrl)
+                : await pdfDoc.embedJpg(a.imgDataUrl);
+              page.drawImage(embedded, {
+                x: a.x,
+                y: pdfY,
+                width: w,
+                height: h
+              });
+            }
+          }
+        }
+
+        const outBytes = await pdfDoc.save();
+        downloadBytes(outBytes, 'Careclinics-Edited-Studio.pdf');
+        setStatus('✓ Exported and downloaded your edited PDF!');
+      } catch (err) {
+        setStatus('Export error: ' + err.message, true);
+      }
+    };
+
+    // =========================================================================
+    // 2. FILL & FLATTEN INTERACTIVE PDF FORMS
+    // =========================================================================
+    function renderFormsTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('formPdfInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">📋</div>
+          <div id="formPdfLabel" style="font-weight:700;">Select a PDF file with interactive form fields (AcroForm)</div>
+          <input type="file" id="formPdfInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div id="detectedFieldsContainer" style="margin: 16px 0;"></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-action" id="btnSaveFilledForm" disabled onclick="runSavePdfForm(false)">💾 Save Filled PDF Form</button>
+          <button class="btn-action" id="btnFlattenFilledForm" style="background:#10b981;" disabled onclick="runSavePdfForm(true)">🔒 Save & Flatten Form Fields</button>
+        </div>
+      `;
+
+      document.getElementById('formPdfInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('formPdfLabel').textContent = f.name;
+        const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        const form = pdfDoc.getForm();
+        const fields = form.getFields();
+        const container = document.getElementById('detectedFieldsContainer');
+
+        document.getElementById('btnSaveFilledForm').disabled = false;
+        document.getElementById('btnFlattenFilledForm').disabled = false;
+
+        if (fields.length === 0) {
+          container.innerHTML = `
+            <div style="background:#0f172a; border:1px solid var(--border); padding:16px; border-radius:12px; color:#cbd5e1;">
+              ℹ️ This PDF does not contain fillable AcroForm fields. You can still click <strong>🔒 Save & Flatten</strong> or open it in the <a href="#" onclick="openTool('editor'); return false;" style="color:var(--cc-sky); font-weight:700;">🎨 Visual PDF Canvas Editor</a> to type directly over any area of the form!
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div style="font-weight:800; margin-bottom:10px; color:var(--cc-sky);">Detected ${fields.length} Interactive Form Field(s):</div>
+          <div class="form-row">
+            ${fields.map((field, idx) => {
+              const name = field.getName();
+              const ctor = field.constructor.name;
+              if (ctor.includes('CheckBox')) {
+                const checked = field.isChecked ? field.isChecked() : false;
+                return `
+                  <div class="form-group" style="background:#0f172a; padding:10px 12px; border-radius:10px; border:1px solid var(--border);">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+                      <input type="checkbox" data-pdf-field="${name}" data-pdf-type="checkbox" ${checked ? 'checked' : ''} />
+                      <span>${name}</span>
+                    </label>
+                  </div>
+                `;
+              }
+              const val = field.getText ? (field.getText() || '') : '';
+              return `
+                <div class="form-group">
+                  <label>${name}</label>
+                  <input type="text" data-pdf-field="${name}" data-pdf-type="text" value="${val}" placeholder="Enter ${name}..." />
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      });
+    }
+
+    window.runSavePdfForm = async (flatten = false) => {
+      try {
+        const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        const form = pdfDoc.getForm();
+        document.querySelectorAll('[data-pdf-field]').forEach(el => {
+          const name = el.getAttribute('data-pdf-field');
+          const type = el.getAttribute('data-pdf-type');
+          try {
+            if (type === 'checkbox') {
+              const cb = form.getCheckBox(name);
+              if (el.checked) cb.check(); else cb.uncheck();
+            } else {
+              const tf = form.getTextField(name);
+              tf.setText(el.value);
+            }
+          } catch (e) {}
+        });
+        if (flatten) {
+          form.flatten();
+        }
+        const bytes = await pdfDoc.save();
+        downloadBytes(bytes, flatten ? 'Careclinics-Form-Flattened.pdf' : 'Careclinics-Form-Filled.pdf');
+        setStatus(`✓ Saved ${flatten ? 'and flattened ' : ''}PDF form!`);
+      } catch (err) {
+        setStatus('Form error: ' + err.message, true);
+      }
+    };
+
+    // =========================================================================
+    // 3. MERGE PDF
+    // =========================================================================
     function renderMergeTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('mergeInput').click()">
           <div style="font-size:2rem; margin-bottom:8px;">📂</div>
           <div style="font-weight:700; font-size:1.05rem;">Click to select multiple PDF files to merge</div>
-          <div style="color:var(--muted); font-size:0.84rem; margin-top:4px;">Select 2 or more PDFs — you can reorder them before merging</div>
+          <div style="color:var(--muted); font-size:0.84rem; margin-top:4px;">Select 2 or more PDFs — reorder them before merging</div>
           <input type="file" id="mergeInput" accept="application/pdf" multiple style="display:none" />
         </div>
         <div id="mergeList" class="file-list"></div>
@@ -624,7 +1689,9 @@
       }
     };
 
-    // 2. SPLIT PDF
+    // =========================================================================
+    // 4. SPLIT / EXTRACT PDF
+    // =========================================================================
     function renderSplitTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('splitInput').click()">
@@ -636,7 +1703,10 @@
           <label>Page Range to Extract (e.g. <code>1-3, 5</code>)</label>
           <input type="text" id="splitRange" placeholder="1-2" value="1" />
         </div>
-        <button class="btn-action" id="btnRunSplit" disabled onclick="runSplit()">✂️ Extract Selected Pages</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-action" id="btnRunSplit" disabled onclick="runSplit()">✂️ Extract Selected Range</button>
+          <button class="btn-action" id="btnBurstAll" style="background:#0f766e;" disabled onclick="runBurstAllPages()">📑 Burst Every Page into Separate PDFs</button>
+        </div>
       `;
       document.getElementById('splitInput').addEventListener('change', async (e) => {
         const f = e.target.files[0];
@@ -647,6 +1717,7 @@
         document.getElementById('splitFileLabel').textContent = `${f.name} (${count} pages)`;
         document.getElementById('splitRange').value = `1-${Math.min(count, 2)}`;
         document.getElementById('btnRunSplit').disabled = false;
+        document.getElementById('btnBurstAll').disabled = false;
       });
     }
 
@@ -676,19 +1747,38 @@
         const copied = await newDoc.copyPages(srcDoc, indices);
         copied.forEach(p => newDoc.addPage(p));
         const bytes = await newDoc.save();
-        downloadBytes(bytes, 'Careclinics-Split.pdf');
-        setStatus(`✓ Extracted ${indices.length} page(s) into Careclinics-Split.pdf!`);
+        downloadBytes(bytes, 'Careclinics-Extracted.pdf');
+        setStatus(`✓ Extracted ${indices.length} page(s)!`);
       } catch (err) {
         setStatus('Split failed: ' + err.message, true);
       }
     };
 
-    // 3. ORGANIZE / ROTATE / DELETE PAGES
+    window.runBurstAllPages = async () => {
+      try {
+        const srcDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        const count = srcDoc.getPageCount();
+        for (let i = 0; i < count; i++) {
+          const single = await PDFLib.PDFDocument.create();
+          const [p] = await single.copyPages(srcDoc, [i]);
+          single.addPage(p);
+          const bytes = await single.save();
+          downloadBytes(bytes, `Careclinics-Page-${i + 1}.pdf`);
+        }
+        setStatus(`✓ Burst and downloaded all ${count} individual page PDFs!`);
+      } catch (err) {
+        setStatus('Burst error: ' + err.message, true);
+      }
+    };
+
+    // =========================================================================
+    // 5. ORGANIZE, DUPLICATE, ROTATE & DELETE PAGES
+    // =========================================================================
     function renderOrganizeTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('orgInput').click()">
           <div style="font-size:2rem; margin-bottom:8px;">🗂️</div>
-          <div id="orgLabel" style="font-weight:700;">Select a PDF to visually organize, rotate, or delete pages</div>
+          <div id="orgLabel" style="font-weight:700;">Select a PDF to visually organize, duplicate, rotate, or delete pages</div>
           <input type="file" id="orgInput" accept="application/pdf" style="display:none" />
         </div>
         <div id="orgGrid" class="pages-grid"></div>
@@ -721,11 +1811,12 @@
         const card = document.createElement('div');
         card.className = `page-thumb ${op.deleted ? 'deleted' : ''}`;
         card.innerHTML = `
-          <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px;">Page ${op.pageNumber} ${op.rotate ? `(${op.rotate}°)` : ''}</div>
-          <canvas id="thumbCanvas-${idx}"></canvas>
+          <div style="font-size:0.76rem; font-weight:700; margin-bottom:6px;">#${idx + 1} (Src P.${op.pageNumber}) ${op.rotate ? `(${op.rotate}°)` : ''}</div>
+          <canvas></canvas>
           <div class="thumb-actions">
             <button class="thumb-btn" onclick="orgMove(${idx}, -1)" title="Move Left">◀</button>
             <button class="thumb-btn" onclick="orgRotate(${idx})" title="Rotate 90°">🔄</button>
+            <button class="thumb-btn" onclick="orgDuplicate(${idx})" title="Duplicate Page">➕</button>
             <button class="thumb-btn" onclick="orgDelete(${idx})" title="Toggle Delete">${op.deleted ? '↩' : '🗑️'}</button>
             <button class="thumb-btn" onclick="orgMove(${idx}, 1)" title="Move Right">▶</button>
           </div>
@@ -743,6 +1834,11 @@
 
     window.orgRotate = async (idx) => {
       organizePageOps[idx].rotate = (organizePageOps[idx].rotate + 90) % 360;
+      const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+      renderOrganizeGrid(pdf);
+    };
+    window.orgDuplicate = async (idx) => {
+      organizePageOps.splice(idx + 1, 0, { ...organizePageOps[idx] });
       const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
       renderOrganizeGrid(pdf);
     };
@@ -785,7 +1881,9 @@
       }
     };
 
-    // 4. SIGN & STAMP PDF
+    // =========================================================================
+    // 6. SIGN & STAMP PDF
+    // =========================================================================
     function renderSignTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('signInput').click()">
@@ -903,7 +2001,9 @@
       }
     };
 
-    // 5. ROTATE PDF
+    // =========================================================================
+    // 7. ROTATE PDF
+    // =========================================================================
     function renderRotateTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('rotInput').click()">
@@ -911,13 +2011,23 @@
           <div id="rotLabel" style="font-weight:700;">Select a PDF file to rotate</div>
           <input type="file" id="rotInput" accept="application/pdf" style="display:none" />
         </div>
-        <div class="form-group">
-          <label>Rotation Angle</label>
-          <select id="rotAngle">
-            <option value="90">90° Clockwise</option>
-            <option value="180">180° Upside Down</option>
-            <option value="270">270° Counter-Clockwise</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Rotation Angle</label>
+            <select id="rotAngle">
+              <option value="90">90° Clockwise</option>
+              <option value="180">180° Upside Down</option>
+              <option value="270">270° Counter-Clockwise</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Apply To Pages</label>
+            <select id="rotTarget">
+              <option value="all">All Pages</option>
+              <option value="odd">Odd Pages Only (1, 3, 5...)</option>
+              <option value="even">Even Pages Only (2, 4, 6...)</option>
+            </select>
+          </div>
         </div>
         <button class="btn-action" id="btnRunRot" disabled onclick="runRotate()">🔄 Rotate & Download PDF</button>
       `;
@@ -932,17 +2042,23 @@
 
     window.runRotate = async () => {
       const deg = parseInt(document.getElementById('rotAngle').value, 10);
+      const target = document.getElementById('rotTarget').value;
       const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
-      pdfDoc.getPages().forEach(p => {
+      pdfDoc.getPages().forEach((p, idx) => {
+        const pageNum = idx + 1;
+        if (target === 'odd' && pageNum % 2 === 0) return;
+        if (target === 'even' && pageNum % 2 !== 0) return;
         const cur = p.getRotation().angle;
         p.setRotation(PDFLib.degrees((cur + deg) % 360));
       });
       const bytes = await pdfDoc.save();
       downloadBytes(bytes, 'Careclinics-Rotated.pdf');
-      setStatus(`✓ Rotated all pages by ${deg}°!`);
+      setStatus(`✓ Rotated pages by ${deg}°!`);
     };
 
-    // 6. WATERMARK PDF
+    // =========================================================================
+    // 8. WATERMARK PDF
+    // =========================================================================
     function renderWatermarkTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('wmInput').click()">
@@ -956,8 +2072,12 @@
             <input type="text" id="wmText" value="CARECLINICS INTERNAL USE ONLY" />
           </div>
           <div class="form-group">
-            <label>Opacity (0.1 to 0.8)</label>
-            <input type="number" id="wmOpacity" value="0.22" min="0.05" max="0.9" step="0.05" />
+            <label>Opacity (0.05 to 0.85)</label>
+            <input type="number" id="wmOpacity" value="0.20" min="0.05" max="0.9" step="0.05" />
+          </div>
+          <div class="form-group">
+            <label>Font Size</label>
+            <input type="number" id="wmSize" value="36" min="14" max="90" />
           </div>
         </div>
         <button class="btn-action" id="btnRunWm" disabled onclick="runWatermark()">💧 Apply Watermark & Download</button>
@@ -973,7 +2093,8 @@
 
     window.runWatermark = async () => {
       const text = document.getElementById('wmText').value.trim() || 'CONFIDENTIAL';
-      const opacity = parseFloat(document.getElementById('wmOpacity').value) || 0.22;
+      const opacity = parseFloat(document.getElementById('wmOpacity').value) || 0.20;
+      const size = parseInt(document.getElementById('wmSize').value, 10) || 36;
       const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
       const font = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
 
@@ -982,7 +2103,7 @@
         p.drawText(text, {
           x: width * 0.14,
           y: height * 0.35,
-          size: 36,
+          size,
           font,
           color: PDFLib.rgb(0.09, 0.25, 0.55),
           opacity,
@@ -994,12 +2115,14 @@
       setStatus('✓ Watermark stamped across all pages!');
     };
 
-    // 7. PAGE NUMBERS
+    // =========================================================================
+    // 9. PAGE NUMBERS & BATES NUMBERING
+    // =========================================================================
     function renderPageNumbersTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('pnInput').click()">
           <div style="font-size:2rem; margin-bottom:8px;">🔢</div>
-          <div id="pnLabel" style="font-weight:700;">Select a PDF file to add page numbers</div>
+          <div id="pnLabel" style="font-weight:700;">Select a PDF file to add page or Bates numbers</div>
           <input type="file" id="pnInput" accept="application/pdf" style="display:none" />
         </div>
         <div class="form-row">
@@ -1008,18 +2131,24 @@
             <select id="pnPos">
               <option value="bc">Bottom Center</option>
               <option value="br">Bottom Right</option>
+              <option value="bl">Bottom Left</option>
               <option value="tr">Top Right</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Format</label>
+            <label>Numbering Format</label>
             <select id="pnFmt">
               <option value="page-of">Page X of Y</option>
               <option value="slash">X / Y</option>
+              <option value="bates">Bates Numbering (Prefix + 0001)</option>
             </select>
           </div>
+          <div class="form-group">
+            <label>Bates Prefix (if Bates selected)</label>
+            <input type="text" id="pnBatesPrefix" value="CCHS-HQ-" />
+          </div>
         </div>
-        <button class="btn-action" id="btnRunPn" disabled onclick="runPageNumbers()">🔢 Add Page Numbers & Download</button>
+        <button class="btn-action" id="btnRunPn" disabled onclick="runPageNumbers()">🔢 Add Numbering & Download</button>
       `;
       document.getElementById('pnInput').addEventListener('change', async (e) => {
         const f = e.target.files[0];
@@ -1033,20 +2162,26 @@
     window.runPageNumbers = async () => {
       const pos = document.getElementById('pnPos').value;
       const fmt = document.getElementById('pnFmt').value;
+      const prefix = document.getElementById('pnBatesPrefix').value || 'CCHS-';
       const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
-      const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+      const font = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
       const pages = pdfDoc.getPages();
       const total = pages.length;
 
       pages.forEach((p, idx) => {
         const { width, height } = p.getSize();
-        const label = fmt === 'page-of' ? `Page ${idx + 1} of ${total}` : `${idx + 1} / ${total}`;
+        const label = fmt === 'page-of'
+          ? `Page ${idx + 1} of ${total}`
+          : fmt === 'slash'
+            ? `${idx + 1} / ${total}`
+            : `${prefix}${String(idx + 1).padStart(4, '0')}`;
         const textW = font.widthOfTextAtSize(label, 10);
         let x = (width - textW) / 2;
         let y = 24;
         if (pos === 'br') x = width - textW - 36;
+        if (pos === 'bl') x = 36;
         if (pos === 'tr') { x = width - textW - 36; y = height - 28; }
-        p.drawText(label, { x, y, size: 10, font, color: PDFLib.rgb(0.25, 0.3, 0.38) });
+        p.drawText(label, { x, y, size: 10, font, color: PDFLib.rgb(0.2, 0.25, 0.35) });
       });
 
       const bytes = await pdfDoc.save();
@@ -1054,7 +2189,278 @@
       setStatus(`✓ Numbered all ${total} pages!`);
     };
 
-    // 8. IMAGES TO PDF
+    // =========================================================================
+    // 10. HEADER & FOOTER BUILDER
+    // =========================================================================
+    function renderHeaderFooterTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('hfInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">📄</div>
+          <div id="hfLabel" style="font-weight:700;">Select a PDF to add custom Headers & Footers</div>
+          <input type="file" id="hfInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Top Header Text (Left)</label>
+            <input type="text" id="hfHeaderLeft" value="Careclinics Healthcare Services HQ" />
+          </div>
+          <div class="form-group">
+            <label>Top Header Text (Right)</label>
+            <input type="text" id="hfHeaderRight" placeholder="e.g. INTERNAL DOCUMENT" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Bottom Footer Text (Left)</label>
+            <input type="text" id="hfFooterLeft" placeholder="e.g. Confidential — Do Not Distribute" />
+          </div>
+          <div class="form-group">
+            <label>Bottom Footer Text (Right)</label>
+            <input type="text" id="hfFooterRight" value="${new Date().toISOString().slice(0, 10)}" />
+          </div>
+        </div>
+        <button class="btn-action" id="btnRunHf" disabled onclick="runHeaderFooter()">📄 Apply Headers & Footers</button>
+      `;
+      document.getElementById('hfInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('hfLabel').textContent = f.name;
+        document.getElementById('btnRunHf').disabled = false;
+      });
+    }
+
+    window.runHeaderFooter = async () => {
+      const hl = document.getElementById('hfHeaderLeft').value.trim();
+      const hr = document.getElementById('hfHeaderRight').value.trim();
+      const fl = document.getElementById('hfFooterLeft').value.trim();
+      const fr = document.getElementById('hfFooterRight').value.trim();
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+      const col = PDFLib.rgb(0.3, 0.35, 0.45);
+
+      pdfDoc.getPages().forEach(p => {
+        const { width, height } = p.getSize();
+        if (hl) p.drawText(hl, { x: 36, y: height - 26, size: 9, font, color: col });
+        if (hr) {
+          const w = font.widthOfTextAtSize(hr, 9);
+          p.drawText(hr, { x: width - w - 36, y: height - 26, size: 9, font, color: col });
+        }
+        if (fl) p.drawText(fl, { x: 36, y: 20, size: 9, font, color: col });
+        if (fr) {
+          const w = font.widthOfTextAtSize(fr, 9);
+          p.drawText(fr, { x: width - w - 36, y: 20, size: 9, font, color: col });
+        }
+      });
+
+      const bytes = await pdfDoc.save();
+      downloadBytes(bytes, 'Careclinics-HeaderFooter.pdf');
+      setStatus('✓ Applied headers & footers across all pages!');
+    };
+
+    // =========================================================================
+    // 11. CROP & MARGIN ADJUSTER
+    // =========================================================================
+    function renderCropTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('cropInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">📐</div>
+          <div id="cropLabel" style="font-weight:700;">Select a PDF to crop margins or add padding</div>
+          <input type="file" id="cropInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Top Margin Trim (pt, negative to expand)</label>
+            <input type="number" id="cropTop" value="20" />
+          </div>
+          <div class="form-group">
+            <label>Bottom Margin Trim (pt)</label>
+            <input type="number" id="cropBottom" value="20" />
+          </div>
+          <div class="form-group">
+            <label>Left Margin Trim (pt)</label>
+            <input type="number" id="cropLeft" value="20" />
+          </div>
+          <div class="form-group">
+            <label>Right Margin Trim (pt)</label>
+            <input type="number" id="cropRight" value="20" />
+          </div>
+        </div>
+        <button class="btn-action" id="btnRunCrop" disabled onclick="runCropPdf()">📐 Apply Crop / Margin Adjustment</button>
+      `;
+      document.getElementById('cropInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('cropLabel').textContent = f.name;
+        document.getElementById('btnRunCrop').disabled = false;
+      });
+    }
+
+    window.runCropPdf = async () => {
+      const top = parseFloat(document.getElementById('cropTop').value) || 0;
+      const bottom = parseFloat(document.getElementById('cropBottom').value) || 0;
+      const left = parseFloat(document.getElementById('cropLeft').value) || 0;
+      const right = parseFloat(document.getElementById('cropRight').value) || 0;
+
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      pdfDoc.getPages().forEach(p => {
+        const { width, height } = p.getSize();
+        const newW = Math.max(72, width - left - right);
+        const newH = Math.max(72, height - top - bottom);
+        p.setCropBox(left, bottom, newW, newH);
+        p.setMediaBox(left, bottom, newW, newH);
+      });
+      const bytes = await pdfDoc.save();
+      downloadBytes(bytes, 'Careclinics-Cropped.pdf');
+      setStatus('✓ Cropped PDF margins and downloaded!');
+    };
+
+    // =========================================================================
+    // 12. INSERT BLANK PAGES
+    // =========================================================================
+    function renderInsertBlankTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('ibInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">➕</div>
+          <div id="ibLabel" style="font-weight:700;">Select a PDF to insert blank pages</div>
+          <input type="file" id="ibInput" accept="application/pdf" style="display:none" />
+        </div>
+        <div class="form-group">
+          <label>Insertion Mode</label>
+          <select id="ibMode">
+            <option value="end">Append Blank Page at the End</option>
+            <option value="start">Insert Blank Cover Page at the Beginning</option>
+            <option value="interleave">Interleave Blank Note Page After Every Page</option>
+          </select>
+        </div>
+        <button class="btn-action" id="btnRunIb" disabled onclick="runInsertBlank()">➕ Insert Blank Pages & Download</button>
+      `;
+      document.getElementById('ibInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('ibLabel').textContent = f.name;
+        document.getElementById('btnRunIb').disabled = false;
+      });
+    }
+
+    window.runInsertBlank = async () => {
+      const mode = document.getElementById('ibMode').value;
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      const first = pdfDoc.getPage(0);
+      const { width, height } = first.getSize();
+
+      if (mode === 'end') {
+        pdfDoc.addPage([width, height]);
+      } else if (mode === 'start') {
+        pdfDoc.insertPage(0, [width, height]);
+      } else if (mode === 'interleave') {
+        const count = pdfDoc.getPageCount();
+        for (let i = count; i >= 1; i--) {
+          pdfDoc.insertPage(i, [width, height]);
+        }
+      }
+      const bytes = await pdfDoc.save();
+      downloadBytes(bytes, 'Careclinics-WithBlankPages.pdf');
+      setStatus('✓ Inserted blank page(s) and downloaded!');
+    };
+
+    // =========================================================================
+    // 13. REVERSE PAGE ORDER
+    // =========================================================================
+    function renderReverseTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('revInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">🔃</div>
+          <div id="revLabel" style="font-weight:700;">Select a PDF to reverse its page sequence</div>
+          <input type="file" id="revInput" accept="application/pdf" style="display:none" />
+        </div>
+        <button class="btn-action" id="btnRunRev" disabled onclick="runReversePdf()">🔃 Reverse Pages & Download</button>
+      `;
+      document.getElementById('revInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('revLabel').textContent = f.name;
+        document.getElementById('btnRunRev').disabled = false;
+      });
+    }
+
+    window.runReversePdf = async () => {
+      const srcDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      const outDoc = await PDFLib.PDFDocument.create();
+      const indices = srcDoc.getPageIndices().reverse();
+      const copied = await outDoc.copyPages(srcDoc, indices);
+      copied.forEach(p => outDoc.addPage(p));
+      const bytes = await outDoc.save();
+      downloadBytes(bytes, 'Careclinics-Reversed.pdf');
+      setStatus(`✓ Reversed all ${indices.length} pages!`);
+    };
+
+    // =========================================================================
+    // 14. 2-UP HANDOUT / BOOKLET LAYOUT
+    // =========================================================================
+    function renderNupTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('nupInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">📖</div>
+          <div id="nupLabel" style="font-weight:700;">Select a PDF to arrange 2 pages side-by-side per landscape sheet</div>
+          <input type="file" id="nupInput" accept="application/pdf" style="display:none" />
+        </div>
+        <button class="btn-action" id="btnRunNup" disabled onclick="runNupPdf()">📖 Generate 2-Up Handout PDF</button>
+      `;
+      document.getElementById('nupInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('nupLabel').textContent = f.name;
+        document.getElementById('btnRunNup').disabled = false;
+      });
+    }
+
+    window.runNupPdf = async () => {
+      try {
+        const srcDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+        const outDoc = await PDFLib.PDFDocument.create();
+        const srcPages = srcDoc.getPages();
+        const sheetW = 841.89; // A4 Landscape width
+        const sheetH = 595.28; // A4 Landscape height
+        const halfW = sheetW / 2;
+
+        for (let i = 0; i < srcPages.length; i += 2) {
+          const sheet = outDoc.addPage([sheetW, sheetH]);
+          const [emb1] = await outDoc.embedPages([srcPages[i]]);
+          const scale1 = Math.min((halfW - 36) / emb1.width, (sheetH - 36) / emb1.height);
+          sheet.drawPage(emb1, {
+            x: 18,
+            y: (sheetH - emb1.height * scale1) / 2,
+            width: emb1.width * scale1,
+            height: emb1.height * scale1
+          });
+
+          if (i + 1 < srcPages.length) {
+            const [emb2] = await outDoc.embedPages([srcPages[i + 1]]);
+            const scale2 = Math.min((halfW - 36) / emb2.width, (sheetH - 36) / emb2.height);
+            sheet.drawPage(emb2, {
+              x: halfW + 18,
+              y: (sheetH - emb2.height * scale2) / 2,
+              width: emb2.width * scale2,
+              height: emb2.height * scale2
+            });
+          }
+        }
+        const bytes = await outDoc.save();
+        downloadBytes(bytes, 'Careclinics-2Up-Handout.pdf');
+        setStatus('✓ Created 2-Up landscape handout PDF!');
+      } catch (err) {
+        setStatus('2-Up error: ' + err.message, true);
+      }
+    };
+
+    // =========================================================================
+    // 15. IMAGES TO PDF
+    // =========================================================================
     function renderImg2PdfTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('imgInput').click()">
@@ -1067,7 +2473,7 @@
       `;
       document.getElementById('imgInput').addEventListener('change', (e) => {
         for (const f of e.target.files) stateFiles.push(f);
-        document.getElementById('imgList').innerHTML = stateFiles.map((f, i) => `<div class="file-pill"><span>#${i+1} — ${f.name}</span></div>`).join('');
+        document.getElementById('imgList').innerHTML = stateFiles.map((f, i) => `<div class="file-pill"><span>#${i + 1} — ${f.name}</span></div>`).join('');
         document.getElementById('btnRunImg2Pdf').disabled = stateFiles.length === 0;
       });
     }
@@ -1089,7 +2495,9 @@
       }
     };
 
-    // 9. PDF TO IMAGES
+    // =========================================================================
+    // 16. PDF TO HIGH-RES IMAGES
+    // =========================================================================
     function renderPdf2ImgTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('p2iInput').click()">
@@ -1110,7 +2518,7 @@
         const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
-          const viewport = page.getViewport({ scale: 1.8 });
+          const viewport = page.getViewport({ scale: 2.0 });
           const canvas = document.createElement('canvas');
           canvas.width = viewport.width;
           canvas.height = viewport.height;
@@ -1132,19 +2540,110 @@
       });
     }
 
-    // 10. EXTRACT TEXT
+    // =========================================================================
+    // 17. GRAYSCALE / B&W PDF CONVERTER
+    // =========================================================================
+    function renderGrayscaleTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('grayInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">⚫</div>
+          <div id="grayLabel" style="font-weight:700;">Select a colored PDF to convert into B&W / Grayscale</div>
+          <input type="file" id="grayInput" accept="application/pdf" style="display:none" />
+        </div>
+        <button class="btn-action" id="btnRunGray" disabled onclick="runGrayscalePdf()">⚫ Convert to Grayscale & Download</button>
+      `;
+      document.getElementById('grayInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('grayLabel').textContent = f.name;
+        document.getElementById('btnRunGray').disabled = false;
+      });
+    }
+
+    window.runGrayscalePdf = async () => {
+      try {
+        setStatus('Converting pages to high-resolution grayscale...');
+        const pdf = await pdfjsLib.getDocument({ data: currentPdfBuffer.slice(0) }).promise;
+        const outDoc = await PDFLib.PDFDocument.create();
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const vp = page.getViewport({ scale: 1.6 });
+          const canvas = document.createElement('canvas');
+          canvas.width = vp.width;
+          canvas.height = vp.height;
+          const ctx = canvas.getContext('2d');
+          await page.render({ canvasContext: ctx, viewport: vp }).promise;
+
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const d = imgData.data;
+          for (let j = 0; j < d.length; j += 4) {
+            const avg = 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
+            d[j] = d[j + 1] = d[j + 2] = avg;
+          }
+          ctx.putImageData(imgData, 0, 0);
+          const jpgUrl = canvas.toDataURL('image/jpeg', 0.85);
+          const emb = await outDoc.embedJpg(jpgUrl);
+          const origVp = page.getViewport({ scale: 1.0 });
+          const p = outDoc.addPage([origVp.width, origVp.height]);
+          p.drawImage(emb, { x: 0, y: 0, width: origVp.width, height: origVp.height });
+        }
+        const bytes = await outDoc.save();
+        downloadBytes(bytes, 'Careclinics-Grayscale.pdf');
+        setStatus(`✓ Converted ${pdf.numPages} page(s) to grayscale!`);
+      } catch (err) {
+        setStatus('Grayscale error: ' + err.message, true);
+      }
+    };
+
+    // =========================================================================
+    // 18. FLATTEN PDF
+    // =========================================================================
+    function renderFlattenTool() {
+      toolBody.innerHTML = `
+        <div class="dropzone" onclick="document.getElementById('flatInput').click()">
+          <div style="font-size:2rem; margin-bottom:8px;">🔒</div>
+          <div id="flatLabel" style="font-weight:700;">Select a PDF to flatten all forms and annotations</div>
+          <input type="file" id="flatInput" accept="application/pdf" style="display:none" />
+        </div>
+        <button class="btn-action" id="btnRunFlat" disabled onclick="runFlattenPdf()">🔒 Flatten & Download PDF</button>
+      `;
+      document.getElementById('flatInput').addEventListener('change', async (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        currentPdfBuffer = await f.arrayBuffer();
+        document.getElementById('flatLabel').textContent = f.name;
+        document.getElementById('btnRunFlat').disabled = false;
+      });
+    }
+
+    window.runFlattenPdf = async () => {
+      const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBuffer);
+      try { pdfDoc.getForm().flatten(); } catch (e) {}
+      const bytes = await pdfDoc.save({ useObjectStreams: true });
+      downloadBytes(bytes, 'Careclinics-Flattened.pdf');
+      setStatus('✓ Flattened PDF form fields and layers!');
+    };
+
+    // =========================================================================
+    // 19. EXTRACT TEXT & WORD COUNT
+    // =========================================================================
     function renderExtractTextTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('txtInput').click()">
           <div style="font-size:2rem; margin-bottom:8px;">📝</div>
-          <div id="txtLabel" style="font-weight:700;">Select a PDF to extract all text</div>
+          <div id="txtLabel" style="font-weight:700;">Select a PDF to extract all text and word statistics</div>
           <input type="file" id="txtInput" accept="application/pdf" style="display:none" />
         </div>
+        <div id="txtStatsBar" style="margin-bottom:10px; font-size:0.84rem; color:var(--cc-sky); font-weight:700;"></div>
         <div class="form-group">
           <label>Extracted Document Text</label>
           <textarea id="extractedArea" rows="10" placeholder="Extracted text will appear here..."></textarea>
         </div>
-        <button class="btn-action" onclick="navigator.clipboard.writeText(document.getElementById('extractedArea').value); setStatus('✓ Copied text to clipboard!')">📋 Copy Text</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-action" onclick="navigator.clipboard.writeText(document.getElementById('extractedArea').value); setStatus('✓ Copied text to clipboard!')">📋 Copy Text</button>
+          <button class="btn-action" style="background:#0f766e;" onclick="downloadBytes(new TextEncoder().encode(document.getElementById('extractedArea').value), 'Careclinics-Extracted.txt', 'text/plain')">⬇ Download as .TXT</button>
+        </div>
       `;
       document.getElementById('txtInput').addEventListener('change', async (e) => {
         const f = e.target.files[0];
@@ -1159,12 +2658,17 @@
           const strings = content.items.map(item => item.str).join(' ');
           fullText += `--- Page ${i} ---\n${strings}\n\n`;
         }
-        document.getElementById('extractedArea').value = fullText.trim();
+        const trimmed = fullText.trim();
+        document.getElementById('extractedArea').value = trimmed;
+        const words = trimmed ? trimmed.split(/\s+/).length : 0;
+        document.getElementById('txtStatsBar').textContent = `📊 Pages: ${pdf.numPages} • Words: ${words.toLocaleString()} • Characters: ${trimmed.length.toLocaleString()}`;
         setStatus(`✓ Extracted text from ${pdf.numPages} page(s)!`);
       });
     }
 
-    // 11. COMPRESS / OPTIMIZE PDF
+    // =========================================================================
+    // 20. COMPRESS / OPTIMIZE PDF
+    // =========================================================================
     function renderCompressTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('cmpInput').click()">
@@ -1192,7 +2696,9 @@
       setStatus(`✓ Optimized PDF saved (${origKB} KB → ${newKB} KB)!`);
     };
 
-    // 12. EDIT METADATA
+    // =========================================================================
+    // 21. EDIT METADATA
+    // =========================================================================
     function renderMetadataTool() {
       toolBody.innerHTML = `
         <div class="dropzone" onclick="document.getElementById('metaInput').click()">
@@ -1216,6 +2722,10 @@
             <input type="text" id="metaSubject" />
           </div>
           <div class="form-group">
+            <label>Keywords (Comma-separated)</label>
+            <input type="text" id="metaKeywords" placeholder="healthcare, report, careclinics" />
+          </div>
+          <div class="form-group">
             <label>Creator</label>
             <input type="text" id="metaCreator" value="Careclinics Healthcare Services" />
           </div>
@@ -1231,6 +2741,7 @@
         document.getElementById('metaTitle').value = pdfDoc.getTitle() || f.name.replace(/\.pdf$/i, '');
         document.getElementById('metaAuthor').value = pdfDoc.getAuthor() || 'Careclinics Healthcare Services';
         document.getElementById('metaSubject').value = pdfDoc.getSubject() || '';
+        document.getElementById('metaKeywords').value = pdfDoc.getKeywords() || '';
         document.getElementById('btnRunMeta').disabled = false;
       });
     }
@@ -1240,8 +2751,10 @@
       pdfDoc.setTitle(document.getElementById('metaTitle').value.trim());
       pdfDoc.setAuthor(document.getElementById('metaAuthor').value.trim());
       pdfDoc.setSubject(document.getElementById('metaSubject').value.trim());
+      const kw = document.getElementById('metaKeywords').value.split(',').map(s => s.trim()).filter(Boolean);
+      if (kw.length) pdfDoc.setKeywords(kw);
       pdfDoc.setCreator(document.getElementById('metaCreator').value.trim());
-      pdfDoc.setProducer('Careclinics BentoPDF Engine');
+      pdfDoc.setProducer('Careclinics BentoPDF Suite v3.0');
       const bytes = await pdfDoc.save();
       downloadBytes(bytes, 'Careclinics-Metadata.pdf');
       setStatus('✓ Updated PDF metadata and downloaded!');

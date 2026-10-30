@@ -1,0 +1,589 @@
+/* ============================================================================
+   CARECLINICS HEALTHCARE SERVICES (CCHS-HQ-SERVICES)
+   Minimalist Corporate Design System — theme.css
+   Shared by every page in /public. Page-level <style> blocks consume these
+   tokens, so changing a token here restyles the whole suite.
+   ============================================================================ */
+
+:root {
+  /* ---- Surfaces ---------------------------------------------------------- */
+  --bg-page: #F6F8FB;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F8FAFC;
+  --bg-muted: #EEF2F6;
+
+  /* ---- Brand ------------------------------------------------------------- */
+  --color-primary: #1863DC;
+  --color-primary-hover: #1354BD;
+  --color-primary-soft: #EEF4FE;
+  --color-primary-border: #C9DBFB;
+  --color-teal: #0D9488;
+  --color-teal-soft: #ECFDF9;
+
+  /* ---- Typography -------------------------------------------------------- */
+  --text-primary: #0F172A;
+  --text-secondary: #556274;
+  --text-muted: #8A96A8;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* ---- Borders & focus --------------------------------------------------- */
+  --border-subtle: #E8EDF3;
+  --border-strong: #D5DDE7;
+  --focus-ring: 0 0 0 4px rgba(24, 99, 220, 0.16);
+
+  /* ---- Semantic status --------------------------------------------------- */
+  --status-success-bg: #EFFBF3;
+  --status-success-text: #15803D;
+  --status-success-border: #CDEFD8;
+  --status-success-dot: #22C55E;
+
+  --status-warning-bg: #FFF8EB;
+  --status-warning-text: #B45309;
+  --status-warning-border: #FBE3B5;
+
+  --status-danger-bg: #FEF3F3;
+  --status-danger-text: #C02626;
+  --status-danger-border: #F9D3D3;
+
+  --status-info-bg: #F0F7FF;
+  --status-info-text: #1D5FB8;
+  --status-info-border: #CFE2FA;
+
+  /* ---- Shape, elevation, layout ----------------------------------------- */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.03), 0 4px 16px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 2px 4px rgba(15, 23, 42, 0.03), 0 12px 32px rgba(15, 23, 42, 0.07);
+  --shadow-lg: 0 24px 56px rgba(15, 23, 42, 0.16);
+  --shadow-primary: 0 6px 16px rgba(24, 99, 220, 0.24);
+
+  --container-max: 1200px;
+  --control-height: 48px;
+  --control-height-lg: 52px;
+
+  /* ---- Legacy aliases (kept so older markup keeps working) -------------- */
+  --cc-bg: var(--bg-page);
+  --cc-bg-subtle: var(--bg-muted);
+  --cc-surface: var(--bg-card);
+  --cc-surface-hover: var(--bg-subtle);
+  --cc-navy: var(--text-primary);
+  --cc-brand-navy: #112349;
+  --cc-primary: var(--color-primary);
+  --cc-primary-hover: var(--color-primary-hover);
+  --cc-primary-soft: var(--color-primary-soft);
+  --cc-blue: var(--color-primary);
+  --cc-teal: var(--color-teal);
+  --cc-teal-soft: var(--color-teal-soft);
+  --cc-sky: var(--color-teal);
+  --cc-text: var(--text-primary);
+  --cc-text-secondary: var(--text-secondary);
+  --cc-text-muted: var(--text-muted);
+  --cc-border: var(--border-subtle);
+  --cc-border-strong: var(--border-strong);
+  --cc-focus-ring: var(--focus-ring);
+  --cc-success: var(--status-success-text);
+  --cc-success-bg: var(--status-success-bg);
+  --cc-success-border: var(--status-success-border);
+  --cc-warning: var(--status-warning-text);
+  --cc-warning-bg: var(--status-warning-bg);
+  --cc-warning-border: var(--status-warning-border);
+  --cc-danger: var(--status-danger-text);
+  --cc-danger-bg: var(--status-danger-bg);
+  --cc-danger-border: var(--status-danger-border);
+  --cc-info: var(--status-info-text);
+  --cc-info-bg: var(--status-info-bg);
+  --cc-info-border: var(--status-info-border);
+  --cc-shadow-xs: var(--shadow-xs);
+  --cc-shadow-sm: var(--shadow-sm);
+  --cc-shadow-md: var(--shadow-md);
+  --cc-shadow-lg: var(--shadow-lg);
+  --cc-radius-sm: var(--radius-sm);
+  --cc-radius-md: var(--radius-md);
+  --cc-radius-lg: var(--radius-lg);
+  --cc-radius-xl: 24px;
+  --cc-card-padding: 2rem;
+  --cc-control-height: var(--control-height);
+  --cc-font-sans: var(--font-sans);
+}
+
+/* ============================================================================
+   BASE
+   ============================================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+::selection {
+  background: var(--color-primary-soft);
+}
+
+/* Thin, quiet scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+/* ============================================================================
+   TOP NAVIGATION — minimal, single line, quiet links
+   ============================================================================ */
+.cchs-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.cchs-navbar-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.cchs-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.cchs-brand img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.cchs-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.cchs-brand-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.cchs-brand-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.cchs-nav-links {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cchs-nav-links::-webkit-scrollbar {
+  display: none;
+}
+
+.cchs-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 40px;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.cchs-nav-link:hover {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+}
+
+.cchs-nav-link.active {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.cchs-nav-link.admin-pill {
+  color: var(--status-warning-text);
+}
+
+.cchs-nav-link.admin-pill:hover {
+  background: var(--status-warning-bg);
+}
+
+.cchs-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   SHARED COMPONENTS
+   ============================================================================ */
+.cchs-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.cchs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--control-height);
+  padding: 0.7rem 1.35rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 0.925rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cchs-btn-primary {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-primary);
+}
+
+.cchs-btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.cchs-btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.cchs-btn-secondary:hover {
+  background: var(--bg-subtle);
+}
+
+.cchs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cchs-badge-success { background: var(--status-success-bg); color: var(--status-success-text); }
+.cchs-badge-warning { background: var(--status-warning-bg); color: var(--status-warning-text); }
+.cchs-badge-danger  { background: var(--status-danger-bg);  color: var(--status-danger-text); }
+.cchs-badge-info    { background: var(--status-info-bg);    color: var(--status-info-text); }
+
+/* ============================================================================
+   FORM CONTROLS — large, calm, obvious focus
+   (body-prefixed selectors intentionally out-rank page-level defaults)
+   ============================================================================ */
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+body input[type="text"],
+body input[type="password"],
+body input[type="email"],
+body input[type="tel"],
+body input[type="number"],
+body input[type="date"],
+body input[type="time"],
+body input[type="search"],
+body select,
+body textarea {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body textarea {
+  min-height: 112px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+body input::placeholder,
+body textarea::placeholder {
+  color: var(--text-muted);
+}
+
+body input:hover,
+body select:hover,
+body textarea:hover {
+  border-color: #C2CCD9;
+}
+
+body input:focus,
+body select:focus,
+body textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+
+body input[type="checkbox"],
+body input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+body .form-group {
+  margin-bottom: 1.35rem;
+}
+
+/* ============================================================================
+   PRIMARY ACTIONS — one clear, prominent call-to-action per view
+   ============================================================================ */
+body .btn-submit,
+body .btn-login,
+body .btn-save,
+body .btn-push,
+body .btn-launch-studio,
+body .btn-action.btn-primary,
+body .meet-btn.primary {
+  min-height: var(--control-height-lg);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  box-shadow: var(--shadow-primary);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+body .btn-submit:active,
+body .btn-login:active,
+body .btn-save:active,
+body .btn-push:active,
+body .btn-launch-studio:active {
+  transform: translateY(1px);
+}
+
+body .btn-submit:disabled,
+body .btn-login:disabled,
+body .btn-push:disabled {
+  box-shadow: none;
+}
+
+/* Secondary / utility buttons: quieter, still a large target */
+body .btn-small,
+body .btn-act,
+body .btn-module,
+body .btn-admin-nav,
+body .nav-pill,
+body .card-link,
+body .back-btn,
+body .ribbon-btn {
+  border-radius: var(--radius-sm);
+}
+
+body .btn-small,
+body .btn-act {
+  min-height: 40px;
+}
+
+body .card-link,
+body .btn-module {
+  min-height: 46px;
+}
+
+/* ============================================================================
+   CARDS & PANELS — generous whitespace, soft elevation, no heavy borders
+   ============================================================================ */
+body .panel,
+body .section-card,
+body .overview-panel,
+body .service-card,
+body .module-card,
+body .hero-banner,
+body .admin-hero,
+body .studio-hero,
+body .form-card,
+body .login-card,
+body .tv-mockup,
+body .tool-workspace,
+body .card {
+  border-color: var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+body .panel,
+body .section-card,
+body .overview-panel,
+body .form-card,
+body .card {
+  padding: 2rem;
+}
+
+body .service-card:hover,
+body .module-card:hover,
+body .tool-card:hover,
+body .room-card:hover {
+  transform: none;
+  box-shadow: var(--shadow-md);
+}
+
+/* Inner list rows: flat and airy instead of boxed-in */
+body .booking-item,
+body .booking-row,
+body .room-widget-item,
+body .presenter-item,
+body .room-mgr-item {
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  border-color: transparent;
+}
+
+body .booking-item:hover,
+body .booking-row:hover {
+  background: var(--bg-card);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Modals */
+body .modal-card {
+  border-radius: 24px;
+  padding: 2.25rem;
+  border: none;
+}
+
+body .modal-backdrop {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+/* ============================================================================
+   DECLUTTER — hide decorative extras that compete with primary content
+   ============================================================================ */
+.service-tag,
+.tool-cat-tag,
+.brand-logo-wrap,
+.service-icon + .service-tag {
+  display: none !important;
+}
+
+/* Section headings: more breathing room */
+body .section-header,
+body .section-header-row {
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+body .section-title,
+body .panel h2,
+body .section-top h2 {
+  font-weight: 700;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+@media (max-width: 1100px) {
+  .cchs-brand-subtitle {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .cchs-navbar-inner {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding: 0.65rem 1rem;
+    min-height: 0;
+  }
+
+  .cchs-nav-right {
+    margin-left: auto;
+  }
+
+  .cchs-nav-links {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+    padding-bottom: 0.25rem;
+  }
+
+  body .panel,
+  body .section-card,
+  body .overview-panel,
+  body .form-card,
+  body .card,
+  body .login-card {
+    padding: 1.35rem;
+  }
+
+  body .modal-card {
+    padding: 1.5rem;
+  }
+}

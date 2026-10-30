@@ -1,621 +1,650 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Command Portal — Careclinics HQ Services</title>
-  <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Control Center — CareClinics HQ</title>
+  <link rel="icon" type="image/webp" href="/careclinic-logo.webp">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/theme.css">
   <style>
-    :root {
-      --cc-navy: #0c1936;
-      --cc-card: #13254c;
-      --cc-blue: #1863dc;
-      --cc-sky: #8ed1fc;
-      --cc-emerald: #10b981;
-      --cc-amber: #f59e0b;
-      --cc-rose: #f43f5e;
-      --cc-text: #f8fafc;
-      --cc-muted: #94a3b8;
-      --cc-border: rgba(255, 255, 255, 0.12);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at 15% 10%, #1a3668 0%, #091328 55%, #050b16 100%);
-      color: var(--cc-text);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
       min-height: 100vh;
-      line-height: 1.5;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      backdrop-filter: blur(16px);
-      background: rgba(12, 25, 54, 0.9);
-      border-bottom: 1px solid var(--cc-border);
-      padding: 14px 32px;
       display: flex;
+      flex-direction: column;
+    }
+
+    .admin-pill-badge {
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .brand-box {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .brand-logo {
-      height: 44px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.05);
-      padding: 4px 8px;
-    }
-
-    .brand-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .admin-pill {
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 3px 10px;
-      border-radius: 999px;
-      background: rgba(245, 158, 11, 0.22);
-      border: 1px solid rgba(245, 158, 11, 0.45);
-      color: #fbbf24;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .btn-top {
-      text-decoration: none;
-      font-size: 0.82rem;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-pill);
+      background: var(--color-primary-soft);
+      border: 1px solid var(--color-primary-border);
+      color: var(--color-primary);
+      font-size: 0.76rem;
       font-weight: 700;
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--cc-border);
-      background: rgba(255, 255, 255, 0.08);
-      color: #e2e8f0;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-top:hover {
-      background: var(--cc-blue);
-      color: #ffffff;
     }
 
     .btn-logout {
-      background: rgba(244, 63, 94, 0.2);
-      border-color: rgba(244, 63, 94, 0.4);
-      color: #fda4af;
+      min-height: 40px;
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--status-danger-border);
+      background: var(--status-danger-bg);
+      color: var(--status-danger-text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
 
     .btn-logout:hover {
-      background: #e11d48;
-      color: #ffffff;
+      background: #FEE2E2;
     }
 
     .container {
-      max-width: 1440px;
+      max-width: var(--container-max);
+      width: 100%;
       margin: 0 auto;
-      padding: 28px 32px 64px;
+      padding: 2rem 1.5rem 3.5rem;
+      flex: 1;
     }
 
-    .section-header {
+    /* Admin Header Banner */
+    .admin-hero {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.75rem;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin: 24px 0 14px;
+      align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 1.25rem;
+      box-shadow: var(--shadow-sm);
     }
 
-    .section-title {
-      font-size: 0.95rem;
+    .admin-hero h1 {
+      font-size: 1.45rem;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--cc-sky);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+      color: var(--text-primary);
     }
 
-    /* All 6 Services Grid for Admin */
-    .services-grid {
+    .admin-hero p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* Quick Modules Grid */
+    .admin-modules-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-      gap: 18px;
-      margin-bottom: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.15rem;
+      margin-bottom: 2rem;
     }
 
-    .service-card {
-      background: rgba(19, 37, 76, 0.78);
-      border: 1px solid var(--cc-border);
-      border-radius: 18px;
-      padding: 20px;
+    .module-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 14px;
-      transition: all 0.2s;
+      gap: 0.85rem;
+      box-shadow: var(--shadow-xs);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .service-card:hover {
-      border-color: var(--cc-sky);
-      transform: translateY(-3px);
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+    .module-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
     }
 
-    .service-top {
+    .module-card h3 {
+      font-size: 1.02rem;
+      font-weight: 700;
       display: flex;
-      gap: 14px;
-      align-items: flex-start;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-primary);
     }
 
-    .service-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
+    .module-card p {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .btn-module {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.45rem;
-      flex-shrink: 0;
-    }
-
-    .service-name {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 4px;
-    }
-
-    .service-desc {
-      font-size: 0.83rem;
-      color: var(--cc-muted);
-    }
-
-    .chip-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .chip-btn {
+      gap: 0.4rem;
+      min-height: 42px;
+      padding: 0.55rem 0.95rem;
+      border-radius: var(--radius-sm);
+      background: var(--color-primary);
+      color: #FFFFFF;
       text-decoration: none;
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 8px;
-      background: var(--cc-blue);
-      color: #ffffff;
-      border: none;
-      cursor: pointer;
+      transition: background 0.15s ease;
     }
 
-    .chip-btn.secondary {
-      background: rgba(255,255,255,0.1);
-      color: #e2e8f0;
+    .btn-module:hover {
+      background: var(--color-primary-hover);
     }
 
-    .chip-btn:hover {
-      background: #2563eb;
-      color: #ffffff;
+    /* Section Card */
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.75rem;
+      box-shadow: var(--shadow-sm);
     }
 
-    /* Admin Room Booking Control Table / Cards */
-    .admin-panel {
-      background: rgba(19, 37, 76, 0.78);
-      border: 1px solid var(--cc-border);
-      border-radius: 20px;
-      padding: 26px;
-      margin-bottom: 28px;
-    }
-
-    .panel-toolbar {
+    .section-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 14px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--cc-border);
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
-    .filter-group {
+    .section-top h2 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .section-top p {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+
+    .filter-row {
       display: flex;
-      gap: 10px;
+      gap: 0.6rem;
       flex-wrap: wrap;
       align-items: center;
     }
 
-    input, select, textarea {
-      background: rgba(12, 25, 54, 0.85);
-      border: 1px solid var(--cc-border);
-      color: #ffffff;
-      padding: 9px 12px;
-      border-radius: 10px;
+    .form-control {
+      min-height: 44px;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-primary);
       font-family: inherit;
-      font-size: 0.88rem;
+      font-size: 0.875rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .booking-admin-list {
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: var(--focus-ring);
+    }
+
+    /* Sticky Header Scrollable Admin List Container */
+    .booking-table-wrap {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 0.65rem;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .table-sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 145px 1fr auto;
+      gap: 1rem;
+      padding: 0.65rem 1.15rem;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
     }
 
     .booking-row {
-      background: rgba(12, 25, 54, 0.7);
-      border: 1px solid var(--cc-border);
-      border-left: 5px solid var(--cc-blue);
-      border-radius: 14px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .booking-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-edit {
-      background: rgba(24, 99, 220, 0.28);
-      border: 1px solid var(--cc-sky);
-      color: var(--cc-sky);
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .btn-edit:hover {
-      background: var(--cc-blue);
-      color: #ffffff;
-    }
-
-    .btn-del {
-      background: rgba(244, 63, 94, 0.2);
-      border: 1px solid rgba(244, 63, 94, 0.45);
-      color: #fda4af;
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .btn-del:hover {
-      background: #e11d48;
-      color: #ffffff;
-    }
-
-    /* Edit Booking Modal */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(4, 9, 20, 0.8);
-      backdrop-filter: blur(6px);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal-card {
-      background: #13254c;
-      border: 1px solid var(--cc-sky);
-      border-radius: 20px;
-      padding: 28px;
-      width: 100%;
-      max-width: 540px;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-    }
-
-    .form-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: 145px 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem 1.15rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
 
-    .form-field {
-      margin-bottom: 14px;
+    .booking-row:hover {
+      background: var(--bg-card);
+      border-color: var(--border-strong);
     }
 
-    .form-field label {
-      display: block;
+    .b-time-badge {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.65rem;
+      text-align: center;
+    }
+
+    .b-time-badge .date {
+      font-size: 0.74rem;
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+
+    .b-time-badge .hours {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 0.1rem;
+      color: var(--text-primary);
+    }
+
+    .b-info h4 {
+      font-size: 0.96rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.25rem;
+      color: var(--text-primary);
+    }
+
+    .room-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: var(--radius-pill);
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary-border);
+    }
+
+    .b-meta {
       font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--cc-sky);
-      margin-bottom: 5px;
+      color: var(--text-secondary);
     }
 
-    .form-field input, .form-field select, .form-field textarea {
-      width: 100%;
+    .b-actions {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    /* Visually Distinct Action Buttons */
+    .btn-act {
+      min-height: 38px;
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+    }
+
+    .btn-act.edit {
+      background: var(--status-info-bg);
+      border-color: var(--status-info-border);
+      color: var(--status-info-text);
+    }
+
+    .btn-act.edit:hover {
+      background: #E0F2FE;
+    }
+
+    .btn-act.delete {
+      background: var(--status-danger-bg);
+      border-color: var(--status-danger-border);
+      color: var(--status-danger-text);
+    }
+
+    .btn-act.delete:hover {
+      background: #FEE2E2;
+    }
+
+    .btn-act.approve {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #FFFFFF;
+    }
+
+    .btn-act.approve:hover {
+      background: var(--color-primary-hover);
+    }
+
+    .btn-act.whatsapp {
+      background: var(--status-success-bg);
+      border-color: var(--status-success-border);
+      color: var(--status-success-text);
+    }
+
+    /* Single-Column Form Helpers */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.35rem;
+    }
+
+    .btn-save {
+      min-height: 44px;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--color-primary);
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn-save:hover {
+      background: var(--color-primary-hover);
     }
 
     .toast-msg {
       display: none;
-      padding: 12px 16px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-      font-size: 0.88rem;
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.84rem;
       font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .toast-msg.ok {
+      display: block;
+      background: var(--status-success-bg);
+      border: 1px solid var(--status-success-border);
+      color: var(--status-success-text);
+    }
+
+    .toast-msg.err {
+      display: block;
+      background: var(--status-danger-bg);
+      border: 1px solid var(--status-danger-border);
+      color: var(--status-danger-text);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .btn-close {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .room-customization-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .table-sticky-header {
+        display: none;
+      }
+      .booking-row {
+        grid-template-columns: 1fr;
+      }
+      .room-customization-layout {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <a href="/admin/" class="brand-box">
-      <img src="/careclinic-logo.webp" alt="Logo" class="brand-logo" onerror="this.src='/images/acme-logo.svg'" />
-      <div>
-        <div class="brand-title">
-          Careclinics HQ Admin Portal
-          <span class="admin-pill">🛡️ Full Administrator Access</span>
-        </div>
-        <div style="font-size: 0.8rem; color: var(--cc-muted);">
-          Signed in as <strong id="adminUserLabel" style="color: #fff;">admin</strong> • Full control over TV Broadcasts, Departments & Room Bookings
-        </div>
-      </div>
-    </a>
 
-    <div class="topbar-right">
-      <a href="/" class="btn-top">👁️ View Staff Portal</a>
-      <a href="/meeting/" target="_blank" class="btn-top">📺 Launch Meeting TV ↗</a>
-      <a href="/display/?mode=receiver" target="_blank" class="btn-top">📡 Launch Signage Kiosk ↗</a>
-      <button type="button" class="btn-top btn-logout" id="logoutBtn">Logout Admin</button>
+  <!-- Unified Minimal Top Navigation Bar -->
+  <nav class="cchs-navbar">
+    <div class="cchs-navbar-inner">
+      <a href="/" class="cchs-brand">
+        <img src="/careclinic-logo.webp" alt="CareClinics Logo">
+        <div class="cchs-brand-text">
+          <span class="cchs-brand-title">CareClinics HQ</span>
+          <span class="cchs-brand-subtitle">Administrator Control Center</span>
+        </div>
+      </a>
+
+      <div class="cchs-nav-links">
+        <a href="/" class="cchs-nav-link">Portal Home</a>
+        <a href="/admin/" class="cchs-nav-link active">Admin Hub</a>
+        <a href="/booking/" class="cchs-nav-link">Room Booking</a>
+        <a href="/meeting/admin.html" class="cchs-nav-link">Meeting Admin</a>
+        <a href="/display/" class="cchs-nav-link">TV Controller</a>
+        <a href="/pdf/" class="cchs-nav-link">PDF Studio</a>
+      </div>
+
+      <div class="cchs-nav-right">
+        <span class="admin-pill-badge">🛡️ Signed in: <strong id="adminUserLabel">admin</strong></span>
+        <button type="button" class="btn-logout" id="logoutBtn">Sign Out</button>
+      </div>
     </div>
-  </header>
+  </nav>
 
   <main class="container">
-    <!-- Section 1: All Admin & Staff Application Launchers -->
-    <div class="section-header" style="margin-top: 0;">
-      <div class="section-title">🛡️ Administrator & HQ Service Launchers (Full Access)</div>
-    </div>
-
-    <section class="services-grid">
-      <!-- 1. Alignment Admin Console -->
-      <div class="service-card">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(245, 158, 11, 0.22); color: #fbbf24;">⚙️</div>
-          <div>
-            <div class="service-name">Alignment Admin Console</div>
-            <p class="service-desc">Toggle Q&A/Vision/Phrases slides, reorder departments, edit C-Suite closing speech, or reset meeting updates.</p>
-          </div>
-        </div>
-        <div class="chip-row">
-          <a href="/meeting/admin.html" class="chip-btn">Open Alignment Admin →</a>
-          <a href="/meeting/" target="_blank" class="chip-btn secondary">Open TV Deck ↗</a>
-        </div>
+    <section class="admin-hero">
+      <div>
+        <h1>Admin Dashboard</h1>
+        <p>Manage bookings, meeting rooms, and what's showing on the TV.</p>
       </div>
-
-      <!-- 2. Remote Display & Screen Share Switcher -->
-      <div class="service-card">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(244, 63, 94, 0.22); color: #fb7185;">🖥️</div>
-          <div>
-            <div class="service-name">Screen Share & TV Switcher</div>
-            <p class="service-desc">Choose which staff screen share (slides/video + audio) is displayed on the HQ TV Receiver.</p>
-          </div>
-        </div>
-        <div class="chip-row">
-          <a href="/display/" class="chip-btn">Open TV Switcher →</a>
-          <a href="/display/?mode=share" target="_blank" class="chip-btn secondary">Share Screen ↗</a>
-          <a href="/display/?mode=receiver" target="_blank" class="chip-btn secondary">TV Receiver ↗</a>
-        </div>
-      </div>
-
-      <!-- 3. Meeting TV Dashboard -->
-      <div class="service-card">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(24, 99, 220, 0.25); color: #60a5fa;">📺</div>
-          <div>
-            <div class="service-name">Meeting TV Presentation</div>
-            <p class="service-desc">1920×1080 Weekly Alignment TV Slide Deck with Forza Q&A Slot Reel and Department Updates.</p>
-          </div>
-        </div>
-        <div class="chip-row">
-          <a href="/meeting/" class="chip-btn">Launch TV Presentation →</a>
-          <a href="/meeting/input.html" class="chip-btn secondary">Staff Input Form</a>
-        </div>
-      </div>
-
-      <!-- 4. Room Booking Management -->
-      <div class="service-card">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(139, 92, 246, 0.25); color: #c084fc;">📅</div>
-          <div>
-            <div class="service-name">Room Booking System (Admin Mode)</div>
-            <p class="service-desc">Create new bookings or modify and delete existing & upcoming room reservations across 5 HQ spaces.</p>
-          </div>
-        </div>
-        <div class="chip-row">
-          <a href="#bookingControlSection" class="chip-btn">Manage Bookings Below ↓</a>
-          <a href="/booking/" class="chip-btn secondary">Open Booking Page →</a>
-        </div>
-      </div>
-
-      <!-- 5. Department Update Portal -->
-      <div class="service-card">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(16, 185, 129, 0.22); color: #34d399;">📝</div>
-          <div>
-            <div class="service-name">Department Update Portal</div>
-            <p class="service-desc">Submit or edit department weekly updates and Q&A questions with live slide preview.</p>
-          </div>
-        </div>
-        <div class="chip-row">
-          <a href="/meeting/input.html" class="chip-btn">Open Input Portal →</a>
-        </div>
-      </div>
-
-      <!-- 6. BentoPDF Studio -->
-      <div class="service-card">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(14, 165, 233, 0.22); color: #38bdf8;">📄</div>
-          <div>
-            <div class="service-name">BentoPDF Studio</div>
-            <p class="service-desc">100% browser-based private PDF toolkit: Merge, Split, Organize, Sign & Stamp, Watermark, Convert.</p>
-          </div>
-        </div>
-        <div class="chip-row">
-          <a href="/pdf/" class="chip-btn">Open PDF Studio →</a>
-        </div>
+      <div style="display:flex;gap:0.65rem;flex-wrap:wrap;">
+        <a href="#bookingControlSection" class="btn-module">Manage Bookings</a>
+        <a href="#roomCustomizationSection" class="btn-act" style="min-height:46px;">Rooms</a>
+        <a href="/meeting/admin.html" class="btn-act" style="min-height:46px;">Meeting Slides</a>
+        <a href="/display/" class="btn-act" style="min-height:46px;">TV Controller</a>
       </div>
     </section>
 
-    <!-- Section 1.5: Live Staff Screen Share Queue (Choose Presenter for TV) -->
-    <div class="section-header" id="screenShareControlSection">
-      <div class="section-title">🖥️ Active Staff Screen Share Queue — Choose Presenter to Output to TV</div>
-      <div style="display:flex; gap:8px;">
-        <a href="/display/?mode=share" target="_blank" class="btn-top">+ Launch Screen Share</a>
-        <a href="/display/?mode=receiver" target="_blank" class="btn-top">📺 Open TV Receiver ↗</a>
-      </div>
-    </div>
-
-    <section class="admin-panel">
-      <div id="adminShareToast" class="toast-msg"></div>
-      <div style="margin-bottom:14px; font-size:0.86rem; color:var(--cc-muted);">
-        Multiple staff can share their screen & audio simultaneously at <code>/display/?mode=share</code>. Select <strong>one presenter</strong> below to broadcast live to the HQ TV Receiver.
-      </div>
-      <div id="adminPresenterQueue" class="booking-admin-list"></div>
-    </section>
-
-    <!-- Section 2: Admin Room Booking Control Center (Update & Delete Existing/Upcoming Bookings) -->
-    <div class="section-header" id="bookingControlSection">
-      <div class="section-title">📅 Admin Room Booking Control — Update & Delete Existing / Upcoming Reservations</div>
-      <a href="/booking/" class="btn-top">+ Create New Room Booking</a>
-    </div>
-
-    <section class="admin-panel">
-      <div id="adminBookingToast" class="toast-msg"></div>
-
-      <div class="panel-toolbar">
+    <!-- Live TV Screen Share Presenter Switcher -->
+    <section class="section-card">
+      <div class="section-top">
         <div>
-          <h3 style="font-size: 1.15rem; font-weight: 800;">All Existing & Upcoming Room Bookings</h3>
-          <p style="font-size: 0.84rem; color: var(--cc-muted);">As an administrator, you can modify times, reassign rooms, edit details, or delete any reservation.</p>
+          <h2>💻 Live TV Screen Share Presenter Queue</h2>
+          <p>Multiple staff can share their screen &amp; audio from the portal. Select which presenter outputs to the TV Receiver.</p>
         </div>
-        <div class="filter-group">
-          <select id="adminRoomFilter">
-            <option value="ALL">All HQ Rooms</option>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <a href="/display/?mode=share" target="_blank" class="btn-act edit">💻 Open Staff Share Page</a>
+          <a href="/display/?mode=receiver" target="_blank" class="btn-act">📺 Open TV Receiver</a>
+        </div>
+      </div>
+
+      <div id="adminShareToast" class="toast-msg"></div>
+      <div class="booking-table-wrap" id="adminPresenterQueue"></div>
+    </section>
+
+    <!-- Full Room Booking Management -->
+    <section class="section-card" id="bookingControlSection">
+      <div class="section-top">
+        <div>
+          <h2>📅 Existing &amp; Upcoming Room Bookings Control</h2>
+          <p>Update or delete any room reservation, or send Outlook Calendar &amp; WhatsApp reminders to staff</p>
+        </div>
+        <div class="filter-row">
+          <select id="adminRoomFilter" class="form-control" aria-label="Filter Room">
+            <option value="ALL">All Meeting Rooms</option>
           </select>
-          <select id="adminScopeFilter">
-            <option value="ALL">All Existing & Upcoming</option>
-            <option value="UPCOMING">Today & Upcoming Only</option>
+          <select id="adminScopeFilter" class="form-control" aria-label="Filter Time Scope">
+            <option value="ALL">All Existing &amp; Upcoming</option>
+            <option value="UPCOMING">Upcoming &amp; Today Only</option>
             <option value="TODAY">Today Only</option>
           </select>
-          <input type="text" id="adminSearchBooking" placeholder="Search title, dept, person..." />
+          <input type="text" id="adminSearchBooking" class="form-control" placeholder="Search title, dept, organizer...">
+          <a href="/booking/" class="btn-module">+ New Booking</a>
         </div>
       </div>
 
-      <div id="adminBookingList" class="booking-admin-list"></div>
+      <div id="adminBookingToast" class="toast-msg"></div>
+      <div class="table-sticky-header">
+        <div>Date &amp; Time</div>
+        <div>Reservation &amp; Room Details</div>
+        <div style="text-align:right;">Actions</div>
+      </div>
+      <div class="booking-table-wrap" id="adminBookingList"></div>
     </section>
 
-    <!-- Section 2B: Admin HQ Meeting Rooms Customization (Quantity, Names, Details) -->
-    <div class="section-header" id="roomCustomizationSection">
-      <div class="section-title">🏢 Customize HQ Meeting Rooms — Quantity, Room Names & Details</div>
-      <span id="adminRoomCountBadge" class="btn-top">5 Rooms Available</span>
-    </div>
+    <!-- Admin Meeting Room Customization Section -->
+    <section class="section-card" id="roomCustomizationSection">
+      <div class="section-top">
+        <div>
+          <h2>🏢 HQ Meeting Room Customization</h2>
+          <p>Configure how many meeting rooms are available, customize room names, capacities, floor locations, and equipment</p>
+        </div>
+        <span class="admin-pill-badge" id="adminRoomCountBadge">4 Rooms Active</span>
+      </div>
 
-    <section class="admin-panel">
       <div id="adminRoomToast" class="toast-msg"></div>
 
-      <form id="adminRoomConfigForm" style="background:rgba(12,25,54,0.65); border:1px solid var(--cc-border); border-radius:14px; padding:18px; margin-bottom:20px;">
-        <div style="font-weight:800; font-size:0.95rem; color:var(--cc-sky); margin-bottom:12px;" id="adminRoomFormTitle">➕ Add New HQ Meeting Room</div>
-        <input type="hidden" id="admCfgRoomId" value="" />
-        <div class="form-grid">
-          <div class="form-field">
-            <label>Meeting Room Name *</label>
-            <input type="text" id="admCfgRoomName" placeholder="e.g. Main Boardroom / Pod B" required />
+      <div class="room-customization-layout">
+        <!-- Single-Column Room Editor Form -->
+        <form id="adminRoomConfigForm" style="background:var(--bg-subtle);padding:1.5rem;border-radius:var(--radius-md);border:1px solid var(--border-subtle);">
+          <h3 id="adminRoomFormTitle" style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-primary);">➕ Add New HQ Meeting Room</h3>
+          <input type="hidden" id="admCfgRoomId">
+          <div class="form-group">
+            <label class="form-label" for="admCfgRoomName">Meeting Room Name</label>
+            <input type="text" id="admCfgRoomName" class="form-control" style="width:100%;" placeholder="e.g. Boardroom B" required>
           </div>
-          <div class="form-field">
-            <label>Floor / Wing Location *</label>
-            <input type="text" id="admCfgRoomFloor" placeholder="e.g. Level 1 - East Wing" required />
+          <div class="form-group">
+            <label class="form-label" for="admCfgRoomFloor">Floor / Wing Location</label>
+            <input type="text" id="admCfgRoomFloor" class="form-control" style="width:100%;" placeholder="e.g. Level 3, HQ" required>
           </div>
-        </div>
-        <div class="form-grid">
-          <div class="form-field">
-            <label>Pax Capacity *</label>
-            <input type="number" id="admCfgRoomCapacity" min="1" max="500" value="12" required />
+          <div class="form-group">
+            <label class="form-label" for="admCfgRoomCapacity">Seating Capacity (Pax)</label>
+            <input type="number" id="admCfgRoomCapacity" class="form-control" style="width:100%;" min="1" max="500" value="10" required>
           </div>
-          <div class="form-field">
-            <label>Status & Theme Color</label>
-            <div style="display:flex; gap:10px;">
-              <select id="admCfgRoomStatus" style="flex:1;">
-                <option value="available">Available for Booking</option>
-                <option value="maintenance">Under Maintenance (Locked)</option>
-              </select>
-              <input type="color" id="admCfgRoomColor" value="#1863dc" style="width:52px; height:40px; padding:3px;" />
-            </div>
+          <div class="form-group">
+            <label class="form-label" for="admCfgRoomStatus">Room Availability Status</label>
+            <select id="admCfgRoomStatus" class="form-control" style="width:100%;">
+              <option value="available">Available for Booking</option>
+              <option value="maintenance">Under Maintenance</option>
+            </select>
           </div>
-        </div>
-        <div class="form-field">
-          <label>Room Equipment & Amenities (Comma-separated) *</label>
-          <input type="text" id="admCfgRoomAmenities" placeholder="e.g. 75&quot; 4K Smart TV, Video Conferencing, Whiteboard, Speakerphone" required />
-        </div>
-        <div style="display:flex; gap:10px; justify-content:flex-end;">
-          <button type="button" class="btn-top" id="admBtnCancelRoomEdit" style="display:none;" onclick="adminResetRoomForm()">Cancel Edit</button>
-          <button type="submit" class="chip-btn" style="padding:10px 18px; font-size:0.86rem;" id="admBtnSaveRoom">Add Meeting Room</button>
-        </div>
-      </form>
+          <div class="form-group">
+            <label class="form-label" for="admCfgRoomColor">Schedule Theme Color</label>
+            <input type="color" id="admCfgRoomColor" class="form-control" style="width:100%;height:44px;padding:0.25rem;" value="#1863DC">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="admCfgRoomAmenities">Room Amenities (Comma-separated)</label>
+            <input type="text" id="admCfgRoomAmenities" class="form-control" style="width:100%;" placeholder="4K TV Display, Video Conferencing, Whiteboard" value="TV Display, Whiteboard, Wi-Fi">
+          </div>
+          <div style="display:flex;gap:0.5rem;">
+            <button type="button" class="btn-act" id="admBtnCancelRoomEdit" style="display:none;flex:1;justify-content:center;">Cancel</button>
+            <button type="submit" class="btn-save" id="admBtnSaveRoom" style="flex:2;">Save Meeting Room</button>
+          </div>
+        </form>
 
-      <div id="adminRoomsList" class="booking-admin-list"></div>
+        <!-- Configured Rooms List -->
+        <div class="booking-table-wrap" id="adminRoomsList"></div>
+      </div>
     </section>
 
-    <!-- Section 3: Admin Security & Credentials Management -->
-    <div class="section-header">
-      <div class="section-title">🔐 Admin Login Credentials Settings</div>
-    </div>
-
-    <section class="admin-panel" style="max-width: 680px;">
+    <!-- Admin Credentials Settings -->
+    <section class="section-card">
+      <div class="section-top">
+        <div>
+          <h2>🔑 Administrator Login Credentials</h2>
+          <p>Update the username and password required to sign in at <code>/login.html</code></p>
+        </div>
+      </div>
       <div id="credToast" class="toast-msg"></div>
-      <form id="credForm">
-        <div class="form-grid">
-          <div class="form-field">
-            <label>New Admin Username</label>
-            <input type="text" id="newAdminUser" value="admin" required />
-          </div>
-          <div class="form-field">
-            <label>Current Password *</label>
-            <input type="password" id="curAdminPass" placeholder="Enter current password" required />
-          </div>
+      <form id="credForm" style="max-width:480px;">
+        <div class="form-group">
+          <label class="form-label" for="newAdminUser">Admin Username</label>
+          <input type="text" id="newAdminUser" class="form-control" style="width:100%;" required>
         </div>
-        <div class="form-field">
-          <label>New Admin Password *</label>
-          <input type="password" id="newAdminPass" placeholder="Enter new password" required />
+        <div class="form-group">
+          <label class="form-label" for="curAdminPass">Current Password</label>
+          <input type="password" id="curAdminPass" class="form-control" style="width:100%;" placeholder="Enter current password" required>
         </div>
-        <button type="submit" class="chip-btn" style="padding: 10px 18px; font-size: 0.88rem;">Update Admin Credentials</button>
+        <div class="form-group">
+          <label class="form-label" for="newAdminPass">New Password</label>
+          <input type="password" id="newAdminPass" class="form-control" style="width:100%;" placeholder="Minimum 4 characters" required>
+        </div>
+        <button type="submit" class="btn-save">Update Credentials</button>
       </form>
     </section>
   </main>
@@ -623,379 +652,249 @@
   <!-- Edit Booking Modal -->
   <div class="modal-backdrop" id="editBookingModal">
     <div class="modal-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-        <h3 style="font-size:1.2rem; font-weight:800;">✎ Edit Room Reservation</h3>
-        <button type="button" onclick="closeEditModal()" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer;">&times;</button>
+      <div class="modal-header">
+        <h3 style="font-size:1.1rem;font-weight:800;">✏️ Edit Room Booking</h3>
+        <button type="button" class="btn-close" id="closeEditModal">&times;</button>
       </div>
-
-      <div id="modalError" class="toast-msg" style="background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#fca5a5;"></div>
-
+      <div id="modalError" class="toast-msg err"></div>
       <form id="editBookingForm">
-        <input type="hidden" id="editBookingId" />
-        <div class="form-field">
-          <label>HQ Room</label>
-          <select id="editRoomId" required></select>
+        <input type="hidden" id="editBookingId">
+        <div class="form-group">
+          <label class="form-label" for="editRoomId">Meeting Room</label>
+          <select id="editRoomId" class="form-control" style="width:100%;" required></select>
         </div>
-        <div class="form-field">
-          <label>Meeting Title</label>
-          <input type="text" id="editTitle" required />
+        <div class="form-group">
+          <label class="form-label" for="editTitle">Meeting Title / Purpose</label>
+          <input type="text" id="editTitle" class="form-control" style="width:100%;" required>
         </div>
-        <div class="form-grid">
-          <div class="form-field">
-            <label>Department</label>
-            <select id="editDepartment" required></select>
-          </div>
-          <div class="form-field">
-            <label>Booked By</label>
-            <input type="text" id="editOrganizer" required />
-          </div>
+        <div class="form-group">
+          <label class="form-label" for="editDepartment">Department</label>
+          <select id="editDepartment" class="form-control" style="width:100%;" required></select>
         </div>
-        <div class="form-field">
-          <label>Date</label>
-          <input type="date" id="editDate" required />
+        <div class="form-group">
+          <label class="form-label" for="editOrganizer">Organizer Name</label>
+          <input type="text" id="editOrganizer" class="form-control" style="width:100%;" required>
         </div>
-        <div class="form-grid">
-          <div class="form-field">
-            <label>Start Time</label>
-            <input type="time" id="editStartTime" required />
-          </div>
-          <div class="form-field">
-            <label>End Time</label>
-            <input type="time" id="editEndTime" required />
-          </div>
+        <div class="form-group">
+          <label class="form-label" for="editDate">Date</label>
+          <input type="date" id="editDate" class="form-control" style="width:100%;" required>
         </div>
-        <div class="form-field">
-          <label>Notes</label>
-          <textarea id="editNotes" rows="2"></textarea>
+        <div class="form-group">
+          <label class="form-label" for="editStartTime">Start Time</label>
+          <input type="time" id="editStartTime" class="form-control" style="width:100%;" required>
         </div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
-          <button type="button" class="btn-top" onclick="closeEditModal()">Cancel</button>
-          <button type="submit" class="chip-btn" style="padding:10px 20px; font-size:0.9rem;">Save Changes</button>
+        <div class="form-group">
+          <label class="form-label" for="editEndTime">End Time</label>
+          <input type="time" id="editEndTime" class="form-control" style="width:100%;" required>
         </div>
+        <div class="form-group">
+          <label class="form-label" for="editNotes">Notes</label>
+          <input type="text" id="editNotes" class="form-control" style="width:100%;">
+        </div>
+        <button type="submit" class="btn-save" style="width:100%;">Save Booking Changes</button>
       </form>
     </div>
   </div>
 
   <script type="module">
-    import { requireAdminAuth, getAdminSession, logoutAdmin, updateAdminCredentials } from '/shared/auth.js';
+    import { requireAdminAuth, getAdminSession, logoutAdmin, getAdminCredentials, updateAdminCredentials } from '/shared/auth.js';
     import {
-      subscribeState,
-      updateRoomBooking,
-      deleteRoomBooking,
-      selectActivePresenter,
-      removePresenter,
-      addMeetingRoom,
-      updateMeetingRoom,
-      deleteMeetingRoom,
-      buildWhatsAppBookingUrl,
-      buildOutlookCalendarUrls,
-      downloadOutlookIcs
+      getState, subscribeState, updateBooking, deleteBooking, getTodayStr,
+      selectDisplayPresenter, removeDisplayPresenter, saveRoom, deleteRoom,
+      buildOutlookWebUrl, buildWhatsAppNotificationUrl
     } from '/shared/cloud-store.js';
 
-    // Guard route immediately
     if (!requireAdminAuth()) {
-      throw new Error('Redirecting to Admin Login');
+      throw new Error('Redirecting to login');
     }
 
     const session = getAdminSession();
     if (session?.username) {
       document.getElementById('adminUserLabel').textContent = session.username;
-      document.getElementById('newAdminUser').value = session.username;
     }
+    document.getElementById('newAdminUser').value = getAdminCredentials().username;
 
-    document.getElementById('logoutBtn').addEventListener('click', () => logoutAdmin('/'));
-
-    let currentState = null;
-    const todayStr = new Date().toISOString().slice(0, 10);
-
-    function showToast(elId, msg, isError = false) {
-      const el = document.getElementById(elId);
-      el.textContent = msg;
-      el.style.display = 'block';
-      el.style.background = isError ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)';
-      el.style.border = `1px solid ${isError ? '#ef4444' : '#10b981'}`;
-      el.style.color = isError ? '#fca5a5' : '#6ee7b7';
-      setTimeout(() => { el.style.display = 'none'; }, 4000);
-    }
-
-    subscribeState((state) => {
-      if (!state) return;
-      currentState = state;
-      populateFiltersAndModal(state);
-      renderAdminPresenters(state);
-      renderAdminBookings();
-      renderAdminRoomsList(state);
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      logoutAdmin();
+      window.location.replace('/login.html');
     });
 
-    function renderAdminPresenters(state) {
-      const rd = state.remoteDisplay || {};
-      const now = Date.now();
-      const presenters = (rd.presenters || []).filter(p => !p.lastHeartbeat || (now - p.lastHeartbeat) < 60000);
-      const activeId = rd.activeMode === 'screen-share' ? rd.activePresenterId : null;
-      const container = document.getElementById('adminPresenterQueue');
-      if (!container) return;
+    const todayStr = getTodayStr();
+    const adminBookingToast = document.getElementById('adminBookingToast');
 
-      if (presenters.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--cc-muted); border:1px dashed var(--cc-border); border-radius:12px;">No staff members are currently sharing their screen. Staff can click <strong>Share Screen & Audio to TV</strong> on the Staff Portal to join the queue.</div>`;
-        return;
-      }
-
-      container.innerHTML = presenters.map(p => {
-        const isLive = activeId === p.id;
-        return `
-          <div class="booking-row" style="border-left-color: ${isLive ? '#10b981' : '#f59e0b'}; ${isLive ? 'background:rgba(16,185,129,0.12);' : ''}">
-            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
-              ${p.previewFrame
-                ? `<img src="${p.previewFrame}" style="width:120px; height:68px; object-fit:cover; border-radius:8px; border:1px solid var(--cc-border);" />`
-                : `<div style="width:120px; height:68px; border-radius:8px; background:#040914; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🖥️</div>`
-              }
-              <div>
-                <div style="font-weight:800; font-size:1.02rem; color:#fff; display:flex; align-items:center; gap:8px;">
-                  <span>👤 ${p.name}</span>
-                  <span style="font-size:0.72rem; padding:2px 8px; border-radius:999px; background:${isLive ? '#10b981' : 'rgba(245,158,11,0.22)'}; color:${isLive ? '#052e16' : '#fbbf24'};">${isLive ? '● LIVE ON TV NOW' : 'Waiting in Queue'}</span>
-                </div>
-                <div style="font-size:0.86rem; color:var(--cc-sky); margin-top:2px;">📑 ${p.title || 'Screen Presentation'}</div>
-                <div style="font-size:0.78rem; color:var(--cc-muted); margin-top:3px;">
-                  🏷️ ${p.department} • ${p.hasAudio ? '🔊 Audio Included' : '🔇 Video Only'}
-                </div>
-              </div>
-            </div>
-            <div class="booking-actions">
-              ${isLive
-                ? `<button type="button" class="btn-edit" style="border-color:#f59e0b; color:#fbbf24;" onclick="adminPickPresenter(null)">⏹ Stop TV Output</button>`
-                : `<button type="button" class="btn-edit" style="background:#10b981; border-color:#10b981; color:#052e16;" onclick="adminPickPresenter('${p.id}')">📺 Output This Screen to TV</button>`
-              }
-              <button type="button" class="btn-del" onclick="adminDisconnectPresenter('${p.id}')">✕ Disconnect</button>
-            </div>
-          </div>
-        `;
-      }).join('');
+    function showBookingToast(msg, type = 'ok') {
+      adminBookingToast.textContent = msg;
+      adminBookingToast.className = `toast-msg ${type}`;
+      setTimeout(() => { adminBookingToast.className = 'toast-msg'; }, 4000);
     }
 
-    window.adminPickPresenter = async (presenterId) => {
-      await selectActivePresenter(presenterId);
-      showToast('adminShareToast', presenterId ? '✓ Selected staff screen is now live on the HQ TV Receiver!' : '✓ Stopped TV screen share output.');
-    };
-
-    window.adminDisconnectPresenter = async (presenterId) => {
-      if (confirm('Disconnect this staff presenter?')) {
-        await removePresenter(presenterId);
-        showToast('adminShareToast', '✓ Disconnected presenter.');
-      }
-    };
-
-    function populateFiltersAndModal(state) {
-      const rooms = state.rooms || [];
-      const depts = Object.keys(state.departments || {});
-
+    function populateFilters(state) {
       const roomFilter = document.getElementById('adminRoomFilter');
-      const prevFilter = roomFilter.value || 'ALL';
-      roomFilter.innerHTML = `<option value="ALL">All HQ Rooms (${rooms.length})</option>` +
-        rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-      roomFilter.value = prevFilter;
-
       const editRoom = document.getElementById('editRoomId');
-      editRoom.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-
       const editDept = document.getElementById('editDepartment');
+
+      const curRoom = roomFilter.value || 'ALL';
+      const rooms = state.rooms || [];
+      roomFilter.innerHTML = `<option value="ALL">All Meeting Rooms</option>` + rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+      roomFilter.value = curRoom;
+
+      editRoom.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name} (${r.capacity} pax)</option>`).join('');
+      const depts = state.meeting?.settings?.departments || [];
       editDept.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
     }
 
-    function renderAdminBookings() {
-      if (!currentState) return;
-      const rooms = currentState.rooms || [];
-      const roomMap = Object.fromEntries(rooms.map(r => [r.id, r]));
-      const roomFilter = document.getElementById('adminRoomFilter').value;
-      const scopeFilter = document.getElementById('adminScopeFilter').value;
-      const searchQ = document.getElementById('adminSearchBooking').value.trim().toLowerCase();
+    function renderPresenterQueue(state) {
+      const container = document.getElementById('adminPresenterQueue');
+      const disp = state.display || {};
+      const list = disp.presenters || [];
+      const activeId = disp.activePresenterId;
+      const isScreenShareMode = disp.mode === 'screen-share';
 
-      let list = [...(currentState.bookings || [])];
-      if (roomFilter !== 'ALL') {
-        list = list.filter(b => b.roomId === roomFilter);
-      }
-      if (scopeFilter === 'TODAY') {
-        list = list.filter(b => b.date === todayStr);
-      } else if (scopeFilter === 'UPCOMING') {
-        list = list.filter(b => b.date >= todayStr);
-      }
-      if (searchQ) {
-        list = list.filter(b =>
-          `${b.title} ${b.department} ${b.organizer} ${b.phone || ''} ${b.notes || ''}`.toLowerCase().includes(searchQ)
-        );
-      }
-
-      list.sort((a, b) => {
-        if (a.date !== b.date) return a.date.localeCompare(b.date);
-        return a.startTime.localeCompare(b.startTime);
-      });
-
-      const container = document.getElementById('adminBookingList');
       if (list.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:32px; color:var(--cc-muted);">No room reservations match the current filter.</div>`;
+        container.innerHTML = `
+          <div style="text-align:center;padding:1.75rem;color:var(--text-secondary);font-size:0.88rem;background:var(--bg-subtle);border-radius:var(--radius-md);border:1px solid var(--border-subtle);">
+            No staff members are currently sharing their screen. Staff can click <strong>"Share Screen to TV"</strong> on the portal to join the queue.
+          </div>
+        `;
         return;
       }
 
-      container.innerHTML = list.map(b => {
-        const room = roomMap[b.roomId] || { name: b.roomId, color: '#1863dc' };
-        const waUrl = buildWhatsAppBookingUrl(b, room, 'starting');
-        const outlookUrls = buildOutlookCalendarUrls(b, room);
-
+      container.innerHTML = list.map(p => {
+        const isLive = isScreenShareMode && p.id === activeId;
         return `
-          <div class="booking-row" style="border-left-color: ${room.color || '#1863dc'};">
-            <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
-              <div style="background:rgba(255,255,255,0.06); padding:10px 14px; border-radius:10px; min-width:130px; text-align:center;">
-                <div style="font-weight:800; font-size:0.95rem; color:#fff;">${b.startTime} – ${b.endTime}</div>
-                <div style="font-size:0.76rem; color:var(--cc-sky);">${b.date}</div>
-              </div>
-              <div>
-                <div style="font-weight:700; font-size:1.02rem; color:#fff;">${b.title}</div>
-                <div style="font-size:0.82rem; color:var(--cc-muted); margin-top:3px;">
-                  📍 <strong style="color:#e2e8f0;">${room.name}</strong> • 🏷️ ${b.department} • 👤 ${b.organizer || 'HQ Staff'}${b.phone ? ' • 📱 ' + b.phone : ''}
-                </div>
-                ${b.notes ? `<div style="font-size:0.78rem; color:#94a3b8; margin-top:4px;">💬 ${b.notes}</div>` : ''}
-              </div>
+          <div class="booking-row" style="${isLive ? 'border-color:var(--status-success-border);background:var(--status-success-bg);' : ''}">
+            <div class="b-time-badge">
+              <div class="date" style="color:${isLive ? 'var(--status-success-text)' : 'var(--color-primary)'};">${isLive ? '🔴 ON TV NOW' : 'READY TO SHARE'}</div>
+              <div class="hours">${p.audio ? '🔊 Audio + Video' : '🖥️ Video Only'}</div>
             </div>
-            <div class="booking-actions" style="flex-wrap:wrap;">
-              <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="btn-edit" style="text-decoration:none;">📅 Outlook</a>
-              <button type="button" class="btn-edit" onclick="adminDownloadIcs('${b.id}')">📥 .ics</button>
-              <a href="${waUrl}" target="_blank" rel="noopener" class="btn-edit" style="border-color:#10b981; color:#6ee7b7; text-decoration:none;">💬 WhatsApp</a>
-              <button type="button" class="btn-edit" onclick="openEditModal('${b.id}')">✎ Edit / Update</button>
-              <button type="button" class="btn-del" onclick="adminDeleteBooking('${b.id}')">🗑 Delete</button>
+            <div class="b-info">
+              <h4>
+                <span>${p.name}</span>
+                <span class="room-tag">${p.department || 'HQ Staff'}</span>
+              </h4>
+              <div class="b-meta">Presentation: <strong>${p.title || 'Live Screen Share'}</strong></div>
+            </div>
+            <div class="b-actions">
+              <button type="button" class="btn-act ${isLive ? '' : 'approve'}" data-tv-select="${p.id}">
+                ${isLive ? '✓ Displaying on TV' : '📺 Output to TV'}
+              </button>
+              <button type="button" class="btn-act delete" data-tv-kick="${p.id}">Disconnect</button>
             </div>
           </div>
         `;
       }).join('');
+
+      container.querySelectorAll('[data-tv-select]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          await selectDisplayPresenter(btn.dataset.tvSelect);
+          const toast = document.getElementById('adminShareToast');
+          toast.textContent = 'Switched TV output to selected staff presenter!';
+          toast.className = 'toast-msg ok';
+          setTimeout(() => { toast.className = 'toast-msg'; }, 3500);
+        });
+      });
+
+      container.querySelectorAll('[data-tv-kick]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          await removeDisplayPresenter(btn.dataset.tvKick);
+        });
+      });
     }
 
-    window.adminDownloadIcs = (bookingId) => {
-      const b = (currentState?.bookings || []).find(item => item.id === bookingId);
-      if (!b) return;
-      const room = (currentState?.rooms || []).find(r => r.id === b.roomId);
-      downloadOutlookIcs(b, room);
-    };
+    function renderAdminBookings(state) {
+      const listEl = document.getElementById('adminBookingList');
+      const roomFilter = document.getElementById('adminRoomFilter').value;
+      const scopeFilter = document.getElementById('adminScopeFilter').value;
+      const searchQ = document.getElementById('adminSearchBooking').value.trim().toLowerCase();
+      const roomsMap = Object.fromEntries((state.rooms || []).map(r => [r.id, r]));
 
-    // =========================================================================
-    // ADMIN MEETING ROOM CUSTOMIZATION HANDLERS
-    // =========================================================================
-    function renderAdminRoomsList(state) {
-      const rooms = state.rooms || [];
-      const countBadge = document.getElementById('adminRoomCountBadge');
-      if (countBadge) countBadge.textContent = `${rooms.length} Rooms Available`;
+      let list = [...(state.bookings || [])];
+      if (roomFilter !== 'ALL') {
+        list = list.filter(b => b.roomId === roomFilter);
+      }
+      if (scopeFilter === 'UPCOMING') {
+        list = list.filter(b => b.date >= todayStr);
+      } else if (scopeFilter === 'TODAY') {
+        list = list.filter(b => b.date === todayStr);
+      }
+      if (searchQ) {
+        list = list.filter(b =>
+          `${b.title} ${b.department} ${b.organizer} ${b.notes || ''}`.toLowerCase().includes(searchQ)
+        );
+      }
 
-      const container = document.getElementById('adminRoomsList');
-      if (!container) return;
+      list.sort((a, b) => (a.date + a.startTime).localeCompare(b.date + b.startTime));
 
-      container.innerHTML = rooms.map(r => `
-        <div class="booking-row" style="border-left-color: ${r.color || '#1863dc'};">
-          <div>
-            <div style="font-weight:800; font-size:1.02rem; color:#fff; display:flex; align-items:center; gap:10px;">
-              <span>🏢 ${r.name}</span>
-              <span style="font-size:0.72rem; padding:2px 9px; border-radius:999px; background:${r.status === 'maintenance' ? 'rgba(245,158,11,0.22)' : 'rgba(16,185,129,0.22)'}; color:${r.status === 'maintenance' ? '#fbbf24' : '#6ee7b7'};">
-                ${r.status === 'maintenance' ? '🛠️ Under Maintenance' : '● Available'}
-              </span>
+      if (list.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-secondary);font-size:0.9rem;">No bookings match the current filter.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = list.map(b => {
+        const room = roomsMap[b.roomId] || { name: b.roomId, floor: 'HQ' };
+        const outlookUrl = buildOutlookWebUrl(b, room);
+        const waUrl = buildWhatsAppNotificationUrl(b, room);
+        return `
+          <div class="booking-row">
+            <div class="b-time-badge">
+              <div class="date">${b.date}</div>
+              <div class="hours">${b.startTime} – ${b.endTime}</div>
             </div>
-            <div style="font-size:0.84rem; color:var(--cc-sky); margin-top:3px;">
-              📍 ${r.floor || 'HQ'} • 👥 Capacity: ${r.capacity} pax
+            <div class="b-info">
+              <h4>
+                <span>${b.title}</span>
+                <span class="room-tag">${room.name}</span>
+              </h4>
+              <div class="b-meta">
+                Dept: <strong>${b.department}</strong> • Booked by: ${b.organizer}
+                ${b.phone ? ` • 📱 ${b.phone}` : ''}
+                ${b.notes ? ` • Note: ${b.notes}` : ''}
+              </div>
             </div>
-            <div style="font-size:0.78rem; color:var(--cc-muted); margin-top:4px;">
-              🛠️ Amenities: ${(r.amenities || []).join(' • ')}
+            <div class="b-actions">
+              <a href="${outlookUrl}" target="_blank" rel="noopener" class="btn-act">📅 Outlook</a>
+              <a href="${waUrl}" target="_blank" rel="noopener" class="btn-act whatsapp">💬 WhatsApp</a>
+              <button type="button" class="btn-act edit" data-edit="${b.id}">✏️ Edit</button>
+              <button type="button" class="btn-act delete" data-del="${b.id}">🗑️ Delete</button>
             </div>
           </div>
-          <div class="booking-actions">
-            <button type="button" class="btn-edit" onclick="adminStartEditRoom('${r.id}')">✎ Customize Room</button>
-            <button type="button" class="btn-del" onclick="adminRemoveRoom('${r.id}')">🗑 Remove Room</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+
+      listEl.querySelectorAll('[data-del]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Are you sure you want to permanently delete this room booking?')) return;
+          await deleteBooking(btn.dataset.del);
+          showBookingToast('Room booking deleted.');
+        });
+      });
+
+      listEl.querySelectorAll('[data-edit]').forEach(btn => {
+        btn.addEventListener('click', () => openEditModal(btn.dataset.edit));
+      });
     }
 
-    window.adminStartEditRoom = (roomId) => {
-      const r = (currentState?.rooms || []).find(item => item.id === roomId);
-      if (!r) return;
-      document.getElementById('admCfgRoomId').value = r.id;
-      document.getElementById('admCfgRoomName').value = r.name || '';
-      document.getElementById('admCfgRoomFloor').value = r.floor || '';
-      document.getElementById('admCfgRoomCapacity').value = r.capacity || 10;
-      document.getElementById('admCfgRoomStatus').value = r.status || 'available';
-      document.getElementById('admCfgRoomColor').value = r.color || '#1863dc';
-      document.getElementById('admCfgRoomAmenities').value = (r.amenities || []).join(', ');
-      document.getElementById('adminRoomFormTitle').textContent = `✎ Editing Room: ${r.name}`;
-      document.getElementById('admBtnSaveRoom').textContent = 'Save Room Changes';
-      document.getElementById('admBtnCancelRoomEdit').style.display = 'inline-block';
-      document.getElementById('roomCustomizationSection').scrollIntoView({ behavior: 'smooth' });
-    };
+    const editModal = document.getElementById('editBookingModal');
+    const modalError = document.getElementById('modalError');
 
-    window.adminResetRoomForm = () => {
-      document.getElementById('admCfgRoomId').value = '';
-      document.getElementById('admCfgRoomName').value = '';
-      document.getElementById('admCfgRoomFloor').value = '';
-      document.getElementById('admCfgRoomCapacity').value = '12';
-      document.getElementById('admCfgRoomStatus').value = 'available';
-      document.getElementById('admCfgRoomColor').value = '#1863dc';
-      document.getElementById('admCfgRoomAmenities').value = '';
-      document.getElementById('adminRoomFormTitle').textContent = '➕ Add New HQ Meeting Room';
-      document.getElementById('admBtnSaveRoom').textContent = 'Add Meeting Room';
-      document.getElementById('admBtnCancelRoomEdit').style.display = 'none';
-    };
-
-    window.adminRemoveRoom = async (roomId) => {
-      const r = (currentState?.rooms || []).find(item => item.id === roomId);
-      if (!confirm(`Remove meeting room "${r?.name || roomId}"?`)) return;
-      try {
-        await deleteMeetingRoom(roomId);
-        showToast('adminRoomToast', '✓ Meeting room removed.');
-      } catch (err) {
-        showToast('adminRoomToast', err.message, true);
-      }
-    };
-
-    document.getElementById('adminRoomConfigForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('admCfgRoomId').value;
-      const name = document.getElementById('admCfgRoomName').value.trim();
-      const floor = document.getElementById('admCfgRoomFloor').value.trim();
-      const capacity = Number(document.getElementById('admCfgRoomCapacity').value) || 10;
-      const status = document.getElementById('admCfgRoomStatus').value;
-      const color = document.getElementById('admCfgRoomColor').value;
-      const amenities = document.getElementById('admCfgRoomAmenities').value.split(',').map(s => s.trim()).filter(Boolean);
-
-      try {
-        if (id) {
-          await updateMeetingRoom(id, { name, floor, capacity, status, color, amenities });
-          showToast('adminRoomToast', `✓ Updated "${name}" details!`);
-        } else {
-          await addMeetingRoom({ name, floor, capacity, status, color, amenities });
-          showToast('adminRoomToast', `✓ Added new meeting room "${name}"!`);
-        }
-        window.adminResetRoomForm();
-      } catch (err) {
-        showToast('adminRoomToast', err.message, true);
-      }
-    });
-
-    document.getElementById('adminRoomFilter').addEventListener('change', renderAdminBookings);
-    document.getElementById('adminScopeFilter').addEventListener('change', renderAdminBookings);
-    document.getElementById('adminSearchBooking').addEventListener('input', renderAdminBookings);
-
-    window.openEditModal = (bookingId) => {
-      const b = (currentState?.bookings || []).find(item => item.id === bookingId);
+    function openEditModal(id) {
+      const state = getState();
+      const b = (state.bookings || []).find(x => x.id === id);
       if (!b) return;
-      document.getElementById('modalError').style.display = 'none';
+      modalError.className = 'toast-msg';
       document.getElementById('editBookingId').value = b.id;
       document.getElementById('editRoomId').value = b.roomId;
-      document.getElementById('editTitle').value = b.title || '';
-      document.getElementById('editDepartment').value = b.department || 'IT';
-      document.getElementById('editOrganizer').value = b.organizer || '';
-      document.getElementById('editDate').value = b.date || todayStr;
-      document.getElementById('editStartTime').value = b.startTime || '09:00';
-      document.getElementById('editEndTime').value = b.endTime || '10:00';
+      document.getElementById('editTitle').value = b.title;
+      document.getElementById('editDepartment').value = b.department;
+      document.getElementById('editOrganizer').value = b.organizer;
+      document.getElementById('editDate').value = b.date;
+      document.getElementById('editStartTime').value = b.startTime;
+      document.getElementById('editEndTime').value = b.endTime;
       document.getElementById('editNotes').value = b.notes || '';
-      document.getElementById('editBookingModal').style.display = 'flex';
-    };
+      editModal.classList.add('open');
+    }
 
-    window.closeEditModal = () => {
-      document.getElementById('editBookingModal').style.display = 'none';
-    };
+    document.getElementById('closeEditModal').addEventListener('click', () => editModal.classList.remove('open'));
 
     document.getElementById('editBookingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1009,40 +908,160 @@
       const endTime = document.getElementById('editEndTime').value;
       const notes = document.getElementById('editNotes').value.trim();
 
+      if (startTime >= endTime) {
+        modalError.textContent = 'End time must be after start time.';
+        modalError.className = 'toast-msg err';
+        return;
+      }
+
       try {
-        await updateRoomBooking(id, { roomId, title, department, organizer, date, startTime, endTime, notes });
-        window.closeEditModal();
-        showToast('adminBookingToast', '✓ Room booking updated and broadcasted!');
+        await updateBooking({ id, roomId, title, department, organizer, date, startTime, endTime, notes });
+        editModal.classList.remove('open');
+        showBookingToast('Booking updated successfully.');
       } catch (err) {
-        const errEl = document.getElementById('modalError');
-        errEl.textContent = err.message;
-        errEl.style.display = 'block';
+        modalError.textContent = err.message;
+        modalError.className = 'toast-msg err';
       }
     });
 
-    window.adminDeleteBooking = async (bookingId) => {
-      if (confirm('Are you sure you want to permanently delete this room reservation?')) {
-        await deleteRoomBooking(bookingId);
-        showToast('adminBookingToast', '✓ Room reservation deleted.');
-      }
-    };
+    ['adminRoomFilter', 'adminScopeFilter', 'adminSearchBooking'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => renderAdminBookings(getState()));
+      document.getElementById(id).addEventListener('change', () => renderAdminBookings(getState()));
+    });
 
-    document.getElementById('credForm').addEventListener('submit', async (e) => {
+    document.getElementById('credForm').addEventListener('submit', (e) => {
       e.preventDefault();
+      const credToast = document.getElementById('credToast');
       const curPass = document.getElementById('curAdminPass').value;
-      const newUser = document.getElementById('newAdminUser').value.trim();
+      const newUser = document.getElementById('newAdminUser').value;
       const newPass = document.getElementById('newAdminPass').value;
 
-      const res = await updateAdminCredentials(curPass, newUser, newPass);
+      if (curPass !== getAdminCredentials().password) {
+        credToast.textContent = 'Current password is incorrect.';
+        credToast.className = 'toast-msg err';
+        return;
+      }
+
+      const res = updateAdminCredentials(newUser, newPass);
       if (res.ok) {
-        document.getElementById('adminUserLabel').textContent = newUser;
+        document.getElementById('adminUserLabel').textContent = newUser.trim();
         document.getElementById('curAdminPass').value = '';
         document.getElementById('newAdminPass').value = '';
-        showToast('credToast', '✓ Admin username and password updated!');
+        credToast.textContent = 'Administrator credentials updated!';
+        credToast.className = 'toast-msg ok';
       } else {
-        showToast('credToast', res.error || 'Failed to update credentials.', true);
+        credToast.textContent = res.error;
+        credToast.className = 'toast-msg err';
       }
     });
+
+    function resetAdminRoomForm() {
+      document.getElementById('admCfgRoomId').value = '';
+      document.getElementById('admCfgRoomName').value = '';
+      document.getElementById('admCfgRoomFloor').value = 'Level 3, HQ';
+      document.getElementById('admCfgRoomCapacity').value = '10';
+      document.getElementById('admCfgRoomStatus').value = 'available';
+      document.getElementById('admCfgRoomColor').value = '#1863DC';
+      document.getElementById('admCfgRoomAmenities').value = 'TV Display, Whiteboard, Wi-Fi';
+      document.getElementById('adminRoomFormTitle').textContent = '➕ Add New HQ Meeting Room';
+      document.getElementById('admBtnSaveRoom').textContent = 'Save Meeting Room';
+      document.getElementById('admBtnCancelRoomEdit').style.display = 'none';
+    }
+
+    document.getElementById('admBtnCancelRoomEdit')?.addEventListener('click', resetAdminRoomForm);
+
+    function renderAdminRooms(state) {
+      const rooms = state.rooms || [];
+      document.getElementById('adminRoomCountBadge').textContent = `${rooms.length} Room${rooms.length === 1 ? '' : 's'} Configured`;
+      const container = document.getElementById('adminRoomsList');
+
+      container.innerHTML = rooms.map(r => `
+        <div class="booking-row">
+          <div class="b-time-badge" style="border-left:4px solid ${r.color || '#1863DC'};">
+            <div class="date">${r.status === 'maintenance' ? '⚠️ MAINTENANCE' : '✅ AVAILABLE'}</div>
+            <div class="hours">${r.capacity} Pax</div>
+          </div>
+          <div class="b-info">
+            <h4>
+              <span>${r.name}</span>
+              <span class="room-tag">${r.floor}</span>
+            </h4>
+            <div class="b-meta">Amenities: ${(r.amenities || []).join(' • ') || 'Standard Setup'}</div>
+          </div>
+          <div class="b-actions">
+            <button type="button" class="btn-act edit" data-room-edit="${r.id}">✏️ Customize</button>
+            <button type="button" class="btn-act delete" data-room-del="${r.id}">🗑️ Delete</button>
+          </div>
+        </div>
+      `).join('');
+
+      container.querySelectorAll('[data-room-edit]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const r = (getState().rooms || []).find(x => x.id === btn.dataset.roomEdit);
+          if (!r) return;
+          document.getElementById('admCfgRoomId').value = r.id;
+          document.getElementById('admCfgRoomName').value = r.name;
+          document.getElementById('admCfgRoomFloor').value = r.floor;
+          document.getElementById('admCfgRoomCapacity').value = r.capacity;
+          document.getElementById('admCfgRoomStatus').value = r.status || 'available';
+          document.getElementById('admCfgRoomColor').value = r.color || '#1863DC';
+          document.getElementById('admCfgRoomAmenities').value = (r.amenities || []).join(', ');
+          document.getElementById('adminRoomFormTitle').textContent = `✏️ Customize Room: ${r.name}`;
+          document.getElementById('admBtnSaveRoom').textContent = 'Update Room';
+          document.getElementById('admBtnCancelRoomEdit').style.display = 'inline-flex';
+        });
+      });
+
+      container.querySelectorAll('[data-room-del]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Delete this meeting room and its associated bookings?')) return;
+          const toast = document.getElementById('adminRoomToast');
+          try {
+            await deleteRoom(btn.dataset.roomDel);
+            toast.textContent = 'Meeting room removed.';
+            toast.className = 'toast-msg ok';
+            setTimeout(() => { toast.className = 'toast-msg'; }, 3500);
+          } catch (err) {
+            toast.textContent = err.message;
+            toast.className = 'toast-msg err';
+          }
+        });
+      });
+    }
+
+    document.getElementById('adminRoomConfigForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const toast = document.getElementById('adminRoomToast');
+      const id = document.getElementById('admCfgRoomId').value || undefined;
+      const name = document.getElementById('admCfgRoomName').value.trim();
+      const floor = document.getElementById('admCfgRoomFloor').value.trim();
+      const capacity = Number(document.getElementById('admCfgRoomCapacity').value) || 8;
+      const status = document.getElementById('admCfgRoomStatus').value;
+      const color = document.getElementById('admCfgRoomColor').value;
+      const amenities = document.getElementById('admCfgRoomAmenities').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      try {
+        await saveRoom({ id, name, floor, capacity, status, color, amenities });
+        resetAdminRoomForm();
+        toast.textContent = 'Meeting room saved and synced across HQ!';
+        toast.className = 'toast-msg ok';
+        setTimeout(() => { toast.className = 'toast-msg'; }, 3500);
+      } catch (err) {
+        toast.textContent = err.message;
+        toast.className = 'toast-msg err';
+      }
+    });
+
+    function render(state) {
+      if (!state) return;
+      populateFilters(state);
+      renderPresenterQueue(state);
+      renderAdminBookings(state);
+      renderAdminRooms(state);
+    }
+
+    render(getState());
+    subscribeState(render);
   </script>
 </body>
 </html>

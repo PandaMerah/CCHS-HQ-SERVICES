@@ -1,830 +1,810 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Careclinics HQ Services — Staff Workspace Portal</title>
-  <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareClinics HQ — Unified Staff Services Portal</title>
+  <link rel="icon" type="image/webp" href="/careclinic-logo.webp">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/theme.css">
   <style>
-    :root {
-      --cc-navy: #0c1936;
-      --cc-navy-card: #13254c;
-      --cc-navy-hover: #193164;
-      --cc-blue: #1863dc;
-      --cc-sky: #8ed1fc;
-      --cc-emerald: #10b981;
-      --cc-amber: #f59e0b;
-      --cc-rose: #f43f5e;
-      --cc-purple: #8b5cf6;
-      --cc-text: #f8fafc;
-      --cc-muted: #94a3b8;
-      --cc-border: rgba(255, 255, 255, 0.1);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: radial-gradient(circle at 15% 15%, #162e5e 0%, #091328 55%, #060d1b 100%);
-      color: var(--cc-text);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
       min-height: 100vh;
-      line-height: 1.5;
-    }
-
-    /* Top Header Bar */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      backdrop-filter: blur(16px);
-      background: rgba(12, 25, 54, 0.85);
-      border-bottom: 1px solid var(--cc-border);
-      padding: 14px 32px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
+      flex-direction: column;
     }
 
-    .brand-box {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .brand-logo {
-      height: 44px;
-      width: auto;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.04);
-      padding: 4px 8px;
-    }
-
-    .brand-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-badge {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(24, 99, 220, 0.3);
-      border: 1px solid rgba(142, 209, 252, 0.35);
-      color: var(--cc-sky);
-    }
-
-    .brand-sub {
-      font-size: 0.82rem;
-      color: var(--cc-muted);
-    }
-
-    .search-wrapper {
-      flex: 1;
-      max-width: 420px;
+    /* Search Input inside Navbar */
+    .nav-search-wrap {
       position: relative;
+      display: flex;
+      align-items: center;
     }
 
-    .search-input {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid var(--cc-border);
-      border-radius: 12px;
-      padding: 10px 70px 10px 38px;
-      color: #ffffff;
-      font-size: 0.92rem;
-      outline: none;
-      transition: all 0.2s;
-    }
-
-    .search-input:focus {
-      border-color: var(--cc-sky);
-      background: rgba(255, 255, 255, 0.11);
-      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.25);
-    }
-
-    .search-icon {
+    .nav-search-wrap svg {
       position: absolute;
-      left: 13px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--cc-muted);
-      font-size: 0.9rem;
+      left: 0.75rem;
+      width: 15px;
+      height: 15px;
+      color: var(--text-muted);
       pointer-events: none;
     }
 
-    .search-kbd {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.72rem;
-      color: var(--cc-muted);
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid var(--cc-border);
-      padding: 2px 7px;
-      border-radius: 6px;
+    .nav-search {
+      min-height: 40px;
+      padding: 0.45rem 0.85rem 0.45rem 2.2rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      font-family: inherit;
+      width: 210px;
+      transition: all 0.15s ease;
     }
 
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
+    .nav-search:focus {
+      outline: none;
+      background: var(--bg-card);
+      border-color: var(--color-primary);
+      box-shadow: var(--focus-ring);
+      width: 240px;
     }
 
     .sync-pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 6px 13px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #6ee7b7;
+      gap: 0.45rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-pill);
+      background: var(--status-success-bg);
+      border: 1px solid var(--status-success-border);
+      color: var(--status-success-text);
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
     .sync-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
-      animation: pulse 2s infinite;
+      background: var(--status-success-dot);
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.45; }
-    }
-
-    .admin-btn {
+    .btn-admin-nav {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 15px;
-      border-radius: 10px;
+      gap: 0.4rem;
+      min-height: 40px;
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
       font-size: 0.82rem;
-      font-weight: 700;
+      font-weight: 600;
       text-decoration: none;
-      background: rgba(245, 158, 11, 0.16);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      color: #fbbf24;
-      transition: all 0.2s;
+      transition: all 0.15s ease;
+      cursor: pointer;
     }
 
-    .admin-btn:hover {
-      background: #f59e0b;
-      color: #0f172a;
+    .btn-admin-nav:hover {
+      background: var(--color-primary-soft);
+      border-color: var(--color-primary-border);
+      color: var(--color-primary);
     }
 
-    .clock-widget {
-      text-align: right;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--cc-border);
-      padding: 6px 14px;
-      border-radius: 10px;
-    }
-
-    .clock-time {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #ffffff;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .clock-date {
-      font-size: 0.74rem;
-      color: var(--cc-sky);
-      font-weight: 500;
+    .btn-admin-nav.active-session {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #FFFFFF;
     }
 
     /* Main Container */
     .container {
-      max-width: 1440px;
+      max-width: var(--container-max);
+      width: 100%;
       margin: 0 auto;
-      padding: 28px 32px 60px;
-    }
-
-    /* Hero Welcome Banner */
-    .hero-banner {
-      background: linear-gradient(135deg, rgba(24, 99, 220, 0.28) 0%, rgba(19, 37, 76, 0.85) 100%);
-      border: 1px solid rgba(142, 209, 252, 0.22);
-      border-radius: 20px;
-      padding: 26px 32px;
-      margin-bottom: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      flex-wrap: wrap;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-    }
-
-    .hero-text h1 {
-      font-size: 1.65rem;
-      font-weight: 800;
-      margin-bottom: 6px;
-      letter-spacing: -0.02em;
-    }
-
-    .hero-text p {
-      color: #cbd5e1;
-      font-size: 0.95rem;
-      max-width: 720px;
-    }
-
-    .hero-stats {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .stat-tile {
-      background: rgba(12, 25, 54, 0.65);
-      border: 1px solid var(--cc-border);
-      border-radius: 14px;
-      padding: 12px 18px;
-      min-width: 130px;
-    }
-
-    .stat-value {
-      font-size: 1.45rem;
-      font-weight: 800;
-      color: #ffffff;
-    }
-
-    .stat-label {
-      font-size: 0.75rem;
-      color: var(--cc-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    /* Section Headings */
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      margin-top: 8px;
-    }
-
-    .section-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--cc-sky);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Staff Services Grid (3 Staff Modules) */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 20px;
-      margin-bottom: 32px;
-    }
-
-    .service-card {
-      background: rgba(19, 37, 76, 0.75);
-      border: 1px solid var(--cc-border);
-      border-radius: 18px;
-      padding: 24px;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 18px;
-      transition: all 0.22s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .service-card:hover {
-      transform: translateY(-4px);
-      background: rgba(25, 49, 100, 0.9);
-      border-color: rgba(142, 209, 252, 0.45);
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
-    }
-
-    .service-top {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-    }
-
-    .service-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      flex-shrink: 0;
-    }
-
-    .service-info {
+      padding: 2rem 1.5rem 3.5rem;
       flex: 1;
     }
 
-    .service-header-row {
-      display: flex;
+    /* Hero Banner Card */
+    .hero-banner {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2rem;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 4px;
+      box-shadow: var(--shadow-sm);
     }
 
-    .service-name {
-      font-size: 1.12rem;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .status-tag {
-      font-size: 0.68rem;
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-pill);
+      background: var(--color-primary-soft);
+      border: 1px solid var(--color-primary-border);
+      color: var(--color-primary);
+      font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(16, 185, 129, 0.16);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.85rem;
     }
 
-    .service-desc {
-      font-size: 0.88rem;
-      color: var(--cc-muted);
-      line-height: 1.48;
+    .hero-title {
+      font-size: clamp(1.65rem, 2.8vw, 2.25rem);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      margin-bottom: 0.65rem;
     }
 
-    .service-footer {
+    .hero-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      max-width: 60ch;
+      line-height: 1.6;
+      margin-bottom: 1.35rem;
+    }
+
+    .hero-quick-actions {
       display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .btn-action {
+      display: inline-flex;
       align-items: center;
+      gap: 0.45rem;
+      min-height: 44px;
+      padding: 0.65rem 1.15rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: #FFFFFF;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .btn-primary:hover {
+      background: var(--color-primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-muted);
+    }
+
+    /* Hero Stats Panel */
+    .hero-stats-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .clock-row {
+      display: flex;
       justify-content: space-between;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255, 255, 255, 0.07);
-      font-size: 0.8rem;
-      color: var(--cc-sky);
+      align-items: baseline;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .live-clock {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--color-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .live-date {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
       font-weight: 600;
     }
 
-    .sub-links {
+    .mini-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .mini-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .mini-stat-val {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .mini-stat-lbl {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 0.2rem;
+      font-weight: 600;
+    }
+
+    /* Section Header */
+    .section-header {
       display: flex;
-      gap: 8px;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 1.15rem;
+      gap: 1rem;
       flex-wrap: wrap;
     }
 
-    .chip-link {
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 8px;
-      background: var(--cc-blue);
-      color: #ffffff;
-      text-decoration: none;
-      transition: background 0.15s;
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
     }
 
-    .chip-link:hover {
-      background: #2563eb;
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
     }
 
-    /* Live Widgets Layout */
-    .widgets-grid {
+    /* Service Cards Grid */
+    .services-grid {
       display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.25rem;
     }
 
-    .widget-card {
-      background: rgba(19, 37, 76, 0.68);
-      border: 1px solid var(--cc-border);
-      border-radius: 18px;
-      padding: 22px;
+    .service-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     }
 
-    .col-6 { grid-column: span 6; }
-    .col-12 { grid-column: span 12; }
-
-    @media (max-width: 1024px) {
-      .col-6 { grid-column: span 12; }
+    .service-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
     }
 
-    .widget-header {
+    .card-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .service-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      justify-content: center;
+      font-size: 1.4rem;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-subtle);
     }
 
-    .widget-title {
+    .service-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-pill);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .service-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--text-primary);
+    }
+
+    .service-card p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+      line-height: 1.55;
+    }
+
+    .service-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .card-link {
+      flex: 1;
+      min-width: 115px;
+      min-height: 42px;
+      text-align: center;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    .card-link.primary {
+      background: var(--color-primary);
+      color: #FFFFFF;
+    }
+
+    .card-link.primary:hover {
+      background: var(--color-primary-hover);
+    }
+
+    .card-link.outline {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+    }
+
+    .card-link.outline:hover {
+      background: var(--bg-muted);
+    }
+
+    /* Live Operations Overview Grid */
+    .live-overview-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .overview-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.15rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-title {
       font-size: 1rem;
       font-weight: 700;
-      color: #ffffff;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 0.5rem;
+      color: var(--text-primary);
     }
 
-    .widget-action {
-      font-size: 0.8rem;
-      color: var(--cc-sky);
+    .panel-action {
+      font-size: 0.82rem;
+      color: var(--color-primary);
       text-decoration: none;
       font-weight: 600;
     }
 
-    .widget-action:hover {
+    .panel-action:hover {
       text-decoration: underline;
     }
 
     /* Progress Bar */
+    .progress-bar-wrap {
+      margin-bottom: 1.15rem;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.45rem;
+      font-weight: 600;
+    }
+
     .progress-track {
-      width: 100%;
-      height: 10px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 999px;
+      height: 8px;
+      background: var(--bg-muted);
+      border-radius: var(--radius-pill);
       overflow: hidden;
     }
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--cc-blue), var(--cc-emerald));
-      border-radius: 999px;
-      transition: width 0.4s ease;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-teal));
+      border-radius: var(--radius-pill);
+      width: 0%;
+      transition: width 0.5s ease;
     }
 
-    /* Mini List inside Widgets */
-    .mini-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 260px;
+    .dept-status-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+      gap: 0.6rem;
+      max-height: 280px;
       overflow-y: auto;
-      padding-right: 4px;
     }
 
-    .mini-item {
-      background: rgba(12, 25, 54, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 12px;
-      padding: 12px 14px;
+    .dept-chip {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-    }
-
-    .mini-item-title {
-      font-size: 0.88rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.8rem;
       font-weight: 600;
-      color: #ffffff;
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
     }
 
-    .mini-item-sub {
+    .dept-chip:hover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-soft);
+    }
+
+    .dept-chip .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dept-chip.submitted .dot {
+      background: var(--status-success-dot);
+    }
+
+    .dept-chip.pending .dot {
+      background: var(--text-muted);
+    }
+
+    /* Room Schedule List */
+    .room-widget-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .room-widget-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      gap: 1rem;
+    }
+
+    .room-widget-info h4 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .room-widget-info p {
       font-size: 0.78rem;
-      color: var(--cc-muted);
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
     }
 
-    .badge {
+    .room-badge {
       font-size: 0.72rem;
       font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 999px;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-pill);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
       white-space: nowrap;
     }
 
-    .badge-green {
-      background: rgba(16, 185, 129, 0.18);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.35);
+    .room-badge.available {
+      background: var(--status-success-bg);
+      color: var(--status-success-text);
+      border: 1px solid var(--status-success-border);
     }
 
-    .badge-amber {
-      background: rgba(245, 158, 11, 0.18);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.35);
+    .room-badge.occupied {
+      background: var(--status-danger-bg);
+      color: var(--status-danger-text);
+      border: 1px solid var(--status-danger-border);
     }
 
-    .badge-blue {
-      background: rgba(24, 99, 220, 0.25);
-      color: var(--cc-sky);
-      border: 1px solid rgba(142, 209, 252, 0.35);
-    }
-
-    .quick-pdf-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-      gap: 10px;
-    }
-
-    .pdf-shortcut {
-      background: rgba(12, 25, 54, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 12px;
-      text-decoration: none;
-      color: #e2e8f0;
-      font-size: 0.84rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.18s;
-    }
-
-    .pdf-shortcut:hover {
-      background: var(--cc-blue);
-      color: #ffffff;
-      border-color: var(--cc-sky);
-      transform: translateY(-2px);
-    }
-
-    .portal-footer {
-      margin-top: 48px;
-      padding-top: 24px;
-      border-top: 1px solid var(--cc-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      color: var(--cc-muted);
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+      color: var(--text-secondary);
       font-size: 0.82rem;
+    }
+
+    @media (max-width: 960px) {
+      .hero-banner,
+      .live-overview-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-search {
+        width: 160px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Top Navigation Header -->
-  <header class="topbar">
-    <a href="/" class="brand-box">
-      <img src="/careclinic-logo.webp" alt="Careclinics Logo" class="brand-logo" onerror="this.src='/images/acme-logo.svg'" />
-      <div>
-        <div class="brand-title">
-          Careclinics HQ Services
-          <span class="brand-badge">Staff Portal</span>
+
+  <!-- Unified Minimal Top Navigation Bar -->
+  <nav class="cchs-navbar">
+    <div class="cchs-navbar-inner">
+      <a href="/" class="cchs-brand">
+        <img src="/careclinic-logo.webp" alt="CareClinics Logo">
+        <div class="cchs-brand-text">
+          <span class="cchs-brand-title">CareClinics HQ</span>
+          <span class="cchs-brand-subtitle">Corporate Services Portal</span>
         </div>
-        <div class="brand-sub">Humanising Care — Staff Workspace & Digital Services</div>
-      </div>
-    </a>
+      </a>
 
-    <div class="search-wrapper">
-      <span class="search-icon">🔍</span>
-      <input
-        type="text"
-        id="serviceSearch"
-        class="search-input"
-        placeholder="Search staff tools, PDF actions, rooms, or departments..."
-      />
-      <kbd class="search-kbd">Ctrl K</kbd>
-    </div>
+      <div class="cchs-nav-links">
+        <a href="/" class="cchs-nav-link active">Portal Home</a>
+        <a href="/booking/" class="cchs-nav-link">Room Booking</a>
+        <a href="/meeting/input.html" class="cchs-nav-link">Dept Update</a>
+        <a href="/meeting/" class="cchs-nav-link">Meeting TV</a>
+        <a href="/display/?mode=share" class="cchs-nav-link">Share Screen</a>
+        <a href="/pdf/" class="cchs-nav-link">PDF Studio</a>
+      </div>
 
-    <div class="topbar-right">
-      <div class="sync-pill" id="syncStatusPill">
-        <span class="sync-dot"></span>
-        <span id="syncStatusText">Connecting Cloud...</span>
-      </div>
-      <div id="adminNavArea">
-        <a href="/login.html" class="admin-btn">🔒 Admin Login</a>
-      </div>
-      <div class="clock-widget">
-        <div class="clock-time" id="portalClock">--:--:--</div>
-        <div class="clock-date" id="portalDate">Loading...</div>
+      <div class="cchs-nav-right">
+        <div class="nav-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="serviceSearch" class="nav-search" placeholder="Filter services...">
+        </div>
+        <div class="sync-pill" id="syncStatusPill">
+          <span class="sync-dot"></span>
+          <span id="syncStatusText">Synced</span>
+        </div>
+        <div id="adminNavArea">
+          <a href="/login.html" class="btn-admin-nav">🔒 Admin Login</a>
+        </div>
       </div>
     </div>
-  </header>
+  </nav>
 
   <main class="container">
-    <!-- Hero Overview Banner -->
+    <!-- Hero Banner -->
     <section class="hero-banner">
-      <div class="hero-text">
-        <h1>Welcome to Careclinics HQ Staff Workspace</h1>
-        <p id="heroVisionText">
-          Empower patients with the freedom to access quality healthcare services through digital integration anytime, anywhere.
+      <div>
+        <h1 class="hero-title">Good to see you. What would you like to do?</h1>
+        <p class="hero-desc" id="heroVisionText">
+          Submit your weekly update, book a meeting room, share your screen to the TV, or edit a PDF — all in one place.
         </p>
+        <div class="hero-quick-actions">
+          <a href="/meeting/input.html" class="btn-action btn-primary">Submit Dept Update →</a>
+          <a href="/booking/" class="btn-action btn-secondary">Book a Room</a>
+        </div>
       </div>
-      <div class="hero-stats">
-        <div class="stat-tile">
-          <div class="stat-value" id="statDeptsReady">0 / 15</div>
-          <div class="stat-label">Depts Updated</div>
+
+      <div class="hero-stats-box">
+        <div class="clock-row">
+          <div class="live-clock" id="portalClock">--:--:--</div>
+          <div class="live-date" id="portalDate">Loading date...</div>
         </div>
-        <div class="stat-tile">
-          <div class="stat-value" id="statRoomsToday">0</div>
-          <div class="stat-label">Bookings Today</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-value">12</div>
-          <div class="stat-label">BentoPDF Tools</div>
+        <div class="mini-stats-grid">
+          <div class="mini-stat">
+            <div class="mini-stat-val" id="statDeptsReady">0/13</div>
+            <div class="mini-stat-lbl">Depts Updated</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val" id="statRoomsToday">0</div>
+            <div class="mini-stat-lbl">Bookings Today</div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Staff Services Section (Regular Viewing & Staff Actions Only) -->
+    <!-- Staff Services Directory -->
     <div class="section-header">
-      <div class="section-title">⚡ Staff Services & Tools</div>
+      <div>
+        <h2 class="section-title">Headquarters Staff Applications</h2>
+        <p class="section-subtitle">Select a service below to begin working</p>
+      </div>
     </div>
 
     <section class="services-grid" id="servicesGrid">
-      <!-- 1. Staff Meeting Submission -->
-      <div class="service-card" data-keywords="staff input submission department update question weekly alignment">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(16, 185, 129, 0.22); color: #34d399;">📝</div>
-          <div class="service-info">
-            <div class="service-header-row">
-              <span class="service-name">Submit Department Update</span>
-              <span class="status-tag">Active</span>
-            </div>
-            <p class="service-desc">
-              Submit your department's weekly or monthly alignment updates and Q&A questions with live slide preview.
-            </p>
+      <!-- 1. Weekly Meeting Alignment -->
+      <article class="service-card" data-keywords="weekly meeting alignment department update tv display slides qna">
+        <div>
+          <div class="card-top-row">
+            <div class="service-icon">📊</div>
+            <span class="service-tag">Staff Input &amp; TV</span>
           </div>
+          <h3>Weekly Meeting Alignment</h3>
+          <p>Submit your department's weekly achievements, operational status, and leadership Q&amp;A topics for the HQ alignment presentation.</p>
         </div>
-        <div class="service-footer">
-          <div class="sub-links">
-            <a href="/meeting/input.html" class="chip-link">Submit Update →</a>
-          </div>
-          <span>15 HQ Departments</span>
+        <div class="service-links">
+          <a href="/meeting/input.html" class="card-link primary">Submit Update</a>
+          <a href="/meeting/" class="card-link outline">View TV Slides</a>
         </div>
-      </div>
+      </article>
 
-      <!-- 2. Room Booking System -->
-      <div class="service-card" data-keywords="room booking system boardroom reservation calendar schedule">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(139, 92, 246, 0.25); color: #c084fc;">📅</div>
-          <div class="service-info">
-            <div class="service-header-row">
-              <span class="service-name">Book HQ Meeting Room</span>
-              <span class="status-tag">Online</span>
-            </div>
-            <p class="service-desc">
-              Reserve HQ Boardroom, Discussion Rooms, Townhall Suite & Telehealth Pods and check room schedules.
-            </p>
+      <!-- 2. HQ Room Booking -->
+      <article class="service-card" data-keywords="room booking calendar boardroom meeting schedule reservation">
+        <div>
+          <div class="card-top-row">
+            <div class="service-icon">📅</div>
+            <span class="service-tag">Timetable &amp; Alerts</span>
           </div>
+          <h3>HQ Room Booking</h3>
+          <p>Reserve CareClinics HQ boardrooms and discussion rooms with live conflict detection, Outlook Calendar sync, and WhatsApp reminders.</p>
         </div>
-        <div class="service-footer">
-          <div class="sub-links">
-            <a href="/booking/" class="chip-link">Book a Room →</a>
-          </div>
-          <span>5 HQ Spaces</span>
+        <div class="service-links">
+          <a href="/booking/" class="card-link primary">Book a Room</a>
         </div>
-      </div>
+      </article>
 
-      <!-- 3. Share Screen & Audio to TV (Google Meet Style) -->
-      <div class="service-card" data-keywords="remote display share screen audio tv presentation video showcase google meet">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(244, 63, 94, 0.22); color: #fb7185;">🖥️</div>
-          <div class="service-info">
-            <div class="service-header-row">
-              <span class="service-name">Share Screen & Audio to TV</span>
-              <span class="status-tag">Live Cast</span>
-            </div>
-            <p class="service-desc">
-              Share your presentation slides or showcase video with audio to the HQ TV (Google Meet style). Admin selects the active screen.
-            </p>
+      <!-- 3. Screen Share to TV -->
+      <article class="service-card" data-keywords="remote display screen share audio tv cast presentation">
+        <div>
+          <div class="card-top-row">
+            <div class="service-icon">📡</div>
+            <span class="service-tag">Live Presentation</span>
           </div>
+          <h3>Share Screen &amp; Audio to TV</h3>
+          <p>Broadcast your presentation slides or showcase videos with system audio to the HQ TV receiver (approved by the meeting administrator).</p>
         </div>
-        <div class="service-footer">
-          <div class="sub-links">
-            <a href="/display/?mode=share" class="chip-link">Launch Screen Share →</a>
-          </div>
-          <span>Video + Audio</span>
+        <div class="service-links">
+          <a href="/display/?mode=share" class="card-link primary">💻 Share Screen to TV</a>
+          <a href="/display/?mode=receiver" class="card-link outline">📺 TV Receiver</a>
         </div>
-      </div>
+      </article>
 
-      <!-- 4. Self-Hosted PDF Editor / BentoPDF -->
-      <div class="service-card" data-keywords="bento pdf studio editor merge split sign compress watermark convert">
-        <div class="service-top">
-          <div class="service-icon" style="background: rgba(14, 165, 233, 0.22); color: #38bdf8;">📄</div>
-          <div class="service-info">
-            <div class="service-header-row">
-              <span class="service-name">Open BentoPDF Studio</span>
-              <span class="status-tag">100% Private</span>
-            </div>
-            <p class="service-desc">
-              Careclinics self-hosted browser PDF toolkit: Merge, Split, Organize, Sign & Stamp, Watermark, and Convert PDFs locally.
-            </p>
+      <!-- 4. BentoPDF Studio -->
+      <article class="service-card" data-keywords="bentopdf pdf studio merge split compress watermark sign convert">
+        <div>
+          <div class="card-top-row">
+            <div class="service-icon">📄</div>
+            <span class="service-tag">23 Client-Side Tools</span>
           </div>
+          <h3>BentoPDF Studio</h3>
+          <p>Full interactive PDF canvas editor and 23 document utilities to annotate, sign, merge, split, watermark, and convert PDFs privately in your browser.</p>
         </div>
-        <div class="service-footer">
-          <div class="sub-links">
-            <a href="/pdf/" class="chip-link">Open PDF Studio →</a>
-          </div>
-          <span>12 PDF Tools</span>
+        <div class="service-links">
+          <a href="/pdf/" class="card-link primary">Open PDF Studio</a>
         </div>
-      </div>
+      </article>
     </section>
 
-    <!-- Live Staff Status Widgets -->
+    <!-- Live Operations Status -->
     <div class="section-header">
-      <div class="section-title">📊 Live HQ Status & Schedules</div>
+      <div>
+        <h2 class="section-title">Live HQ Operations Status</h2>
+        <p class="section-subtitle">Real-time readiness across departments and meeting rooms</p>
+      </div>
     </div>
 
-    <section class="widgets-grid">
-      <!-- Widget 1: Weekly Meeting Alignment Readiness -->
-      <div class="widget-card col-6">
-        <div class="widget-header">
-          <div class="widget-title">🎯 Weekly Meeting Alignment Readiness</div>
-          <a href="/meeting/input.html" class="widget-action">+ Submit Update</a>
+    <section class="live-overview-grid">
+      <!-- Department Submission Progress -->
+      <div class="overview-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📋</span> Weekly Meeting Alignment Readiness
+          </div>
+          <a href="/meeting/input.html" class="panel-action">Submit Update →</a>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.84rem; color: var(--cc-muted);">
-          <span id="deptProgressLabel">Calculating department readiness...</span>
-          <strong id="deptProgressPct" style="color: #fff;">0%</strong>
+        <div class="progress-bar-wrap">
+          <div class="progress-meta">
+            <span id="deptProgressLabel">0 of 13 departments submitted</span>
+            <span id="deptProgressPct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="deptProgressBar"></div>
+          </div>
         </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="deptProgressBar" style="width: 0%;"></div>
-        </div>
-        <div class="mini-list" id="deptStatusList"></div>
+        <div class="dept-status-list" id="deptStatusList"></div>
       </div>
 
-      <!-- Widget 2: HQ Meeting Rooms & Today's Schedule -->
-      <div class="widget-card col-6">
-        <div class="widget-header">
-          <div class="widget-title">🏢 HQ Meeting Rooms & Today's Schedule</div>
-          <a href="/booking/" class="widget-action">+ Book a Room →</a>
+      <!-- Today's Room Availability -->
+      <div class="overview-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🚪</span> HQ Meeting Rooms &amp; Today's Schedule
+          </div>
+          <a href="/booking/" class="panel-action">Book Room →</a>
         </div>
-        <div class="mini-list" id="roomWidgetList"></div>
-      </div>
-
-      <!-- Widget 3: Quick BentoPDF Tools -->
-      <div class="widget-card col-12">
-        <div class="widget-header">
-          <div class="widget-title">🛠️ Quick Launch — Careclinics BentoPDF Studio</div>
-          <a href="/pdf/" class="widget-action">Open Full PDF Studio →</a>
-        </div>
-        <div class="quick-pdf-grid">
-          <a href="/pdf/?tool=merge" class="pdf-shortcut"><span>📑</span> Merge PDF</a>
-          <a href="/pdf/?tool=split" class="pdf-shortcut"><span>✂️</span> Split PDF</a>
-          <a href="/pdf/?tool=organize" class="pdf-shortcut"><span>🗂️</span> Organize Pages</a>
-          <a href="/pdf/?tool=sign" class="pdf-shortcut"><span>✍️</span> Sign & Stamp</a>
-          <a href="/pdf/?tool=rotate" class="pdf-shortcut"><span>🔄</span> Rotate PDF</a>
-          <a href="/pdf/?tool=watermark" class="pdf-shortcut"><span>💧</span> Watermark</a>
-          <a href="/pdf/?tool=pagenumbers" class="pdf-shortcut"><span>🔢</span> Page Numbers</a>
-          <a href="/pdf/?tool=img2pdf" class="pdf-shortcut"><span>🖼️</span> Images to PDF</a>
-          <a href="/pdf/?tool=pdf2img" class="pdf-shortcut"><span>📸</span> PDF to Images</a>
-          <a href="/pdf/?tool=extracttext" class="pdf-shortcut"><span>📝</span> Extract Text</a>
-          <a href="/pdf/?tool=compress" class="pdf-shortcut"><span>⚡</span> Optimize PDF</a>
-          <a href="/pdf/?tool=metadata" class="pdf-shortcut"><span>🏷️</span> Edit Metadata</a>
-        </div>
+        <div class="room-widget-list" id="roomWidgetList"></div>
       </div>
     </section>
-
-    <footer class="portal-footer">
-      <div>© 2026 Careclinics Healthcare Services. Internal use only.</div>
-      <div>Staff Viewing Access • <a href="/login.html" style="color: var(--cc-sky); text-decoration: none;">Administrator Portal Login</a></div>
-    </footer>
   </main>
 
+  <footer>
+    CareClinics Healthcare Services Sdn Bhd (CCHS) — Unified HQ Services Suite • Staff Portal
+  </footer>
+
   <script type="module">
-    import { subscribeState, subscribeSyncStatus } from '/shared/cloud-store.js';
+    import { getState, subscribeState, getTodayStr } from '/shared/cloud-store.js';
     import { isAdminLoggedIn, logoutAdmin } from '/shared/auth.js';
 
-    // Update Admin Login button if already logged in as Admin
-    if (isAdminLoggedIn()) {
-      const adminNavArea = document.getElementById('adminNavArea');
-      adminNavArea.innerHTML = `
-        <a href="/admin/" class="admin-btn" style="background:rgba(16,185,129,0.2); border-color:#10b981; color:#6ee7b7;">🛡️ Admin Portal →</a>
-        <button id="staffTopLogout" class="admin-btn" style="cursor:pointer; background:rgba(244,63,94,0.18); border-color:#f43f5e; color:#fda4af;">Logout</button>
-      `;
-      document.getElementById('staffTopLogout').addEventListener('click', () => logoutAdmin('/'));
+    const adminNavArea = document.getElementById('adminNavArea');
+    function renderAdminNav() {
+      if (isAdminLoggedIn()) {
+        adminNavArea.innerHTML = `
+          <div style="display:flex;gap:0.45rem;align-items:center;">
+            <a href="/admin/" class="btn-admin-nav active-session">🛡️ Admin Control Center</a>
+            <button type="button" id="quickLogoutBtn" class="btn-admin-nav" title="Sign Out">Sign Out</button>
+          </div>
+        `;
+        document.getElementById('quickLogoutBtn')?.addEventListener('click', () => {
+          logoutAdmin();
+          renderAdminNav();
+        });
+      } else {
+        adminNavArea.innerHTML = `<a href="/login.html" class="btn-admin-nav">🔒 Admin Login</a>`;
+      }
     }
+    renderAdminNav();
 
-    // Live Malaysia Clock
-    function updatePortalClock() {
+    function updateClock() {
       const now = new Date();
-      document.getElementById('portalClock').textContent = now.toLocaleTimeString('en-MY', {
+      document.getElementById('portalClock').textContent = now.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
-        hour12: true
+        second: '2-digit'
       });
       document.getElementById('portalDate').textContent = now.toLocaleDateString('en-MY', {
         weekday: 'short',
@@ -833,105 +813,97 @@
         year: 'numeric'
       });
     }
-    setInterval(updatePortalClock, 1000);
-    updatePortalClock();
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    // Search Filter
     const searchInput = document.getElementById('serviceSearch');
-    window.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        searchInput.focus();
-      }
-    });
-
+    const cards = Array.from(document.querySelectorAll('.service-card'));
     searchInput.addEventListener('input', () => {
       const q = searchInput.value.trim().toLowerCase();
-      document.querySelectorAll('.service-card').forEach(card => {
-        const text = (card.innerText + ' ' + (card.dataset.keywords || '')).toLowerCase();
-        card.style.display = text.includes(q) ? 'flex' : 'none';
+      cards.forEach(card => {
+        const text = (card.textContent + ' ' + (card.dataset.keywords || '')).toLowerCase();
+        card.style.display = !q || text.includes(q) ? '' : 'none';
       });
     });
 
-    // Sync status indicator
-    subscribeSyncStatus(({ mode }) => {
-      const textEl = document.getElementById('syncStatusText');
-      if (mode === 'firebase') {
-        textEl.textContent = 'Firebase Cloud Live';
-      } else if (mode === 'cloud-api') {
-        textEl.textContent = 'Vercel Cloud Sync';
-      } else {
-        textEl.textContent = 'Local Realtime Sync';
-      }
-    });
-
-    // Populate live widgets from unified state
-    subscribeState((state) => {
+    function renderPortalData(state) {
       if (!state) return;
 
-      if (state.config?.visionText) {
-        document.getElementById('heroVisionText').textContent = state.config.visionText;
-      }
+      const depts = state.meeting?.settings?.departments || [];
+      const updates = state.meeting?.updates || {};
+      let submittedCount = 0;
 
-      // 1. Departments readiness
-      const depts = state.departments || {};
-      const deptNames = Object.keys(depts);
-      const updatedDepts = deptNames.filter(d => {
-        const u = (depts[d]?.update || '').trim();
-        return u && u.toLowerCase() !== 'pending update...';
+      const deptListEl = document.getElementById('deptStatusList');
+      deptListEl.innerHTML = '';
+
+      depts.forEach(dept => {
+        const u = updates[dept];
+        const hasUpdate = u && u.update && u.update.trim().length > 0;
+        if (hasUpdate) submittedCount++;
+
+        const chip = document.createElement('a');
+        chip.href = `/meeting/input.html?dept=${encodeURIComponent(dept)}`;
+        chip.className = `dept-chip ${hasUpdate ? 'submitted' : 'pending'}`;
+        chip.innerHTML = `
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${dept}</span>
+          <span class="dot" title="${hasUpdate ? 'Submitted' : 'Pending'}"></span>
+        `;
+        deptListEl.appendChild(chip);
       });
 
-      const pct = deptNames.length ? Math.round((updatedDepts.length / deptNames.length) * 100) : 0;
-      document.getElementById('statDeptsReady').textContent = `${updatedDepts.length} / ${deptNames.length}`;
-      document.getElementById('deptProgressLabel').textContent = `${updatedDepts.length} of ${deptNames.length} departments submitted updates`;
+      const pct = depts.length ? Math.round((submittedCount / depts.length) * 100) : 0;
+      document.getElementById('statDeptsReady').textContent = `${submittedCount}/${depts.length}`;
+      document.getElementById('deptProgressLabel').textContent = `${submittedCount} of ${depts.length} departments submitted`;
       document.getElementById('deptProgressPct').textContent = `${pct}%`;
       document.getElementById('deptProgressBar').style.width = `${pct}%`;
 
-      const deptStatusList = document.getElementById('deptStatusList');
-      const sortedDepts = [...deptNames].sort((a, b) => {
-        const aReady = updatedDepts.includes(a) ? 0 : 1;
-        const bReady = updatedDepts.includes(b) ? 0 : 1;
-        return aReady - bReady;
-      });
-
-      deptStatusList.innerHTML = sortedDepts.map(d => {
-        const isReady = updatedDepts.includes(d);
-        const snippet = (depts[d]?.update || 'Pending update...').split('\n')[0];
-        return `
-          <div class="mini-item">
-            <div style="min-width: 0;">
-              <div class="mini-item-title">${d}</div>
-              <div class="mini-item-sub" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px;">${snippet}</div>
-            </div>
-            <span class="badge ${isReady ? 'badge-green' : 'badge-amber'}">${isReady ? 'Submitted' : 'Pending'}</span>
-          </div>
-        `;
-      }).join('');
-
-      // 2. HQ Meeting Rooms & Today's Schedule
-      const todayStr = new Date().toISOString().slice(0, 10);
-      const bookings = (state.bookings || []).filter(b => b.date === todayStr);
-      document.getElementById('statRoomsToday').textContent = String(bookings.length);
-
       const rooms = state.rooms || [];
-      const roomWidgetList = document.getElementById('roomWidgetList');
-      roomWidgetList.innerHTML = rooms.map(room => {
-        const roomBookings = bookings
+      const bookings = state.bookings || [];
+      const today = getTodayStr();
+      const nowTime = new Date().toTimeString().slice(0, 5);
+
+      const todaysBookings = bookings.filter(b => b.date === today);
+      document.getElementById('statRoomsToday').textContent = String(todaysBookings.length);
+
+      const roomListEl = document.getElementById('roomWidgetList');
+      roomListEl.innerHTML = '';
+
+      rooms.forEach(room => {
+        const roomToday = todaysBookings
           .filter(b => b.roomId === room.id)
           .sort((a, b) => a.startTime.localeCompare(b.startTime));
-        const nextBooking = roomBookings[0];
-        return `
-          <div class="mini-item">
-            <div>
-              <div class="mini-item-title">${room.name} <span style="font-weight:400; color:var(--cc-muted); font-size:0.78rem;">(${room.capacity} pax)</span></div>
-              <div class="mini-item-sub">
-                ${nextBooking ? `Today: ${roomBookings.map(b => `${b.startTime}–${b.endTime} ${b.title} (${b.department})`).join(' | ')}` : 'Available all day today'}
-              </div>
-            </div>
-            <span class="badge ${nextBooking ? 'badge-blue' : 'badge-green'}">${roomBookings.length ? `${roomBookings.length} Booked` : 'Available'}</span>
+
+        const activeNow = roomToday.find(b => b.startTime <= nowTime && b.endTime >= nowTime);
+        const nextUp = roomToday.find(b => b.startTime > nowTime);
+
+        let subtitle = `${room.floor} • Capacity ${room.capacity} pax`;
+        if (activeNow) {
+          subtitle = `Now: ${activeNow.title} (${activeNow.startTime}–${activeNow.endTime} • ${activeNow.department})`;
+        } else if (nextUp) {
+          subtitle = `Next: ${nextUp.title} at ${nextUp.startTime} (${nextUp.department})`;
+        } else {
+          subtitle = `${room.floor} • Free all day (${room.capacity} pax)`;
+        }
+
+        const item = document.createElement('div');
+        item.className = 'room-widget-item';
+        item.innerHTML = `
+          <div class="room-widget-info">
+            <h4>${room.name}</h4>
+            <p>${subtitle}</p>
           </div>
+          <span class="room-badge ${activeNow ? 'occupied' : 'available'}">
+            ${activeNow ? 'In Use' : 'Available'}
+          </span>
         `;
-      }).join('');
+        roomListEl.appendChild(item);
+      });
+    }
+
+    renderPortalData(getState());
+    subscribeState((state) => {
+      renderPortalData(state);
+      document.getElementById('syncStatusText').textContent = 'Live Synced';
     });
   </script>
 </body>
