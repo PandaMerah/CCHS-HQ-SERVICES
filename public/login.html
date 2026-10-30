@@ -1,333 +1,259 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Administrator Sign In — CareClinics HQ Services</title>
-  <link rel="icon" type="image/webp" href="/careclinic-logo.webp">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/shared/theme.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login — Careclinics HQ Services</title>
+  <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --cc-navy: #0c1936;
+      --cc-card: #13254c;
+      --cc-blue: #1863dc;
+      --cc-sky: #8ed1fc;
+      --cc-border: rgba(255, 255, 255, 0.14);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 20% 20%, #17346c 0%, #091328 60%, #050b16 100%);
+      color: #f8fafc;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      background-color: var(--bg-page);
-    }
-
-    .auth-main {
-      flex: 1;
-      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1.25rem;
+      padding: 24px;
     }
 
     .login-card {
       width: 100%;
       max-width: 440px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      box-shadow: var(--shadow-md);
+      background: rgba(19, 37, 76, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--cc-border);
+      border-radius: 22px;
+      padding: 38px 34px;
+      box-shadow: 0 24px 55px rgba(0, 0, 0, 0.45);
     }
 
     .brand-header {
       text-align: center;
-      margin-bottom: 1.75rem;
+      margin-bottom: 28px;
     }
 
-    .brand-logo-wrap {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      padding: 0.65rem 1.15rem;
-      border-radius: var(--radius-md);
-      margin-bottom: 1rem;
-      box-shadow: var(--shadow-xs);
-    }
-
-    .brand-logo-wrap img {
-      height: 40px;
+    .brand-logo {
+      height: 48px;
       width: auto;
-      display: block;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 6px 12px;
+      border-radius: 12px;
+      margin-bottom: 14px;
     }
 
-    .brand-badge {
+    .security-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: var(--radius-pill);
-      background: var(--color-primary-soft);
-      border: 1px solid var(--color-primary-border);
-      color: var(--color-primary);
+      gap: 6px;
       font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.65rem;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+      margin-bottom: 10px;
     }
 
-    .brand-header h1 {
+    h1 {
       font-size: 1.45rem;
       font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      margin-bottom: 0.35rem;
+      color: #ffffff;
+      margin-bottom: 6px;
     }
 
-    .brand-header p {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
+    .sub-text {
+      font-size: 0.86rem;
+      color: #94a3b8;
+      line-height: 1.45;
     }
 
-    .error-alert {
+    .alert-box {
       display: none;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.85rem 1rem;
-      border-radius: var(--radius-sm);
-      background: var(--status-danger-bg);
-      border: 1px solid var(--status-danger-border);
-      color: var(--status-danger-text);
+      padding: 12px 14px;
+      border-radius: 10px;
       font-size: 0.85rem;
       font-weight: 600;
-      margin-bottom: 1.25rem;
-    }
-
-    .error-alert.visible {
-      display: flex;
+      margin-bottom: 18px;
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
     }
 
     .form-group {
-      margin-bottom: 1.25rem;
+      margin-bottom: 18px;
     }
 
-    .form-label {
+    label {
       display: block;
-      font-size: 0.84rem;
+      font-size: 0.83rem;
       font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.45rem;
+      color: #cbd5e1;
+      margin-bottom: 6px;
     }
 
     .input-wrap {
       position: relative;
-      display: flex;
-      align-items: center;
     }
 
-    .form-input {
+    input {
       width: 100%;
-      min-height: 46px;
-      padding: 0.65rem 0.95rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      color: var(--text-primary);
-      font-family: inherit;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--cc-border);
+      background: rgba(12, 25, 54, 0.8);
+      color: #ffffff;
       font-size: 0.95rem;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
     }
 
-    .form-input:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: var(--focus-ring);
+    input:focus {
+      border-color: var(--cc-sky);
+      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.28);
     }
 
     .toggle-pw {
       position: absolute;
-      right: 0.5rem;
-      background: var(--bg-muted);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-size: 0.75rem;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.8rem;
       font-weight: 600;
-      padding: 0.35rem 0.65rem;
-      border-radius: 6px;
-      min-height: 32px;
-      transition: all 0.15s;
-    }
-
-    .toggle-pw:hover {
-      color: var(--text-primary);
-      background: var(--border-subtle);
+      cursor: pointer;
     }
 
     .btn-login {
       width: 100%;
-      min-height: 46px;
-      padding: 0.75rem 1.25rem;
+      padding: 13px 18px;
+      border-radius: 12px;
       border: none;
-      border-radius: var(--radius-sm);
-      background: var(--color-primary);
-      color: #FFFFFF;
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 600;
+      background: var(--cc-blue);
+      color: #ffffff;
+      font-size: 0.98rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: background 0.15s ease, transform 0.1s ease;
-      box-shadow: var(--shadow-xs);
-      margin-top: 0.25rem;
+      transition: background 0.2s;
+      margin-top: 6px;
     }
 
     .btn-login:hover {
-      background: var(--color-primary-hover);
+      background: #2563eb;
     }
 
-    .btn-login:focus-visible {
-      outline: none;
-      box-shadow: var(--focus-ring);
-    }
-
-    .access-info {
-      margin-top: 1.5rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--border-subtle);
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      line-height: 1.55;
-    }
-
-    .access-info strong {
-      color: var(--text-primary);
+    .btn-login:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .back-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      width: 100%;
-      min-height: 44px;
-      margin-top: 1rem;
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.85rem;
+      display: block;
+      text-align: center;
+      margin-top: 22px;
+      font-size: 0.86rem;
       font-weight: 600;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      background: var(--bg-subtle);
-      transition: all 0.15s ease;
+      color: var(--cc-sky);
+      text-decoration: none;
     }
 
     .back-link:hover {
-      color: var(--color-primary);
-      border-color: var(--color-primary-border);
-      background: var(--color-primary-soft);
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-
-  <!-- Unified Minimal Top Navigation Bar -->
-  <nav class="cchs-navbar">
-    <div class="cchs-navbar-inner">
-      <a href="/" class="cchs-brand">
-        <img src="/careclinic-logo.webp" alt="CareClinics Logo">
-        <div class="cchs-brand-text">
-          <span class="cchs-brand-title">CareClinics HQ</span>
-          <span class="cchs-brand-subtitle">Corporate Services Portal</span>
-        </div>
-      </a>
-      <div class="cchs-nav-links">
-        <a href="/" class="cchs-nav-link">Portal Home</a>
-        <a href="/booking/" class="cchs-nav-link">Room Booking</a>
-        <a href="/meeting/input.html" class="cchs-nav-link">Dept Update</a>
-        <a href="/pdf/" class="cchs-nav-link">PDF Studio</a>
+  <div class="login-card">
+    <div class="brand-header">
+      <img src="/careclinic-logo.webp" alt="Careclinics Logo" class="brand-logo" onerror="this.src='/images/acme-logo.svg'" />
+      <div>
+        <span class="security-badge">🔒 Restricted Access</span>
       </div>
+      <h1>HQ Administrator Login</h1>
+      <p class="sub-text">
+        Sign in with administrator credentials to access the Admin Portal, TV Broadcast Controls, and Room Booking Management.
+      </p>
     </div>
-  </nav>
 
-  <main class="auth-main">
-    <div class="login-card">
-      <div class="brand-header">
-        <div class="brand-logo-wrap">
-          <img src="/careclinic-logo.webp" alt="CareClinics Logo">
-        </div>
-        <div>
-          <span class="brand-badge">🔒 Restricted Access</span>
-        </div>
-        <h1>Administrator Sign In</h1>
-        <p>Enter your CareClinics HQ administrator credentials to manage room bookings, TV displays, and meeting configurations.</p>
+    <div id="errorAlert" class="alert-box"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Admin Username</label>
+        <input type="text" id="username" placeholder="Enter admin username" autocomplete="username" required autofocus />
       </div>
 
-      <div id="errorAlert" class="error-alert" role="alert">
-        <span>⚠️</span>
-        <span id="errorText">Invalid administrator username or password.</span>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password" placeholder="Enter admin password" autocomplete="current-password" required />
+          <button type="button" class="toggle-pw" id="togglePwBtn">Show</button>
+        </div>
       </div>
 
-      <form id="loginForm" autocomplete="on" novalidate>
-        <div class="form-group">
-          <label class="form-label" for="username">Administrator Username</label>
-          <div class="input-wrap">
-            <input type="text" id="username" class="form-input" placeholder="Enter username (e.g. admin)" required autocomplete="username" autofocus>
-          </div>
-        </div>
+      <button type="submit" class="btn-login" id="submitBtn">Sign In to Admin Portal →</button>
+    </form>
 
-        <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <div class="input-wrap">
-            <input type="password" id="password" class="form-input" placeholder="Enter administrator password" required autocomplete="current-password" style="padding-right: 4.5rem;">
-            <button type="button" class="toggle-pw" id="togglePwBtn">Show</button>
-          </div>
-        </div>
-
-        <button type="submit" class="btn-login" id="submitBtn">Sign In to Admin Portal →</button>
-      </form>
-
-      <div class="access-info">
-        <strong>Staff Member?</strong> You do not need an administrator account to submit department updates, book rooms, use BentoPDF Studio, or view schedules.
-        <a href="/" class="back-link">← Return to Staff Portal</a>
-      </div>
-    </div>
-  </main>
+    <a href="/" class="back-link">← Return to Regular Staff Portal</a>
+  </div>
 
   <script type="module">
-    import { loginAdmin, isAdminLoggedIn } from '/shared/auth.js';
+    import { isAdminLoggedIn, loginAdmin } from '/shared/auth.js';
 
     const params = new URLSearchParams(window.location.search);
-    const redirectUrl = params.get('redirect') || '/admin/';
+    const redirectTarget = params.get('redirect') || '/admin/';
 
     if (isAdminLoggedIn()) {
-      window.location.replace(redirectUrl);
+      window.location.replace(redirectTarget);
     }
+
+    const pwInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('togglePwBtn');
+    toggleBtn.addEventListener('click', () => {
+      const isPw = pwInput.type === 'password';
+      pwInput.type = isPw ? 'text' : 'password';
+      toggleBtn.textContent = isPw ? 'Hide' : 'Show';
+    });
 
     const form = document.getElementById('loginForm');
     const errorAlert = document.getElementById('errorAlert');
-    const errorText = document.getElementById('errorText');
-    const togglePwBtn = document.getElementById('togglePwBtn');
-    const passwordInput = document.getElementById('password');
     const submitBtn = document.getElementById('submitBtn');
 
-    togglePwBtn.addEventListener('click', () => {
-      const isPw = passwordInput.type === 'password';
-      passwordInput.type = isPw ? 'text' : 'password';
-      togglePwBtn.textContent = isPw ? 'Hide' : 'Show';
-    });
-
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      errorAlert.classList.remove('visible');
+      errorAlert.style.display = 'none';
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Verifying credentials...';
+      submitBtn.textContent = 'Verifying Credentials...';
 
       const username = document.getElementById('username').value;
-      const password = passwordInput.value;
+      const password = pwInput.value;
 
-      const result = loginAdmin(username, password);
-      if (result.ok) {
-        window.location.replace(redirectUrl);
+      const res = await loginAdmin(username, password);
+      if (res.ok) {
+        window.location.replace(redirectTarget);
       } else {
-        errorText.textContent = result.error || 'Invalid credentials.';
-        errorAlert.classList.add('visible');
+        errorAlert.textContent = res.error || 'Invalid username or password.';
+        errorAlert.style.display = 'block';
         submitBtn.disabled = false;
         submitBtn.textContent = 'Sign In to Admin Portal →';
       }
