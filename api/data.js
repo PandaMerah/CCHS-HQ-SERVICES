@@ -1,9 +1,10 @@
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const https = require('https');
 
 const SEED_FILE = path.join(process.cwd(), 'CCHSMeetingDashboard', 'data.json');
-const TMP_FILE = '/tmp/cchs_hq_state.json';
+const TMP_FILE = path.join(os.tmpdir(), 'cchs_hq_state.json');
 const FIREBASE_RTDB_URL = process.env.FIREBASE_DATABASE_URL || 'https://cchsmeetingdashboard-default-rtdb.asia-southeast1.firebasedatabase.app';
 
 const DEFAULT_ROOMS = [
@@ -218,6 +219,10 @@ function writeState(nextState, changedNode = null) {
     mirrorNodeToFirebase('rooms', nextState.rooms);
   } else if (changedNode === 'bookings') {
     mirrorNodeToFirebase('bookings', nextState.bookings);
+  } else if (changedNode === 'remoteDisplay' && nextState.remoteDisplay) {
+    mirrorNodeToFirebase('remoteDisplay/activeMode', nextState.remoteDisplay.activeMode);
+    mirrorNodeToFirebase('remoteDisplay/activePresenterId', nextState.remoteDisplay.activePresenterId || null);
+    mirrorNodeToFirebase('remoteDisplay/modeUpdatedAt', nextState.remoteDisplay.modeUpdatedAt || Date.now());
   }
 }
 
@@ -281,7 +286,7 @@ module.exports = (req, res) => {
           rd.activePresenterId = p.id;
         }
         rd.updatedAt = Date.now();
-        writeState(current);
+        writeState(current, 'remoteDisplay');
         return res.status(200).json({ ok: true, state: current });
       }
 
@@ -309,7 +314,7 @@ module.exports = (req, res) => {
           }
         }
         rd.updatedAt = Date.now();
-        writeState(current);
+        writeState(current, 'remoteDisplay');
         return res.status(200).json({ ok: true, state: current });
       }
 
@@ -319,7 +324,7 @@ module.exports = (req, res) => {
         rd.activeMode = presenterId ? 'screen-share' : (payload.fallbackMode || 'meeting-tv');
         rd.modeUpdatedAt = Date.now();
         rd.updatedAt = Date.now();
-        writeState(current);
+        writeState(current, 'remoteDisplay');
         return res.status(200).json({ ok: true, state: current });
       }
 
@@ -339,7 +344,7 @@ module.exports = (req, res) => {
         }
         rd.modeUpdatedAt = Date.now();
         rd.updatedAt = Date.now();
-        writeState(current);
+        writeState(current, 'remoteDisplay');
         return res.status(200).json({ ok: true, state: current });
       }
 

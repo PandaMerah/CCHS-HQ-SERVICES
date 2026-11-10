@@ -269,7 +269,7 @@ function deepMergeSeed(raw) {
   };
 }
 
-// Merge incoming state while protecting newer local mode switches & room/booking writes from stale poll snapshots
+// Merge incoming state while protecting newer mode switches & room/booking writes from stale snapshots
 function mergeIncomingState(incomingRaw) {
   const next = deepMergeSeed(incomingRaw);
   const localRd = currentState?.remoteDisplay || {};
@@ -277,11 +277,22 @@ function mergeIncomingState(incomingRaw) {
   const localModeTime = Math.max(localRd.modeUpdatedAt || 0, lastLocalModeChangeAt);
   const incomingModeTime = nextRd.modeUpdatedAt || 0;
 
-  // If this client performed a more recent mode switch (within the last 8s or higher timestamp), preserve its mode & presenter choice
-  if (localModeTime > incomingModeTime && (Date.now() - lastLocalModeChangeAt) < 8000) {
+  // Always preserve whichever state has the newer modeUpdatedAt timestamp
+  if (localModeTime > incomingModeTime) {
     next.remoteDisplay.activeMode = localRd.activeMode;
     next.remoteDisplay.activePresenterId = localRd.activePresenterId;
     next.remoteDisplay.modeUpdatedAt = localModeTime;
+    if (localRd.targetRoomId) next.remoteDisplay.targetRoomId = localRd.targetRoomId;
+    if (localRd.announcement) next.remoteDisplay.announcement = localRd.announcement;
+    if (localRd.welcomeBoard) next.remoteDisplay.welcomeBoard = localRd.welcomeBoard;
+  }
+
+  // Preserve newer presenter list if incoming snapshot has older updatedAt
+  const localRdUpdated = localRd.updatedAt || 0;
+  const incomingRdUpdated = nextRd.updatedAt || 0;
+  if (localRdUpdated > incomingRdUpdated && Array.isArray(localRd.presenters)) {
+    next.remoteDisplay.presenters = localRd.presenters;
+    next.remoteDisplay.updatedAt = localRdUpdated;
   }
 
   // Protect recent room / booking mutations from stale poll snapshots
@@ -312,7 +323,22 @@ function saveLocalState(state) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (e) {
-    console.warn("Local storage write failed:", e);
+    // If previewFrame base64 exceeds localStorage quota, save lightweight state without previewFrame so activeMode always persists
+    try {
+      const slim = {
+        ...state,
+        remoteDisplay: {
+          ...(state.remoteDisplay || {}),
+          presenters: ((state.remoteDisplay && state.remoteDisplay.presenters) || []).map(p => ({
+            ...p,
+            previewFrame: null
+          }))
+        }
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+    } catch (e2) {
+      console.warn("Local storage write failed:", e2);
+    }
   }
 }
 
@@ -356,6 +382,19 @@ if (bc) {
       notifyListeners();
     }
   };
+}
+
+// Listen to cross-tab localStorage 'storage' events so TV Receiver reacts immediately on same browser
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (event) => {
+    if (event.key === STORAGE_KEY && event.newValue) {
+      try {
+        const parsed = JSON.parse(event.newValue);
+        currentState = mergeIncomingState(parsed);
+        notifyListeners();
+      } catch (e) {}
+    }
+  });
 }
 
 // Fetch from Vercel Serverless API (/api/data) to stay synced even if Firebase RTDB rules are locked
@@ -464,6 +503,62 @@ async function initRealtimeSync() {
   const rootRef = ref(db, "/");
   const roomsRef = ref(db, "rooms");
   const bookingsRef = ref(db, "bookings");
+  const remoteDisplayRef = ref(db, "remoteDisplay");
+  const configRef = ref(db, "config");
+  const departmentsRef = ref(db, "departments");
+
+  // Always fetch latest server state on init so TV channel & screen share queue are immediately current
+  fetchApiState();
+
+  // Dedicated listener on /remoteDisplay in Firebase Realtime Database for instant TV channel & presenter switching
+  onValue(
+    remoteDisplayRef,
+    async (snapshot) => {
+      const val = snapshot.val();
+      if (val && typeof val === "object") {
+        const normalizedPresenters = normalizeFirebaseArray(val.presenters);
+        const incomingRd = {
+          ...val,
+          presenters: Array.isArray(normalizedPresenters) ? normalizedPresenters : (currentState.remoteDisplay?.presenters || [])
+        };
+        currentState = mergeIncomingState({
+          ...currentState,
+          remoteDisplay: incomingRd
+        });
+        saveLocalState(currentState);
+        notifyListeners();
+      }
+    },
+    () => {}
+  );
+
+  // Dedicated listener on /config in Firebase Realtime Database
+  onValue(
+    configRef,
+    (snapshot) => {
+      const val = snapshot.val();
+      if (val && typeof val === "object") {
+        currentState = { ...currentState, config: { ...currentState.config, ...val } };
+        saveLocalState(currentState);
+        notifyListeners();
+      }
+    },
+    () => {}
+  );
+
+  // Dedicated listener on /departments in Firebase Realtime Database
+  onValue(
+    departmentsRef,
+    (snapshot) => {
+      const val = snapshot.val();
+      if (val && typeof val === "object" && Object.keys(val).length > 0) {
+        currentState = { ...currentState, departments: val };
+        saveLocalState(currentState);
+        notifyListeners();
+      }
+    },
+    () => {}
+  );
 
   // Dedicated listener on /rooms in Firebase Realtime Database
   onValue(
@@ -533,13 +628,14 @@ async function initRealtimeSync() {
       notifyListeners();
     },
     async (error) => {
-      firebaseConnected = false;
-      console.info("Firebase RTDB notice (using API/Server store while RTDB rules are locked):", error.message);
+      console.info("Firebase RTDB root notice (using per-node RTDB + API/Server store):", error.message);
       const ok = await fetchApiState();
-      if (!ok) {
-        setSyncStatus("local", "Firebase Rules Locked (permission_denied) • Offline Cache");
-      } else {
-        setSyncStatus("cloud-api", "Firebase Rules Locked (permission_denied) • Saved on HQ Cloud Server");
+      if (!firebaseConnected) {
+        if (!ok) {
+          setSyncStatus("local", "Firebase Rules Locked (permission_denied) • Offline Cache");
+        } else {
+          setSyncStatus("cloud-api", "Firebase Rules Locked (permission_denied) • Saved on HQ Cloud Server");
+        }
       }
       notifyListeners();
     }
@@ -548,12 +644,10 @@ async function initRealtimeSync() {
 
 initRealtimeSync();
 
-// Poll API every 2.0 seconds when in cloud-api fallback mode so TV displays & screen share signaling update rapidly
+// Always poll API every 1.5 seconds so TV displays & channel switches react automatically even when only partial Firebase nodes are unlocked
 setInterval(() => {
-  if (!firebaseConnected) {
-    fetchApiState();
-  }
-}, 2000);
+  fetchApiState();
+}, 1500);
 
 export function subscribeState(callback) {
   listeners.add(callback);
