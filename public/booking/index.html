@@ -23,268 +23,608 @@
       --cc-whatsapp: #16a34a;
       --cc-outlook: #0078d4;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--cc-bg);
       color: var(--cc-text);
       min-height: 100vh;
+      overflow-x: clip;
     }
-
+    /* =========================================================================
+       4. CONSOLIDATED TOP HEADER & APPS DROPDOWN MENU
+       ========================================================================= */
     .topbar {
       background: var(--cc-navy);
       color: #ffffff;
-      padding: 16px 32px;
+      padding: 10px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-      box-shadow: 0 4px 16px rgba(17, 35, 73, 0.15);
+      gap: 12px;
+      box-shadow: 0 2px 12px rgba(17, 35, 73, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 60;
     }
-
     .brand-left {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       text-decoration: none;
       color: #ffffff;
     }
-
     .brand-left img {
-      height: 40px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.06);
-      padding: 4px 8px;
+      height: 34px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.08);
+      padding: 3px 6px;
     }
-
+    .brand-title {
+      font-weight: 800;
+      font-size: 0.98rem;
+      letter-spacing: -0.01em;
+    }
+    .brand-subtitle {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
     .nav-links {
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 8px;
       align-items: center;
+      position: relative;
     }
-
     .nav-btn {
       text-decoration: none;
       color: #e2e8f0;
       background: rgba(255, 255, 255, 0.1);
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-size: 0.84rem;
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.8rem;
       font-weight: 600;
-      transition: all 0.2s;
-      border: none;
+      transition: all 0.18s;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
     }
-
     .nav-btn:hover {
-      background: var(--cc-blue);
+      background: rgba(255, 255, 255, 0.2);
       color: #ffffff;
     }
-
+    .nav-btn.primary-cta {
+      background: var(--cc-blue);
+      border-color: #3b82f6;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .nav-btn.primary-cta:hover {
+      background: #1d4ed8;
+    }
     .nav-btn.admin-login {
-      background: rgba(245, 158, 11, 0.2);
+      background: rgba(245, 158, 11, 0.18);
       border: 1px solid rgba(245, 158, 11, 0.45);
       color: #fbbf24;
     }
-
-    .container {
-      max-width: 1480px;
-      margin: 0 auto;
-      padding: 24px 24px 60px;
+    /* Apps / Tools Dropdown Grid Menu */
+    .tools-dropdown-wrap {
+      position: relative;
     }
-
-    /* Live Time-Arrival WhatsApp Alert Banner */
-    .due-alert-banner {
+    .tools-dropdown-menu {
       display: none;
-      background: linear-gradient(135deg, #065f46, #047857);
-      color: #ffffff;
-      border: 2px solid #34d399;
-      border-radius: 16px;
-      padding: 16px 22px;
-      margin-bottom: 22px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 14px;
-      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.25);
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 290px;
+      background: #ffffff;
+      color: var(--cc-text);
+      border-radius: 14px;
+      border: 1px solid var(--cc-border);
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.22);
+      padding: 12px;
+      z-index: 90;
     }
-
-    /* Section Header Bar */
-    .rooms-header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 14px;
+    .tools-dropdown-menu.open {
+      display: block;
     }
-
-    /* Room Status Cards Row */
-    .rooms-row {
+    .tools-dropdown-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--cc-muted);
+      margin-bottom: 8px;
+      padding: 0 4px;
+    }
+    .tools-icon-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 14px;
-      margin-bottom: 26px;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
     }
-
-    .room-card {
-      background: var(--cc-card);
-      border: 2px solid var(--cc-border);
-      border-top: 5px solid var(--cc-blue);
-      border-radius: 16px;
-      padding: 16px;
+    .tool-grid-item {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 10px;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-
-    .room-card:hover, .room-card.selected {
-      border-color: var(--cc-blue);
-      box-shadow: 0 10px 24px rgba(24, 99, 220, 0.12);
-      transform: translateY(-2px);
-    }
-
-    .room-top {
-      display: flex;
-      justify-content: space-between;
       align-items: flex-start;
-      gap: 8px;
+      gap: 3px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--cc-navy);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      transition: all 0.15s;
     }
-
-    .room-name {
-      font-size: 0.98rem;
+    .tool-grid-item:hover {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      transform: translateY(-1px);
+    }
+    .tool-grid-item .tool-icon {
+      font-size: 1.15rem;
+    }
+    .tool-grid-item .tool-name {
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .tool-grid-item .tool-desc {
+      font-size: 0.65rem;
+      color: var(--cc-muted);
+    }
+    /* =========================================================================
+       COMPACT 36PX STATUS STRIP FOR "STARTING NOW" ALERT
+       ========================================================================= */
+    .due-alert-strip {
+      display: none;
+      height: 36px;
+      min-height: 36px;
+      background: linear-gradient(90deg, #065f46, #047857);
+      color: #ffffff;
+      padding: 0 24px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.78rem;
+      border-bottom: 1px solid #34d399;
+      z-index: 55;
+    }
+    .due-strip-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .live-pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+      animation: pulseGlow 1.6s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.75); }
+      70% { box-shadow: 0 0 0 7px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+    @keyframes liveRedPulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.65); }
+      70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .due-strip-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .strip-btn {
+      font-size: 0.71rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #065f46;
+      background: #ffffff;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .strip-btn.secondary {
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+    }
+    .strip-dismiss {
+      background: none;
+      border: none;
+      color: #a7f3d0;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+    }
+    .strip-dismiss:hover { color: #ffffff; }
+    /* =========================================================================
+       MAIN CONTAINER & COMPACT INTERACTIVE ROOM FILTER STRIP (RECLAIMS ~160PX)
+       ========================================================================= */
+    .container {
+      max-width: 1540px;
+      margin: 0 auto;
+      padding: 14px 20px 48px;
+    }
+    .top-control-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    /* Interactive Room Switcher Pill Group (Replaces redundant 160px Room Cards) */
+    .room-switcher-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+      flex: 1;
+      min-width: 0;
+    }
+    .room-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: var(--cc-navy);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    }
+    .room-pill-btn:hover {
+      border-color: var(--cc-blue);
+      background: #f8fafc;
+    }
+    .room-pill-btn.active {
+      background: var(--cc-navy);
+      color: #ffffff;
+      border-color: var(--cc-navy);
+      box-shadow: 0 4px 10px rgba(17, 35, 73, 0.18);
+    }
+    .room-pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .room-pill-cap {
+      font-size: 0.69rem;
+      font-weight: 600;
+      opacity: 0.75;
+    }
+    .live-room-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.63rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      animation: liveRedPulse 1.8s infinite;
+      text-transform: uppercase;
+    }
+    .free-room-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.63rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .maint-room-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.63rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #fef3c7;
+      color: #b45309;
+    }
+    /* Layout Switcher Controls (Option A Sticky Split vs Option B Slide-over Drawer) */
+    .layout-mode-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .mode-switch-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+    .mode-switch-btn.active {
+      background: #eff6ff;
+      border-color: var(--cc-blue);
+      color: var(--cc-blue);
+    }
+    /* =========================================================================
+       1. REBALANCED WORKSPACE LAYOUT: STICKY FORM (OPTION A) + SLIDE-OVER DRAWER (OPTION B)
+       ========================================================================= */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 18px;
+      align-items: start;
+      transition: all 0.2s ease;
+    }
+    /* Option A: Sticky Left Form so there is zero left-side dead space when scrolling to 20:00 */
+    .booking-form-panel {
+      background: var(--cc-card);
+      border: 1px solid var(--cc-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+      position: sticky;
+      top: 1.5rem;
+      max-height: calc(100vh - 2.5rem);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      z-index: 30;
+      transition: box-shadow 0.25s, border-color 0.25s, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .booking-form-panel.flash-highlight {
+      border-color: var(--cc-blue);
+      box-shadow: 0 0 0 4px rgba(24, 99, 220, 0.2), 0 12px 28px rgba(15, 23, 42, 0.1);
+    }
+    /* Option B: Full-Width Grid + 420px Slide-Over Drawer from Right */
+    .workspace-grid.drawer-mode {
+      grid-template-columns: 1fr;
+    }
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 110;
+    }
+    .drawer-backdrop.open {
+      display: block;
+    }
+    .workspace-grid.drawer-mode .booking-form-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 420px;
+      max-width: 94vw;
+      height: 100vh;
+      max-height: 100vh;
+      border-radius: 18px 0 0 18px;
+      z-index: 120;
+      box-shadow: -12px 0 40px rgba(15, 23, 42, 0.25);
+      transform: translateX(105%);
+    }
+    .workspace-grid.drawer-mode .booking-form-panel.drawer-open {
+      transform: translateX(0);
+    }
+    .drawer-close-btn {
+      display: none;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+    .workspace-grid.drawer-mode .drawer-close-btn {
+      display: inline-flex;
+    }
+    .panel {
+      background: var(--cc-card);
+      border: 1px solid var(--cc-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+      min-width: 0;
+    }
+    .panel-title {
+      font-size: 1.05rem;
       font-weight: 800;
       color: var(--cc-navy);
     }
-
-    .room-floor {
+    .panel-sub {
       font-size: 0.77rem;
       color: var(--cc-muted);
       margin-top: 2px;
     }
-
-    .occ-badge {
-      font-size: 0.68rem;
+    /* =========================================================================
+       2. STREAMLINED BOOKING FORM (SESSION AUTO-FILL + QUICK DURATION PILLS)
+       ========================================================================= */
+    .session-autofill-bar {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 10px;
+      padding: 8px 11px;
+      margin: 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.75rem;
+    }
+    .session-user-info {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #0369a1;
+      font-weight: 600;
+      min-width: 0;
+    }
+    .session-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--cc-blue);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .session-toggle-btn {
+      background: #ffffff;
+      border: 1px solid #7dd3fc;
+      color: #0284c7;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
       font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 999px;
-      text-transform: uppercase;
+      cursor: pointer;
       white-space: nowrap;
     }
-
-    .occ-free { background: #dcfce7; color: #15803d; }
-    .occ-busy { background: #fee2e2; color: #b91c1c; }
-    .occ-maint { background: #fef3c7; color: #b45309; }
-
-    .amenities-list {
-      display: flex;
+    .session-toggle-btn:hover { background: #e0f2fe; }
+    .profile-presets-row {
+      display: none;
       flex-wrap: wrap;
       gap: 5px;
+      margin-bottom: 10px;
+      padding: 8px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px dashed #cbd5e1;
     }
-
-    .amenity-tag {
-      font-size: 0.7rem;
-      background: #f1f5f9;
-      color: #475569;
-      padding: 3px 7px;
-      border-radius: 6px;
-      font-weight: 500;
-    }
-
-    .room-footer {
+    .profile-presets-row.open {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 9px;
-      border-top: 1px solid var(--cc-border);
-      font-size: 0.78rem;
-      font-weight: 600;
+    }
+    .preset-chip {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: var(--cc-navy);
+      cursor: pointer;
+    }
+    .preset-chip:hover {
+      border-color: var(--cc-blue);
       color: var(--cc-blue);
     }
-
-    /* Main Workspace Grid */
-    .workspace-grid {
-      display: grid;
-      grid-template-columns: 400px 1fr;
-      gap: 22px;
-      align-items: start;
-    }
-
-    @media (max-width: 1120px) {
-      .workspace-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .panel {
-      background: var(--cc-card);
-      border: 1px solid var(--cc-border);
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
-    }
-
-    .panel-title {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--cc-navy);
-      margin-bottom: 4px;
-    }
-
-    .panel-sub {
-      font-size: 0.83rem;
-      color: var(--cc-muted);
-      margin-bottom: 18px;
-    }
-
-    .form-group { margin-bottom: 13px; }
+    .form-group { margin-bottom: 10px; }
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
-
     label {
       display: block;
-      font-size: 0.81rem;
+      font-size: 0.76rem;
       font-weight: 700;
       color: var(--cc-navy);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
-
     input, select, textarea {
       width: 100%;
-      padding: 9px 11px;
+      padding: 8px 10px;
       border: 1px solid #cbd5e1;
-      border-radius: 9px;
-      font-size: 0.89rem;
+      border-radius: 8px;
+      font-size: 0.84rem;
       font-family: inherit;
       background: #ffffff;
+      color: var(--cc-text);
     }
-
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--cc-blue);
-      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.14);
+      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.13);
     }
-
+    /* Quick Duration Pills (30m, 45m, 1h, 2h) */
+    .duration-pills-group {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+    .duration-pill {
+      padding: 7px 4px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 0.77rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.14s;
+    }
+    .duration-pill:hover {
+      border-color: var(--cc-blue);
+      color: var(--cc-blue);
+    }
+    .duration-pill.active {
+      background: var(--cc-blue);
+      border-color: var(--cc-blue);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(24, 99, 220, 0.25);
+    }
+    .computed-time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--cc-blue);
+      background: #eff6ff;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
     /* Live Availability Check Box */
     .slot-status-box {
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-size: 0.81rem;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.76rem;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
     }
     .slot-status-box.ok {
       background: #ecfdf5;
@@ -296,316 +636,471 @@
       border: 1px solid #fca5a5;
       color: #991b1b;
     }
-
     .checkbox-group {
       background: #f8fafc;
       border: 1px solid var(--cc-border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 12px;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 5px;
     }
-
     .checkbox-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.8rem;
+      gap: 7px;
+      font-size: 0.75rem;
       font-weight: 600;
       color: #334155;
       cursor: pointer;
     }
-
     .checkbox-row input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       margin: 0;
     }
-
     .btn-primary {
       width: 100%;
       background: var(--cc-blue);
       color: #ffffff;
       border: none;
-      padding: 13px 18px;
-      border-radius: 10px;
-      font-size: 0.94rem;
+      padding: 11px 16px;
+      border-radius: 9px;
+      font-size: 0.88rem;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.2s;
     }
-
     .btn-primary:hover:not(:disabled) { background: #114fb3; }
     .btn-primary:disabled {
       background: #94a3b8;
       cursor: not-allowed;
     }
-
     .alert {
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 0.85rem;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
       font-weight: 600;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
       display: none;
     }
     .alert.success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
     .alert.error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-
-    /* Schedule Filter Bar */
+    /* =========================================================================
+       SCHEDULE FILTER BAR & DEPARTMENT COLOR LEGEND
+       ========================================================================= */
     .filter-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 18px;
-      padding-bottom: 14px;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--cc-border);
     }
-
     .filter-controls {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
-
     .filter-controls input, .filter-controls select {
       width: auto;
-      padding: 7px 11px;
+      padding: 6px 10px;
+      font-size: 0.78rem;
     }
-
     .btn-chip {
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
       color: var(--cc-navy);
-      padding: 7px 12px;
+      padding: 6px 11px;
       border-radius: 8px;
-      font-size: 0.8rem;
+      font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.15s;
     }
-
     .btn-chip:hover, .btn-chip.active {
       background: var(--cc-navy);
       color: #ffffff;
       border-color: var(--cc-navy);
     }
-
+    /* Department Color Legend Strip */
+    .dept-legend-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      font-size: 0.71rem;
+      color: var(--cc-muted);
+    }
+    .dept-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+      color: #334155;
+    }
+    .dept-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      display: inline-block;
+    }
     /* =========================================================================
-       ROOM BOOKING TIMETABLE SCHEDULE GRID VIEW (Schedule Style)
+       3 & 5. DE-CLUTTERED TIMETABLE GRID + MERGED STICKY ROOM COLUMN HEADERS
        ========================================================================= */
     .timetable-wrapper {
-      overflow-x: auto;
       border: 1px solid var(--cc-border);
-      border-radius: 14px;
+      border-radius: 12px;
       background: #ffffff;
+      position: relative;
+      overflow-x: auto;
     }
-
     .timetable-table {
       width: 100%;
-      border-collapse: collapse;
-      min-width: 720px;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
     }
-
     .timetable-table th {
       background: #f8fafc;
       color: var(--cc-navy);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 800;
-      padding: 12px 10px;
+      padding: 10px 10px;
       border-bottom: 2px solid var(--cc-border);
       border-right: 1px solid var(--cc-border);
       text-align: left;
       position: sticky;
       top: 0;
-      z-index: 2;
+      z-index: 15;
+      vertical-align: top;
     }
-
+    .timetable-table th:first-child {
+      width: 84px;
+      text-align: center;
+      vertical-align: middle;
+      z-index: 16;
+    }
+    .th-room-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .th-room-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--cc-navy);
+      line-height: 1.2;
+      cursor: pointer;
+    }
+    .th-room-title:hover {
+      color: var(--cc-blue);
+    }
+    .th-room-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 5px;
+    }
+    .th-meta-pill {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 5px;
+      background: #e2e8f0;
+      color: #334155;
+      white-space: nowrap;
+    }
+    /* Info Tooltip (i) in Sticky Table Header */
+    .room-info-trigger {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      color: #475569;
+      font-size: 0.68rem;
+      font-weight: 800;
+      cursor: help;
+      flex-shrink: 0;
+    }
+    .room-info-trigger:hover {
+      background: var(--cc-blue);
+      color: #ffffff;
+    }
+    .room-info-tooltip {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      width: 230px;
+      background: var(--cc-navy);
+      color: #ffffff;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.28);
+      z-index: 40;
+      pointer-events: none;
+      line-height: 1.4;
+    }
+    .room-info-trigger:hover .room-info-tooltip,
+    .room-info-trigger:focus .room-info-tooltip {
+      display: block;
+    }
     .timetable-table td {
       border-bottom: 1px solid #e2e8f0;
       border-right: 1px solid #e2e8f0;
-      padding: 6px;
+      padding: 4px 5px;
       vertical-align: top;
-      height: 62px;
+      height: 52px;
     }
-
     .time-col-cell {
-      width: 92px;
+      width: 84px;
       background: #f8fafc;
-      font-weight: 800;
-      font-size: 0.78rem;
+      font-weight: 700;
+      font-size: 0.73rem;
       color: #475569;
       text-align: center;
       vertical-align: middle !important;
       white-space: nowrap;
     }
-
     .slot-free-btn {
       width: 100%;
       height: 100%;
-      min-height: 48px;
+      min-height: 42px;
       border: 1px dashed #cbd5e1;
-      border-radius: 8px;
+      border-radius: 7px;
       background: #f8fafc;
       color: #64748b;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      transition: all 0.15s;
+      transition: all 0.14s;
     }
-
     .slot-free-btn:hover {
       background: #eff6ff;
       border-color: var(--cc-blue);
       color: var(--cc-blue);
       font-weight: 700;
     }
-
+    .slot-free-btn.selected-slot {
+      background: #dbeafe;
+      border: 2px solid var(--cc-blue);
+      color: #1e40af;
+      font-weight: 800;
+    }
+    /* De-cluttered Scannable Booked Slot Card (Only Title, Time Badge, Dept Tag/Avatar) */
     .slot-booked-card {
-      border-radius: 9px;
-      padding: 8px 10px;
-      color: #0f172a;
-      background: #eff6ff;
+      border-radius: 8px;
+      padding: 6px 8px;
       border-left: 4px solid var(--cc-blue);
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
       display: flex;
       flex-direction: column;
       gap: 4px;
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s;
+      text-align: left;
+      width: 100%;
+      border-top: 1px solid rgba(15, 23, 42, 0.05);
+      border-right: 1px solid rgba(15, 23, 42, 0.05);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.05);
     }
-
+    .slot-booked-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+    }
     .slot-booked-title {
       font-weight: 800;
-      font-size: 0.8rem;
-      color: var(--cc-navy);
+      font-size: 0.76rem;
       line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-
-    .slot-booked-meta {
-      font-size: 0.72rem;
-      color: #475569;
+    .slot-booked-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .slot-time-badge {
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.75);
+      color: #334155;
+      white-space: nowrap;
+    }
+    .slot-dept-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.64rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 999px;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .slot-dept-avatar {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      font-weight: 900;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+    /* =========================================================================
+       LIGHTWEIGHT POPOVER FOR BOOKED SLOT SECONDARY ACTIONS & DETAILS
+       ========================================================================= */
+    .booking-popover-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.25);
+      z-index: 130;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .booking-popover-backdrop.open {
+      display: flex;
+    }
+    .booking-popover-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid var(--cc-border);
+      box-shadow: 0 20px 44px rgba(15, 23, 42, 0.24);
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+      animation: popScale 0.16s ease-out;
+    }
+    @keyframes popScale {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    /* =========================================================================
+       BOOKINGS LIST / AGENDA VIEW
+       ========================================================================= */
+    .booking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .booking-item {
+      border: 1px solid var(--cc-border);
+      border-left: 5px solid var(--cc-blue);
+      border-radius: 12px;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #ffffff;
+      flex-wrap: wrap;
+    }
+    .booking-time-box {
+      min-width: 112px;
+      text-align: center;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border-radius: 9px;
+      border: 1px solid var(--cc-border);
+    }
+    .booking-time { font-size: 0.88rem; font-weight: 800; color: var(--cc-navy); }
+    .booking-date { font-size: 0.72rem; color: var(--cc-muted); margin-top: 2px; }
+    .booking-details { flex: 1; min-width: 200px; }
+    .booking-title { font-size: 0.95rem; font-weight: 800; color: var(--cc-text); margin-bottom: 4px; }
+    .booking-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--cc-muted);
       align-items: center;
     }
-
-    .slot-action-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-top: 4px;
-    }
-
-    .mini-action-btn {
-      font-size: 0.68rem;
+    .dept-pill {
       font-weight: 700;
-      padding: 3px 7px;
+      font-size: 0.7rem;
+      padding: 2px 8px;
       border-radius: 6px;
+    }
+    .mini-action-btn {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 7px;
       border: none;
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
     }
-
     .mini-action-btn.wa {
       background: #dcfce7;
       color: #166534;
       border: 1px solid #86efac;
     }
     .mini-action-btn.wa:hover { background: #16a34a; color: #fff; }
-
     .mini-action-btn.outlook {
       background: #e0f2fe;
       color: #0369a1;
       border: 1px solid #7dd3fc;
     }
     .mini-action-btn.outlook:hover { background: #0078d4; color: #fff; }
-
-    /* Bookings List View */
-    .booking-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .booking-item {
-      border: 1px solid var(--cc-border);
-      border-left: 5px solid var(--cc-blue);
-      border-radius: 12px;
-      padding: 15px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      background: #ffffff;
-      flex-wrap: wrap;
-    }
-
-    .booking-time-box {
-      min-width: 120px;
-      text-align: center;
-      padding: 10px 12px;
-      background: #f8fafc;
-      border-radius: 10px;
-      border: 1px solid var(--cc-border);
-    }
-
-    .booking-time { font-size: 0.92rem; font-weight: 800; color: var(--cc-navy); }
-    .booking-date { font-size: 0.74rem; color: var(--cc-muted); margin-top: 2px; }
-    .booking-details { flex: 1; min-width: 210px; }
-    .booking-title { font-size: 1rem; font-weight: 800; color: var(--cc-text); margin-bottom: 4px; }
-    .booking-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      font-size: 0.8rem;
-      color: var(--cc-muted);
-      align-items: center;
-    }
-
-    .dept-pill {
-      background: rgba(24, 99, 220, 0.1);
-      color: var(--cc-blue);
-      font-weight: 700;
-      font-size: 0.72rem;
-      padding: 2px 8px;
-      border-radius: 6px;
-    }
-
     .btn-edit {
       background: #e0f2fe;
       color: #0369a1;
       border: 1px solid #bae6fd;
-      padding: 6px 10px;
+      padding: 5px 10px;
       border-radius: 7px;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 700;
       cursor: pointer;
     }
-
     .btn-delete {
       background: #fee2e2;
       color: #b91c1c;
       border: 1px solid #fecaca;
-      padding: 6px 10px;
+      padding: 5px 10px;
       border-radius: 7px;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 700;
       cursor: pointer;
     }
-
     .staff-lock-note {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: #64748b;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
@@ -614,47 +1109,43 @@
       text-decoration: none;
       font-weight: 600;
     }
-
     .empty-box {
       text-align: center;
-      padding: 40px 20px;
+      padding: 36px 20px;
       color: var(--cc-muted);
       background: #f8fafc;
       border-radius: 12px;
       border: 1px dashed #cbd5e1;
     }
-
     /* Modals */
     .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.68);
-      backdrop-filter: blur(4px);
-      z-index: 100;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 140;
       align-items: center;
       justify-content: center;
       padding: 20px;
       overflow-y: auto;
     }
-
     .modal-card {
       background: #ffffff;
       border-radius: 18px;
-      padding: 26px;
+      padding: 24px;
       width: 100%;
-      max-width: 580px;
+      max-width: 560px;
       max-height: 90vh;
       overflow-y: auto;
       box-shadow: 0 24px 48px rgba(15, 23, 42, 0.28);
       border: 1px solid var(--cc-border);
     }
-
     .room-admin-item {
       border: 1px solid var(--cc-border);
       border-left: 5px solid var(--cc-blue);
       border-radius: 12px;
-      padding: 14px;
+      padding: 12px;
       margin-bottom: 10px;
       background: #f8fafc;
       display: flex;
@@ -663,74 +1154,239 @@
       gap: 12px;
       flex-wrap: wrap;
     }
+    /* =========================================================================
+       6. MOBILE & SMALL SCREEN ADAPTABILITY (< 1024px)
+       ========================================================================= */
+    .mobile-book-fab {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--cc-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 13px 20px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      box-shadow: 0 10px 25px rgba(24, 99, 220, 0.38);
+      z-index: 95;
+      cursor: pointer;
+      align-items: center;
+      gap: 7px;
+    }
+    @media (max-width: 1024px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+      /* On tablet/mobile < 1024px, form always acts as a slide-over drawer */
+      .booking-form-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 420px;
+        max-width: 92vw;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 18px 0 0 18px;
+        z-index: 120;
+        box-shadow: -12px 0 40px rgba(15, 23, 42, 0.25);
+        transform: translateX(105%);
+      }
+      .booking-form-panel.drawer-open {
+        transform: translateX(0);
+      }
+      .drawer-close-btn {
+        display: inline-flex;
+      }
+      .mobile-book-fab {
+        display: inline-flex;
+      }
+      .layout-mode-group {
+        display: none;
+      }
+      .timetable-table {
+        min-width: 100%;
+      }
+    }
+    @media (max-width: 640px) {
+      .topbar {
+        padding: 10px 14px;
+      }
+      .brand-subtitle {
+        display: none;
+      }
+      .container {
+        padding: 10px 12px 70px;
+      }
+      .due-alert-strip {
+        padding: 0 12px;
+        font-size: 0.72rem;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- 4. Consolidated Top Header with Apps/Tools Dropdown -->
   <header class="topbar">
     <a href="/" class="brand-left">
       <img src="/careclinic-logo.webp" alt="Logo" onerror="this.src='/images/acme-logo.svg'" />
       <div>
-        <div style="font-weight: 800; font-size: 1.1rem;">Careclinics HQ Room Booking & Schedule System</div>
-        <div style="font-size: 0.78rem; color: #94a3b8;">Non-Redundant Timetable • WhatsApp Time Alerts • Microsoft Outlook Calendar Sync</div>
+        <div class="brand-title">Careclinics HQ Room Booking</div>
+        <div class="brand-subtitle">Click-to-Book Timetable • Department Color-Coding • WhatsApp & Outlook Sync</div>
       </div>
     </a>
     <div class="nav-links" id="bookingNavLinks">
-      <a href="/" class="nav-btn">← Staff Portal</a>
-      <a href="/display/?mode=share" class="nav-btn">🖥️ Share Screen to TV</a>
-      <a href="/meeting/input.html" class="nav-btn">📝 Dept Update</a>
-      <a href="/pdf/" class="nav-btn">📄 BentoPDF</a>
-      <a href="/login.html?redirect=/booking/" class="nav-btn admin-login" id="adminLoginBtn">🔒 Admin Login</a>
-    </div>
-  </header>
-
-  <main class="container">
-    <!-- Live Time-Arrival WhatsApp Notification Banner -->
-    <div id="dueBookingBanner" class="due-alert-banner">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <span style="font-size:1.8rem;">🔔</span>
-        <div>
-          <div style="font-weight:900; font-size:1rem;" id="dueBannerTitle">Room Booking Time Has Arrived!</div>
-          <div style="font-size:0.84rem; color:#d1fae5;" id="dueBannerDesc">Notify the organizer via WhatsApp or add to Outlook Calendar.</div>
+      <button type="button" class="nav-btn primary-cta" onclick="openBookingDrawerOrFocus()">
+        <span>＋ New Booking</span>
+      </button>
+      <!-- Consolidated Apps / Tools Dropdown with Icon Grid -->
+      <div class="tools-dropdown-wrap" id="toolsDropdownWrap">
+        <button type="button" class="nav-btn" id="btnToolsMenu" onclick="toggleToolsDropdown(event)">
+          <span>⊞ HQ Tools</span>
+          <span style="font-size:0.65rem;">▾</span>
+        </button>
+        <div class="tools-dropdown-menu" id="toolsDropdownMenu">
+          <div class="tools-dropdown-label">Careclinics HQ Workspace Apps</div>
+          <div class="tools-icon-grid">
+            <a href="/" class="tool-grid-item">
+              <span class="tool-icon">🏠</span>
+              <span class="tool-name">Staff Portal</span>
+              <span class="tool-desc">Main HQ Directory</span>
+            </a>
+            <a href="/display/?mode=share" class="tool-grid-item">
+              <span class="tool-icon">🖥️</span>
+              <span class="tool-name">Share to TV</span>
+              <span class="tool-desc">Wireless Room Cast</span>
+            </a>
+            <a href="/meeting/input.html" class="tool-grid-item">
+              <span class="tool-icon">📝</span>
+              <span class="tool-name">Dept Update</span>
+              <span class="tool-desc">Submit Weekly Input</span>
+            </a>
+            <a href="/pdf/" class="tool-grid-item">
+              <span class="tool-icon">📄</span>
+              <span class="tool-name">BentoPDF</span>
+              <span class="tool-desc">PDF Toolkit Suite</span>
+            </a>
+            <a href="/meeting/" class="tool-grid-item">
+              <span class="tool-icon">📺</span>
+              <span class="tool-name">Meeting TV</span>
+              <span class="tool-desc">Live Alignment Board</span>
+            </a>
+            <a href="/display/" class="tool-grid-item">
+              <span class="tool-icon">📡</span>
+              <span class="tool-name">Display Hub</span>
+              <span class="tool-desc">Signage & Screens</span>
+            </a>
+          </div>
         </div>
       </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;" id="dueBannerActions"></div>
+      <span id="adminNavControls">
+        <a href="/login.html?redirect=/booking/" class="nav-btn admin-login" id="adminLoginBtn">🔒 Admin</a>
+      </span>
     </div>
-
-    <!-- Top Room Header & Admin Room Customizer Trigger -->
-    <div class="rooms-header-bar">
-      <div>
-        <h2 style="font-size:1.15rem; font-weight:800; color:var(--cc-navy);" id="roomsCountHeading">HQ Meeting Rooms</h2>
-        <p style="font-size:0.82rem; color:var(--cc-muted);">Click any room card to filter, or click an open slot in the timetable grid to book</p>
-      </div>
-      <div id="adminRoomConfigActions" style="display:none;">
-        <button type="button" class="btn-chip active" style="background:var(--cc-blue); border-color:var(--cc-blue); padding:9px 16px;" onclick="openRoomManagerModal()">
-          ⚙️ Customize HQ Meeting Rooms (Add / Edit / Details)
+  </header>
+  <!-- 4. Condensed 36px Dismissible Status Strip for "Starting Now" -->
+  <div id="dueBookingBanner" class="due-alert-strip">
+    <div class="due-strip-left">
+      <span class="live-pulse-dot"></span>
+      <strong id="dueBannerTitle">LIVE NOW:</strong>
+      <span id="dueBannerDesc" style="color:#d1fae5; overflow:hidden; text-overflow:ellipsis;"></span>
+    </div>
+    <div class="due-strip-actions" id="dueBannerActions"></div>
+  </div>
+  <!-- Slide-over Drawer Backdrop -->
+  <div id="drawerBackdrop" class="drawer-backdrop" onclick="closeBookingDrawer()"></div>
+  <main class="container">
+    <!-- 5 & 6. Interactive Horizontal Room Switcher Pills + Layout Mode Toggle (Reclaims ~160px of vertical height) -->
+    <div class="top-control-strip">
+      <div class="room-switcher-bar" id="roomSwitcherBar" role="tablist" aria-label="Filter by Meeting Room"></div>
+      <div class="layout-mode-group">
+        <button type="button" class="mode-switch-btn active" id="btnLayoutSticky" onclick="setWorkspaceLayout('sticky')" title="Keep reservation form anchored on the left while scrolling">
+          📌 Sticky Split
         </button>
+        <button type="button" class="mode-switch-btn" id="btnLayoutDrawer" onclick="setWorkspaceLayout('drawer')" title="100% full-width schedule grid with slide-over booking drawer">
+          ▭ Full-Width + Drawer
+        </button>
+        <span id="adminRoomConfigActions" style="display:none;">
+          <button type="button" class="mode-switch-btn" style="background:var(--cc-blue); color:#fff; border-color:var(--cc-blue);" onclick="openRoomManagerModal()">
+            ⚙️ Rooms
+          </button>
+        </span>
       </div>
     </div>
-
-    <!-- Top Live Room Cards -->
-    <section class="rooms-row" id="roomsRow"></section>
-
-    <div class="workspace-grid">
-      <!-- Left: Create Reservation Form -->
-      <section class="panel" id="bookingFormPanel">
-        <div class="panel-title">📅 Reserve a Meeting Room</div>
-        <div class="panel-sub">Redundant / overlapping bookings are automatically blocked</div>
-
+    <!-- 1. Workspace Grid (Supports Sticky Form Option A & 420px Slide-Over Drawer Option B) -->
+    <div class="workspace-grid" id="workspaceGrid">
+      <!-- Left / Slide-Over Reservation Form -->
+      <aside class="booking-form-panel" id="bookingFormPanel" aria-label="Room Reservation Form">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+          <div>
+            <div class="panel-title">📅 Reserve a Meeting Room</div>
+            <div class="panel-sub">Click any "+ Available" slot in the grid to pre-fill</div>
+          </div>
+          <button type="button" class="drawer-close-btn" onclick="closeBookingDrawer()" title="Close Drawer">&times;</button>
+        </div>
+        <!-- 2. Internal Network / Portal Session Auto-Fill Banner -->
+        <div class="session-autofill-bar">
+          <div class="session-user-info">
+            <span class="session-avatar" id="sessionAvatar">AH</span>
+            <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              <div style="font-size:0.73rem; font-weight:800; color:var(--cc-navy);" id="sessionSummaryName">Dr. Amirul Hakim (IT)</div>
+              <div style="font-size:0.66rem; color:#0369a1;" id="sessionSummaryContact">⚡ Auto-filled from HQ Session</div>
+            </div>
+          </div>
+          <button type="button" class="session-toggle-btn" onclick="toggleProfilePresets()">Switch / Edit</button>
+        </div>
+        <!-- Quick Staff Session Switcher Presets -->
+        <div class="profile-presets-row" id="profilePresetsRow">
+          <span style="width:100%; font-size:0.67rem; font-weight:700; color:var(--cc-muted);">Quick-Switch Portal Session Profile:</span>
+          <button type="button" class="preset-chip" onclick="applyStaffPreset('Dr. Amirul Hakim', 'IT', '012-3456789', 'amirul@careclinics.my')">💻 IT • Amirul</button>
+          <button type="button" class="preset-chip" onclick="applyStaffPreset('Dr. Sarah Lim', 'CLINICAL GOVERNANCE', '017-8899201', 'sarah.lim@careclinics.my')">🩺 Clinical • Dr. Sarah</button>
+          <button type="button" class="preset-chip" onclick="applyStaffPreset('En. Razak Dato', 'CEO OFFICE', '019-2233445', 'razak@careclinics.my')">👔 Management • Razak</button>
+          <button type="button" class="preset-chip" onclick="applyStaffPreset('Michelle Tan', 'FINANCE', '016-5544332', 'michelle@careclinics.my')">📊 Finance • Michelle</button>
+        </div>
         <div id="bookingAlert" class="alert"></div>
-
         <form id="bookingForm">
           <div class="form-group">
             <label for="roomId">Select HQ Meeting Room *</label>
             <select id="roomId" required></select>
           </div>
-
           <div class="form-group">
             <label for="title">Meeting Title / Purpose *</label>
             <input type="text" id="title" placeholder="e.g. Monthly Clinical Governance Review" required />
           </div>
-
+          <!-- 2. Date + Start Time + Quick Duration Pills (Prevents reverse time selection) -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="date">Booking Date *</label>
+              <input type="date" id="date" required />
+            </div>
+            <div class="form-group">
+              <label for="startTime">Start Time *</label>
+              <input type="time" id="startTime" value="10:00" step="900" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label style="margin-bottom:0;">Duration *</label>
+              <span class="computed-time-badge" id="computedTimeBadge">10:00 → 11:00 (1h)</span>
+            </div>
+            <div class="duration-pills-group" id="durationPillsGroup">
+              <button type="button" class="duration-pill" data-mins="30" onclick="selectDurationMinutes(30)">30m</button>
+              <button type="button" class="duration-pill" data-mins="45" onclick="selectDurationMinutes(45)">45m</button>
+              <button type="button" class="duration-pill active" data-mins="60" onclick="selectDurationMinutes(60)">1h</button>
+              <button type="button" class="duration-pill" data-mins="120" onclick="selectDurationMinutes(120)">2h</button>
+            </div>
+            <!-- Synced End Time input (kept for compatibility and custom inspection) -->
+            <input type="hidden" id="endTime" value="11:00" />
+          </div>
+          <!-- Real-Time Slot Conflict & Redundancy Indicator -->
+          <div id="liveSlotStatus" class="slot-status-box ok">
+            <span>🟢</span>
+            <span id="liveSlotText">Time slot is available for booking.</span>
+          </div>
+          <!-- Auto-Filled Booker Profile Fields (Compact & Editable) -->
           <div class="form-row">
             <div class="form-group">
               <label for="department">Department *</label>
@@ -738,119 +1394,104 @@
             </div>
             <div class="form-group">
               <label for="organizer">Booked By (Name) *</label>
-              <input type="text" id="organizer" placeholder="e.g. Dr. Amir / Sarah" required />
+              <input type="text" id="organizer" placeholder="Full Name" required />
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group">
-              <label for="phone">WhatsApp Phone No. * <span style="font-weight:500; color:#64748b;">(for time alert)</span></label>
-              <input type="tel" id="phone" placeholder="e.g. 012-3456789" required />
+              <label for="phone">WhatsApp No. *</label>
+              <input type="tel" id="phone" placeholder="012-3456789" required />
             </div>
             <div class="form-group">
-              <label for="email">Outlook Email <span style="font-weight:500; color:#64748b;">(optional)</span></label>
+              <label for="email">Outlook Email</label>
               <input type="email" id="email" placeholder="name@careclinics.my" />
             </div>
           </div>
-
-          <div class="form-group">
-            <label for="date">Booking Date *</label>
-            <input type="date" id="date" required />
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="startTime">Start Time *</label>
-              <input type="time" id="startTime" value="10:00" step="1800" required />
-            </div>
-            <div class="form-group">
-              <label for="endTime">End Time *</label>
-              <input type="time" id="endTime" value="11:00" step="1800" required />
-            </div>
-          </div>
-
-          <!-- Real-Time Slot Conflict & Redundancy Indicator -->
-          <div id="liveSlotStatus" class="slot-status-box ok">
-            <span>🟢</span>
-            <span id="liveSlotText">Time slot is available for booking.</span>
-          </div>
-
           <div class="form-group">
             <label for="notes">Equipment / Catering / Notes (Optional)</label>
             <textarea id="notes" rows="2" placeholder="e.g. Require Zoom link on 75&quot; TV"></textarea>
           </div>
-
           <div class="checkbox-group">
             <label class="checkbox-row">
               <input type="checkbox" id="chkAutoOutlook" checked />
-              <span>📅 Add reservation to my <strong>Microsoft Outlook Calendar</strong></span>
+              <span>📅 Auto-download <strong>Microsoft Outlook (.ics)</strong> invite</span>
             </label>
             <label class="checkbox-row">
               <input type="checkbox" id="chkWhatsappAlert" checked />
-              <span>💬 Notify via <strong>WhatsApp</strong> when booking time arrives</span>
+              <span>💬 Notify via <strong>WhatsApp</strong> when session starts</span>
             </label>
           </div>
-
           <button type="submit" id="btnSubmitBooking" class="btn-primary">Confirm Room Reservation</button>
         </form>
-      </section>
-
-      <!-- Right: Room Booking Schedule Style (Timetable Grid + List View) -->
+      </aside>
+      <!-- Right: Room Booking Schedule Timetable Grid + List View -->
       <section class="panel">
         <div class="filter-bar">
           <div>
-            <div class="panel-title">📊 HQ Room Booking Schedule</div>
-            <div class="panel-sub" style="margin-bottom: 0;" id="scheduleSubtitle">Interactive Timetable & Reservations</div>
+            <div class="panel-title" id="roomsCountHeading">📊 HQ Room Booking Schedule</div>
+            <div class="panel-sub" id="scheduleSubtitle">Click an empty slot to book, or click any booked card for actions</div>
           </div>
           <div class="filter-controls">
             <button type="button" class="btn-chip active" id="btnViewGrid" onclick="setScheduleViewMode('grid')">📊 Schedule Grid</button>
-            <button type="button" class="btn-chip" id="btnViewList" onclick="setScheduleViewMode('list')">📋 List View</button>
+            <button type="button" class="btn-chip" id="btnViewList" onclick="setScheduleViewMode('list')">📋 Agenda List</button>
             <button type="button" class="btn-chip active" id="btnShowToday">Today</button>
             <button type="button" class="btn-chip" id="btnShowAllDates">All Upcoming</button>
-            <input type="date" id="filterDate" />
-            <select id="filterRoom">
+            <input type="date" id="filterDate" aria-label="Filter Date" />
+            <select id="filterRoom" aria-label="Filter Room">
               <option value="ALL">All HQ Rooms</option>
             </select>
           </div>
         </div>
-
-        <!-- 1. Interactive Timetable Schedule Grid (Default) -->
+        <!-- 3. Department Color-Coding Legend -->
+        <div class="dept-legend-bar" aria-label="Department Color Legend">
+          <span style="font-weight:700; color:var(--cc-navy);">Dept Color Key:</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#4f46e5;"></span>IT / Tech (Indigo)</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#10b981;"></span>Clinical / Health (Emerald)</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#f59e0b;"></span>Management / Admin (Amber)</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#0284c7;"></span>Finance / Procurement (Sky)</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#e11d48;"></span>HR / Talent (Rose)</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#7c3aed;"></span>Business / Legal (Violet)</span>
+        </div>
+        <!-- 1. Interactive Timetable Schedule Grid (08:00 to 20:00) -->
         <div id="timetableGridContainer" class="timetable-wrapper"></div>
-
-        <!-- 2. Detailed List View -->
-        <div id="bookingsContainer" class="booking-list" style="display:none; margin-top:14px;"></div>
+        <!-- 2. Detailed Agenda List View -->
+        <div id="bookingsContainer" class="booking-list" style="display:none; margin-top:10px;"></div>
       </section>
     </div>
   </main>
-
+  <!-- Mobile Floating Action Button (< 1024px) -->
+  <button type="button" class="mobile-book-fab" onclick="openBookingDrawerOrFocus()">
+    <span>📅 ＋ Book a Room</span>
+  </button>
+  <!-- 3. Lightweight Booked Slot Popover (Houses WhatsApp, Outlook, Notes, Equipment & Admin Actions) -->
+  <div class="booking-popover-backdrop" id="bookingDetailPopover" onclick="if(event.target===this) closeBookingPopover()">
+    <div class="booking-popover-card" id="bookingPopoverContent"></div>
+  </div>
   <!-- Post-Booking Confirmation + Outlook Calendar + WhatsApp Modal -->
   <div class="modal-backdrop" id="confirmedModal">
-    <div class="modal-card" style="max-width: 500px; text-align: center;">
-      <div style="width:56px; height:56px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 12px;">✓</div>
-      <h3 style="color:var(--cc-navy); font-weight:900; font-size:1.25rem; margin-bottom:6px;">Room Reservation Confirmed!</h3>
-      <p style="font-size:0.86rem; color:var(--cc-muted); margin-bottom:16px;" id="confirmedModalSummary"></p>
-
-      <div style="display:flex; flex-direction:column; gap:10px; text-align:left; background:#f8fafc; padding:16px; border-radius:12px; border:1px solid var(--cc-border); margin-bottom:18px;">
-        <div style="font-size:0.78rem; font-weight:800; color:var(--cc-navy); text-transform:uppercase;">Add to Your Outlook Calendar & WhatsApp</div>
+    <div class="modal-card" style="max-width: 480px; text-align: center;">
+      <div style="width:52px; height:52px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 10px;">✓</div>
+      <h3 style="color:var(--cc-navy); font-weight:900; font-size:1.2rem; margin-bottom:6px;">Room Reservation Confirmed!</h3>
+      <p style="font-size:0.84rem; color:var(--cc-muted); margin-bottom:14px;" id="confirmedModalSummary"></p>
+      <div style="display:flex; flex-direction:column; gap:8px; text-align:left; background:#f8fafc; padding:14px; border-radius:12px; border:1px solid var(--cc-border); margin-bottom:16px;">
+        <div style="font-size:0.74rem; font-weight:800; color:var(--cc-navy); text-transform:uppercase;">Sync with Outlook & WhatsApp</div>
         <a id="btnModalOutlook365" href="#" target="_blank" rel="noopener" class="btn-primary" style="background:var(--cc-outlook); text-decoration:none; text-align:center; display:block;">
           📅 Add to Outlook 365 / Web Calendar ↗
         </a>
-        <button type="button" id="btnModalOutlookIcs" class="btn-chip" style="padding:11px; text-align:center; width:100%;">
+        <button type="button" id="btnModalOutlookIcs" class="btn-chip" style="padding:10px; text-align:center; width:100%;">
           📥 Download Outlook Desktop / Mobile Invite (.ics)
         </button>
         <a id="btnModalWhatsApp" href="#" target="_blank" rel="noopener" class="btn-primary" style="background:var(--cc-whatsapp); text-decoration:none; text-align:center; display:block;">
-          💬 Send WhatsApp Booking Details to Phone ↗
+          💬 Send WhatsApp Booking Details ↗
         </a>
       </div>
-
-      <button type="button" class="btn-chip" style="padding:10px 24px;" onclick="closeConfirmedModal()">Done</button>
+      <button type="button" class="btn-chip" style="padding:9px 24px;" onclick="closeConfirmedModal()">Done</button>
     </div>
   </div>
-
   <!-- Admin Edit Booking Modal -->
   <div class="modal-backdrop" id="editModal">
     <div class="modal-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="color:var(--cc-navy); font-weight:800;">✎ Edit Room Booking (Admin)</h3>
         <button type="button" onclick="closeEditBooking()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:#64748b;">&times;</button>
       </div>
@@ -910,23 +1551,19 @@
       </form>
     </div>
   </div>
-
-  <!-- Admin Customize HQ Meeting Rooms Modal (Quantity, Names, Details) -->
+  <!-- Admin Customize HQ Meeting Rooms Modal -->
   <div class="modal-backdrop" id="roomManagerModal">
     <div class="modal-card" style="max-width: 680px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <div>
-          <h3 style="color:var(--cc-navy); font-weight:900; font-size:1.2rem;">🏢 Customize HQ Meeting Rooms (Admin)</h3>
-          <p style="font-size:0.8rem; color:var(--cc-muted);">Control how many meeting rooms are available, their names, floor location, pax capacity, and amenities.</p>
+          <h3 style="color:var(--cc-navy); font-weight:900; font-size:1.15rem;">🏢 Customize HQ Meeting Rooms (Admin)</h3>
+          <p style="font-size:0.78rem; color:var(--cc-muted);">Control meeting rooms, floor location, pax capacity, and equipment tags.</p>
         </div>
         <button type="button" onclick="closeRoomManagerModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#64748b;">&times;</button>
       </div>
-
       <div id="roomManagerAlert" class="alert"></div>
-
-      <!-- Add / Edit Room Form -->
-      <form id="roomConfigForm" style="background:#f8fafc; border:1px solid var(--cc-border); border-radius:12px; padding:16px; margin-bottom:18px;">
-        <div style="font-weight:800; font-size:0.88rem; color:var(--cc-navy); margin-bottom:10px;" id="roomFormHeading">➕ Add a New Meeting Room</div>
+      <form id="roomConfigForm" style="background:#f8fafc; border:1px solid var(--cc-border); border-radius:12px; padding:14px; margin-bottom:16px;">
+        <div style="font-weight:800; font-size:0.86rem; color:var(--cc-navy); margin-bottom:8px;" id="roomFormHeading">➕ Add a New Meeting Room</div>
         <input type="hidden" id="cfgRoomId" value="" />
         <div class="form-row">
           <div class="form-group">
@@ -950,25 +1587,23 @@
                 <option value="available">Available for Booking</option>
                 <option value="maintenance">Under Maintenance (Locked)</option>
               </select>
-              <input type="color" id="cfgRoomColor" value="#1863dc" style="width:48px; padding:3px; height:38px;" />
+              <input type="color" id="cfgRoomColor" value="#1863dc" style="width:44px; padding:2px; height:36px;" />
             </div>
           </div>
         </div>
         <div class="form-group">
           <label>Room Equipment & Amenities (Comma-separated) *</label>
-          <input type="text" id="cfgRoomAmenities" placeholder="e.g. 75&quot; 4K Smart TV, Video Conferencing, Whiteboard, HDMI Cast" required />
+          <input type="text" id="cfgRoomAmenities" placeholder="e.g. 75&quot; 4K Smart TV, Video Conferencing, Whiteboard" required />
         </div>
         <div style="display:flex; gap:8px; justify-content:flex-end;">
           <button type="button" class="btn-chip" id="btnCancelRoomEdit" style="display:none;" onclick="resetRoomConfigForm()">Cancel Edit</button>
-          <button type="submit" class="btn-primary" style="width:auto; padding:9px 18px;" id="btnSaveRoomConfig">Save Meeting Room</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:8px 16px;" id="btnSaveRoomConfig">Save Meeting Room</button>
         </div>
       </form>
-
-      <div style="font-weight:800; font-size:0.88rem; color:var(--cc-navy); margin-bottom:8px;">Current HQ Meeting Rooms (<span id="modalRoomCount">0</span>)</div>
+      <div style="font-weight:800; font-size:0.86rem; color:var(--cc-navy); margin-bottom:8px;">Current HQ Meeting Rooms (<span id="modalRoomCount">0</span>)</div>
       <div id="roomManagerList"></div>
     </div>
   </div>
-
   <script type="module">
     import {
       subscribeState,
@@ -984,36 +1619,209 @@
       buildOutlookCalendarUrls,
       downloadOutlookIcs
     } from '/shared/cloud-store.js';
-    import { isAdminLoggedIn, logoutAdmin } from '/shared/auth.js';
-
+    import { isAdminLoggedIn, getAdminSession, logoutAdmin } from '/shared/auth.js';
     const isAdmin = isAdminLoggedIn();
+    const adminSession = getAdminSession();
     if (isAdmin) {
-      const navLinks = document.getElementById('bookingNavLinks');
-      navLinks.innerHTML = `
-        <a href="/admin/" class="nav-btn" style="background:rgba(16,185,129,0.22); border:1px solid #10b981; color:#6ee7b7;">🛡️ Admin Portal</a>
-        <button type="button" class="nav-btn" style="background:rgba(24,99,220,0.35); border:1px solid #8ed1fc; color:#fff;" onclick="openRoomManagerModal()">⚙️ Customize Rooms</button>
-        <a href="/" class="nav-btn">Staff View</a>
-        <a href="/display/" class="nav-btn">🖥️ TV Switcher</a>
+      const adminControls = document.getElementById('adminNavControls');
+      adminControls.innerHTML = `
+        <a href="/admin/" class="nav-btn" style="background:rgba(16,185,129,0.22); border:1px solid #10b981; color:#6ee7b7;">🛡️ Admin</a>
+        <button type="button" class="nav-btn" style="background:rgba(24,99,220,0.35); border:1px solid #8ed1fc; color:#fff;" onclick="openRoomManagerModal()">⚙️ Rooms</button>
         <button id="bookingLogoutBtn" class="nav-btn" style="background:rgba(244,63,94,0.2); color:#fda4af;">Logout</button>
       `;
       document.getElementById('bookingLogoutBtn').addEventListener('click', () => logoutAdmin('/booking/'));
-      document.getElementById('adminRoomConfigActions').style.display = 'block';
+      document.getElementById('adminRoomConfigActions').style.display = 'inline-block';
     }
-
+    // =========================================================================
+    // 3. CONSISTENT DEPARTMENT COLOR-CODING PALETTE
+    // =========================================================================
+    const DEPT_THEMES = {
+      'IT': { bg: '#eef2ff', border: '#4f46e5', text: '#312e81', pillBg: '#e0e7ff', pillText: '#3730a3', avatarBg: '#4f46e5', label: 'IT' },
+      'TPP SYSTMONE': { bg: '#eef2ff', border: '#4f46e5', text: '#312e81', pillBg: '#e0e7ff', pillText: '#3730a3', avatarBg: '#4338ca', label: 'SystmOne' },
+      'CLINICAL GOVERNANCE': { bg: '#ecfdf5', border: '#10b981', text: '#064e3b', pillBg: '#d1fae5', pillText: '#065f46', avatarBg: '#10b981', label: 'Clinical' },
+      'CORPORATE HEALTH': { bg: '#ecfdf5', border: '#059669', text: '#064e3b', pillBg: '#d1fae5', pillText: '#065f46', avatarBg: '#059669', label: 'Corp Health' },
+      'PMI TEAM': { bg: '#f0fdf4', border: '#16a34a', text: '#14532d', pillBg: '#dcfce7', pillText: '#166534', avatarBg: '#16a34a', label: 'PMI' },
+      'CEO OFFICE': { bg: '#fffbeb', border: '#f59e0b', text: '#78350f', pillBg: '#fef3c7', pillText: '#92400e', avatarBg: '#d97706', label: 'CEO Office' },
+      'ADMIN': { bg: '#fffbeb', border: '#d97706', text: '#78350f', pillBg: '#fef3c7', pillText: '#92400e', avatarBg: '#b45309', label: 'Admin' },
+      'FINANCE': { bg: '#f0f9ff', border: '#0284c7', text: '#0c4a6e', pillBg: '#e0f2fe', pillText: '#0369a1', avatarBg: '#0284c7', label: 'Finance' },
+      'ACCOUNT': { bg: '#f0f9ff', border: '#0891b2', text: '#164e63', pillBg: '#cffafe', pillText: '#0e7490', avatarBg: '#0891b2', label: 'Account' },
+      'PROCUREMENT': { bg: '#ecfeff', border: '#06b6d4', text: '#155e75', pillBg: '#cffafe', pillText: '#0e7490', avatarBg: '#0891b2', label: 'Procurement' },
+      'HR': { bg: '#fff1f2', border: '#e11d48', text: '#881337', pillBg: '#ffe4e6', pillText: '#9f1239', avatarBg: '#e11d48', label: 'HR' },
+      'TALENT DEVELOPMENT': { bg: '#fdf2f8', border: '#db2777', text: '#831843', pillBg: '#fce7f3', pillText: '#9d174d', avatarBg: '#db2777', label: 'Talent' },
+      'BUSINESS DEVELOPMENT': { bg: '#f5f3ff', border: '#7c3aed', text: '#4c1d95', pillBg: '#ede9fe', pillText: '#5b21b6', avatarBg: '#7c3aed', label: 'Biz Dev' },
+      'BUSINESS LEGAL': { bg: '#f5f3ff', border: '#6d28d9', text: '#4c1d95', pillBg: '#ede9fe', pillText: '#5b21b6', avatarBg: '#6d28d9', label: 'Legal' },
+      'OPERATION': { bg: '#eff6ff', border: '#2563eb', text: '#1e3a8a', pillBg: '#dbeafe', pillText: '#1e40af', avatarBg: '#2563eb', label: 'Operations' }
+    };
+    function getDeptTheme(deptName) {
+      const key = String(deptName || '').toUpperCase().trim();
+      if (DEPT_THEMES[key]) return DEPT_THEMES[key];
+      if (key.includes('CLINIC') || key.includes('HEALTH')) return DEPT_THEMES['CLINICAL GOVERNANCE'];
+      if (key.includes('IT') || key.includes('TECH') || key.includes('SYST')) return DEPT_THEMES['IT'];
+      if (key.includes('CEO') || key.includes('MANAGE') || key.includes('ADMIN')) return DEPT_THEMES['CEO OFFICE'];
+      return {
+        bg: '#eff6ff',
+        border: '#2563eb',
+        text: '#1e3a8a',
+        pillBg: '#dbeafe',
+        pillText: '#1e40af',
+        avatarBg: '#2563eb',
+        label: deptName || 'HQ'
+      };
+    }
+    function getInitials(nameStr) {
+      const parts = String(nameStr || 'HQ').replace(/[^a-zA-Z0-9 ]/g, '').trim().split(/\s+/);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return (parts[0] || 'HQ').slice(0, 2).toUpperCase();
+    }
+    // =========================================================================
+    // 4. TOPBAR TOOLS DROPDOWN MENU
+    // =========================================================================
+    window.toggleToolsDropdown = (e) => {
+      e.stopPropagation();
+      document.getElementById('toolsDropdownMenu').classList.toggle('open');
+    };
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('toolsDropdownWrap');
+      if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('toolsDropdownMenu')?.classList.remove('open');
+      }
+    });
+    // =========================================================================
+    // 1. WORKSPACE LAYOUT MODE (STICKY SPLIT vs SLIDE-OVER DRAWER)
+    // =========================================================================
+    const LAYOUT_PREF_KEY = 'cchs_hq_booking_layout_mode_v1';
+    let workspaceLayout = localStorage.getItem(LAYOUT_PREF_KEY) || 'sticky'; // 'sticky' | 'drawer'
+    window.setWorkspaceLayout = (mode) => {
+      workspaceLayout = mode;
+      localStorage.setItem(LAYOUT_PREF_KEY, mode);
+      const grid = document.getElementById('workspaceGrid');
+      grid.classList.toggle('drawer-mode', mode === 'drawer');
+      document.getElementById('btnLayoutSticky').classList.toggle('active', mode === 'sticky');
+      document.getElementById('btnLayoutDrawer').classList.toggle('active', mode === 'drawer');
+      if (mode === 'sticky') {
+        closeBookingDrawer();
+      }
+    };
+    window.openBookingDrawerOrFocus = () => {
+      const isSmallScreen = window.innerWidth <= 1024;
+      const panel = document.getElementById('bookingFormPanel');
+      if (workspaceLayout === 'drawer' || isSmallScreen) {
+        panel.classList.add('drawer-open');
+        document.getElementById('drawerBackdrop').classList.add('open');
+      } else {
+        panel.classList.remove('flash-highlight');
+        void panel.offsetWidth;
+        panel.classList.add('flash-highlight');
+        setTimeout(() => panel.classList.remove('flash-highlight'), 1200);
+      }
+      setTimeout(() => document.getElementById('title')?.focus(), 80);
+    };
+    window.closeBookingDrawer = () => {
+      document.getElementById('bookingFormPanel')?.classList.remove('drawer-open');
+      document.getElementById('drawerBackdrop')?.classList.remove('open');
+    };
+    setWorkspaceLayout(workspaceLayout);
+    // =========================================================================
+    // 2. SESSION AUTO-FILL FOR BOOKER NAME, DEPARTMENT, WHATSAPP & EMAIL
+    // =========================================================================
+    const STAFF_SESSION_KEY = 'cchs_hq_staff_session_profile_v1';
+    function loadStaffSessionProfile() {
+      try {
+        const raw = localStorage.getItem(STAFF_SESSION_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.organizer) return parsed;
+        }
+      } catch (e) {}
+      if (adminSession && adminSession.username) {
+        return {
+          organizer: adminSession.username === 'admin' ? 'HQ Administrator' : adminSession.username,
+          department: 'ADMIN',
+          phone: '012-3456789',
+          email: 'admin@careclinics.my'
+        };
+      }
+      return {
+        organizer: 'Dr. Amirul Hakim',
+        department: 'IT',
+        phone: '012-3456789',
+        email: 'amirul@careclinics.my'
+      };
+    }
+    function saveStaffSessionProfile(profile) {
+      try {
+        localStorage.setItem(STAFF_SESSION_KEY, JSON.stringify(profile));
+      } catch (e) {}
+      updateSessionBannerUI(profile);
+    }
+    function updateSessionBannerUI(profile) {
+      document.getElementById('sessionAvatar').textContent = getInitials(profile.organizer);
+      document.getElementById('sessionSummaryName').textContent = `${profile.organizer} (${profile.department})`;
+      document.getElementById('sessionSummaryContact').textContent = `⚡ Auto-filled • ${profile.phone || 'HQ Session'}`;
+    }
+    window.toggleProfilePresets = () => {
+      document.getElementById('profilePresetsRow').classList.toggle('open');
+    };
+    window.applyStaffPreset = (organizer, department, phone, email) => {
+      document.getElementById('organizer').value = organizer;
+      const deptSel = document.getElementById('department');
+      if ([...deptSel.options].some(o => o.value === department)) {
+        deptSel.value = department;
+      }
+      document.getElementById('phone').value = phone;
+      document.getElementById('email').value = email;
+      saveStaffSessionProfile({ organizer, department, phone, email });
+      document.getElementById('profilePresetsRow').classList.remove('open');
+    };
+    // =========================================================================
+    // 2. START TIME + QUICK DURATION PILLS (30m, 45m, 1h, 2h)
+    // =========================================================================
+    let selectedDurationMins = 60;
+    let activeClickedSlotKey = null;
+    function computeEndTimeFromDuration(startHm, durationMins) {
+      if (!startHm || !startHm.includes(':')) return '11:00';
+      const [h, m] = startHm.split(':').map(Number);
+      const totalMins = Math.min(h * 60 + m + durationMins, 23 * 60 + 45);
+      const endH = String(Math.floor(totalMins / 60)).padStart(2, '0');
+      const endM = String(totalMins % 60).padStart(2, '0');
+      return `${endH}:${endM}`;
+    }
+    function formatDurationLabel(mins) {
+      if (mins === 30) return '30m';
+      if (mins === 45) return '45m';
+      if (mins === 60) return '1h';
+      if (mins === 120) return '2h';
+      return `${mins}m`;
+    }
+    function syncEndTimeFromStartAndDuration() {
+      const startTime = document.getElementById('startTime').value || '10:00';
+      const endTime = computeEndTimeFromDuration(startTime, selectedDurationMins);
+      document.getElementById('endTime').value = endTime;
+      document.getElementById('computedTimeBadge').textContent =
+        `${startTime} → ${endTime} (${formatDurationLabel(selectedDurationMins)})`;
+      document.querySelectorAll('#durationPillsGroup .duration-pill').forEach(btn => {
+        btn.classList.toggle('active', Number(btn.dataset.mins) === selectedDurationMins);
+      });
+      validateLiveSlot();
+    }
+    window.selectDurationMinutes = (mins) => {
+      selectedDurationMins = Number(mins) || 60;
+      syncEndTimeFromStartAndDuration();
+    };
+    // =========================================================================
+    // INITIALIZE DATES & STATE
+    // =========================================================================
     const todayStr = new Date().toISOString().slice(0, 10);
     document.getElementById('date').value = todayStr;
     document.getElementById('filterDate').value = todayStr;
-
     let showAllDates = false;
-    let scheduleViewMode = 'grid'; // 'grid' | 'list'
+    let scheduleViewMode = 'grid';
     let currentState = null;
-    let lastConfirmedBooking = null;
-
-    // Request browser notification permission for time-arrival alerts
+    let bannerDismissedForId = null;
+    let initialProfileLoaded = false;
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission().catch(() => {});
     }
-
     const alertEl = document.getElementById('bookingAlert');
     function showAlert(msg, isError = false) {
       alertEl.textContent = msg;
@@ -1021,26 +1829,21 @@
       alertEl.style.display = 'block';
       setTimeout(() => { alertEl.style.display = 'none'; }, 5500);
     }
-
     function isRoomBusyNow(roomId, bookings) {
       const now = new Date();
       const dStr = now.toISOString().slice(0, 10);
       const hhmm = now.toTimeString().slice(0, 5);
       return bookings.some(b => b.roomId === roomId && b.date === dStr && b.startTime <= hhmm && b.endTime > hhmm);
     }
-
     subscribeState((state) => {
       if (!state) return;
       currentState = state;
       renderAll();
       checkDueBookingsForWhatsApp();
     });
-
-    // Check every 15 seconds if any booking has reached its start time to notify via WhatsApp
     setInterval(() => {
       checkDueBookingsForWhatsApp();
     }, 15000);
-
     function playNotificationChime() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1057,7 +1860,11 @@
         osc.stop(ctx.currentTime + 0.55);
       } catch (e) {}
     }
-
+    // 4. Compact 36px Dismissible Status Strip for Active Sessions
+    window.dismissDueBanner = (bookingId) => {
+      bannerDismissedForId = bookingId;
+      document.getElementById('dueBookingBanner').style.display = 'none';
+    };
     function checkDueBookingsForWhatsApp() {
       if (!currentState) return;
       const now = new Date();
@@ -1065,55 +1872,49 @@
       const hhmm = now.toTimeString().slice(0, 5);
       const rooms = currentState.rooms || [];
       const roomMap = Object.fromEntries(rooms.map(r => [r.id, r]));
-
-      // Find any booking today whose startTime has arrived (startTime <= hhmm < endTime)
       const activeTodayBookings = (currentState.bookings || []).filter(
         b => b.date === dStr && b.startTime <= hhmm && b.endTime > hhmm
       );
-
       const banner = document.getElementById('dueBookingBanner');
       if (activeTodayBookings.length === 0) {
         banner.style.display = 'none';
         return;
       }
-
       const b = activeTodayBookings[0];
+      if (bannerDismissedForId === b.id) {
+        banner.style.display = 'none';
+        return;
+      }
       const room = roomMap[b.roomId] || { name: b.roomId, floor: 'HQ' };
       const waUrl = buildWhatsAppBookingUrl(b, room, 'starting');
       const outlookUrls = buildOutlookCalendarUrls(b, room);
-
-      document.getElementById('dueBannerTitle').textContent =
-        `🔔 Room Session Starting Now: "${b.title}" (${b.startTime} – ${b.endTime})`;
+      document.getElementById('dueBannerTitle').textContent = `LIVE SESSION (${b.startTime}–${b.endTime}):`;
       document.getElementById('dueBannerDesc').textContent =
-        `📍 ${room.name} • Booked by ${b.organizer || 'Staff'} (${b.department})${b.phone ? ' • WhatsApp: ' + b.phone : ''}`;
-
+        `"${b.title}" in ${room.name} • ${b.organizer || 'Staff'} (${b.department})`;
       document.getElementById('dueBannerActions').innerHTML = `
-        <a href="${waUrl}" target="_blank" rel="noopener" onclick="acknowledgeWhatsAppNotify('${b.id}')" class="nav-btn" style="background:#ffffff; color:#065f46; font-weight:800;">
-          📲 Notify ${b.organizer || 'Booker'} on WhatsApp Now ↗
+        <a href="${waUrl}" target="_blank" rel="noopener" onclick="acknowledgeWhatsAppNotify('${b.id}')" class="strip-btn">
+          📲 WhatsApp
         </a>
-        <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="nav-btn" style="background:rgba(255,255,255,0.18); color:#ffffff;">
-          📅 Open in Outlook Calendar ↗
+        <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="strip-btn secondary">
+          📅 Outlook
         </a>
+        <button type="button" class="strip-dismiss" onclick="dismissDueBanner('${b.id}')" title="Dismiss alert">&times;</button>
       `;
       banner.style.display = 'flex';
-
-      // Trigger one-time chime + desktop notification + auto WhatsApp prompt when booking time first arrives
       if (!b.whatsappNotified && b.notifyWhatsapp !== false) {
         markBookingNotified(b.id);
         playNotificationChime();
         if ('Notification' in window && Notification.permission === 'granted') {
-          const n = new Notification(`Careclinics HQ: ${room.name} Booking Started`, {
-            body: `${b.title} (${b.startTime}–${b.endTime}) booked by ${b.organizer}. Click to notify via WhatsApp.`
+          const n = new Notification(`Careclinics HQ: ${room.name} Session Live`, {
+            body: `${b.title} (${b.startTime}–${b.endTime}) booked by ${b.organizer}.`
           });
           n.onclick = () => window.open(waUrl, '_blank');
         }
       }
     }
-
     window.acknowledgeWhatsAppNotify = (bookingId) => {
       markBookingNotified(bookingId);
     };
-
     function validateLiveSlot() {
       if (!currentState) return true;
       const roomId = document.getElementById('roomId').value;
@@ -1123,78 +1924,72 @@
       const box = document.getElementById('liveSlotStatus');
       const txt = document.getElementById('liveSlotText');
       const btn = document.getElementById('btnSubmitBooking');
-
       const roomObj = (currentState.rooms || []).find(r => r.id === roomId);
       if (roomObj && roomObj.status === 'maintenance') {
         box.className = 'slot-status-box conflict';
         box.firstElementChild.textContent = '🛠️';
-        txt.textContent = `${roomObj.name} is currently under maintenance and cannot be booked.`;
+        txt.textContent = `${roomObj.name} is under maintenance.`;
         btn.disabled = true;
         return false;
       }
-
       if (!startTime || !endTime || endTime <= startTime) {
         box.className = 'slot-status-box conflict';
         box.firstElementChild.textContent = '⚠️';
-        txt.textContent = 'End time must be after start time.';
+        txt.textContent = 'Invalid time window.';
         btn.disabled = true;
         return false;
       }
-
       const conflict = checkBookingConflict(currentState.bookings || [], {
         roomId,
         date,
         startTime,
         endTime
       });
-
       if (conflict) {
         box.className = 'slot-status-box conflict';
         box.firstElementChild.textContent = '🔴';
-        txt.textContent = `Redundant booking blocked! Already reserved ${conflict.startTime}–${conflict.endTime} for "${conflict.title}" (${conflict.department}).`;
+        txt.textContent = `Conflict: Reserved ${conflict.startTime}–${conflict.endTime} for "${conflict.title}" (${conflict.department}).`;
         btn.disabled = true;
         return false;
       }
-
       box.className = 'slot-status-box ok';
       box.firstElementChild.textContent = '🟢';
-      txt.textContent = `Slot ${startTime}–${endTime} on ${date} is open and available.`;
+      txt.textContent = `Available: ${startTime}–${endTime} on ${date}`;
       btn.disabled = false;
       return true;
     }
-
-    ['roomId', 'date', 'startTime', 'endTime'].forEach(id => {
-      document.getElementById(id).addEventListener('change', validateLiveSlot);
-      document.getElementById(id).addEventListener('input', validateLiveSlot);
+    document.getElementById('roomId').addEventListener('change', validateLiveSlot);
+    document.getElementById('date').addEventListener('change', validateLiveSlot);
+    document.getElementById('startTime').addEventListener('change', syncEndTimeFromStartAndDuration);
+    document.getElementById('startTime').addEventListener('input', syncEndTimeFromStartAndDuration);
+    ['organizer', 'department', 'phone', 'email'].forEach(fieldId => {
+      document.getElementById(fieldId).addEventListener('change', () => {
+        const profile = {
+          organizer: document.getElementById('organizer').value.trim() || 'HQ Staff',
+          department: document.getElementById('department').value || 'IT',
+          phone: document.getElementById('phone').value.trim(),
+          email: document.getElementById('email').value.trim()
+        };
+        saveStaffSessionProfile(profile);
+      });
     });
-
     function renderAll() {
       const rooms = currentState.rooms || [];
       const bookings = currentState.bookings || [];
       const depts = Object.keys(currentState.departments || {});
-
-      document.getElementById('roomsCountHeading').textContent =
-        `HQ Meeting Rooms (${rooms.length} Available)`;
-
-      // Populate Room Select & Filter
       const roomSelect = document.getElementById('roomId');
       const editRoomSelect = document.getElementById('editRoomId');
       const filterRoom = document.getElementById('filterRoom');
       const prevRoom = roomSelect.value;
       const prevFilterRoom = filterRoom.value || 'ALL';
-
-      const roomOpts = rooms.map(r =>
+      roomSelect.innerHTML = rooms.map(r =>
         `<option value="${r.id}" ${r.status === 'maintenance' ? 'disabled' : ''}>${r.name} (${r.capacity} pax)${r.status === 'maintenance' ? ' [Maintenance]' : ''}</option>`
       ).join('');
-      roomSelect.innerHTML = roomOpts;
       editRoomSelect.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name} (${r.capacity} pax)</option>`).join('');
       if (prevRoom && rooms.some(r => r.id === prevRoom)) roomSelect.value = prevRoom;
-
       filterRoom.innerHTML = `<option value="ALL">All HQ Rooms (${rooms.length})</option>` +
         rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
       filterRoom.value = prevFilterRoom && (prevFilterRoom === 'ALL' || rooms.some(r => r.id === prevFilterRoom)) ? prevFilterRoom : 'ALL';
-
-      // Populate Department Select
       const deptSelect = document.getElementById('department');
       const editDeptSelect = document.getElementById('editDepartment');
       const prevDept = deptSelect.value;
@@ -1202,46 +1997,62 @@
       deptSelect.innerHTML = deptOpts;
       editDeptSelect.innerHTML = deptOpts;
       if (prevDept && depts.includes(prevDept)) deptSelect.value = prevDept;
-
-      // Render Top Room Cards
-      const roomsRow = document.getElementById('roomsRow');
-      roomsRow.innerHTML = rooms.map(room => {
-        const isMaint = room.status === 'maintenance';
-        const busy = isRoomBusyNow(room.id, bookings);
-        const todayCount = bookings.filter(b => b.roomId === room.id && b.date === todayStr).length;
-        const isSelected = filterRoom.value === room.id;
-
-        return `
-          <div class="room-card ${isSelected ? 'selected' : ''}" style="border-top-color:${room.color || '#1863dc'};" onclick="selectRoomCard('${room.id}')">
-            <div>
-              <div class="room-top">
-                <div>
-                  <div class="room-name">${room.name}</div>
-                  <div class="room-floor">${room.floor || 'HQ'} • Capacity ${room.capacity} pax</div>
-                </div>
-                <span class="occ-badge ${isMaint ? 'occ-maint' : busy ? 'occ-busy' : 'occ-free'}">
-                  ${isMaint ? 'Maintenance' : busy ? 'In Session' : 'Available'}
-                </span>
-              </div>
-              <div class="amenities-list" style="margin-top: 10px;">
-                ${(room.amenities || []).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
-              </div>
-            </div>
-            <div class="room-footer">
-              <span>${todayCount} booking${todayCount === 1 ? '' : 's'} today</span>
-              <span>${isAdmin ? 'Select / Manage →' : 'Select Room →'}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      validateLiveSlot();
+      if (!initialProfileLoaded) {
+        const profile = loadStaffSessionProfile();
+        document.getElementById('organizer').value = profile.organizer || 'Dr. Amirul Hakim';
+        if (profile.department && depts.includes(profile.department)) {
+          deptSelect.value = profile.department;
+        }
+        document.getElementById('phone').value = profile.phone || '012-3456789';
+        document.getElementById('email').value = profile.email || 'amirul@careclinics.my';
+        updateSessionBannerUI(profile);
+        initialProfileLoaded = true;
+      }
+      // 5 & 6. Render Interactive Room Switcher Pill Bar (Replaces redundant 160px Room Cards)
+      const switcherBar = document.getElementById('roomSwitcherBar');
+      const activeFilter = filterRoom.value || 'ALL';
+      switcherBar.innerHTML = `
+        <button type="button" class="room-pill-btn ${activeFilter === 'ALL' ? 'active' : ''}" onclick="selectRoomFilter('ALL')">
+          <span>All Rooms (${rooms.length})</span>
+        </button>
+        ${rooms.map(room => {
+          const isMaint = room.status === 'maintenance';
+          const busy = isRoomBusyNow(room.id, bookings);
+          const isSelected = activeFilter === room.id;
+          const statusBadge = isMaint
+            ? `<span class="maint-room-badge">🛠️ Maint</span>`
+            : busy
+              ? `<span class="live-room-badge">● Live</span>`
+              : `<span class="free-room-badge">● Free</span>`;
+          return `
+            <button type="button" class="room-pill-btn ${isSelected ? 'active' : ''}" onclick="selectRoomFilter('${room.id}')" title="${room.floor || 'HQ'} • Capacity ${room.capacity} pax • ${(room.amenities || []).join(', ')}">
+              <span class="room-pill-dot" style="background:${room.color || '#1863dc'};"></span>
+              <span>${room.name}</span>
+              <span class="room-pill-cap">${room.capacity}p</span>
+              ${statusBadge}
+            </button>
+          `;
+        }).join('')}
+      `;
+      syncEndTimeFromStartAndDuration();
       renderSchedule();
       if (isAdmin) {
         renderRoomManagerList();
       }
     }
-
+    window.selectRoomFilter = (roomId) => {
+      const filterRoom = document.getElementById('filterRoom');
+      if (roomId === 'ALL') {
+        filterRoom.value = 'ALL';
+      } else {
+        filterRoom.value = filterRoom.value === roomId ? 'ALL' : roomId;
+        const roomObj = (currentState?.rooms || []).find(r => r.id === roomId);
+        if (roomObj && roomObj.status !== 'maintenance') {
+          document.getElementById('roomId').value = roomId;
+        }
+      }
+      renderAll();
+    };
     window.setScheduleViewMode = (mode) => {
       scheduleViewMode = mode;
       document.getElementById('btnViewGrid').classList.toggle('active', mode === 'grid');
@@ -1250,102 +2061,186 @@
       document.getElementById('bookingsContainer').style.display = mode === 'list' ? 'flex' : 'none';
       renderSchedule();
     };
-
     function renderSchedule() {
       if (!currentState) return;
       const allRooms = currentState.rooms || [];
       const roomMap = Object.fromEntries(allRooms.map(r => [r.id, r]));
       const filterDateVal = document.getElementById('filterDate').value || todayStr;
       const filterRoomVal = document.getElementById('filterRoom').value;
-
-      // Render Timetable Schedule Grid
       const visibleRooms = (filterRoomVal && filterRoomVal !== 'ALL')
         ? allRooms.filter(r => r.id === filterRoomVal)
         : allRooms;
-
       const dayBookings = (currentState.bookings || []).filter(b => b.date === filterDateVal);
+      // Full schedule slots from 08:00 down to 20:00
       const timeSlots = [
         '08:00', '09:00', '10:00', '11:00', '12:00',
         '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
       ];
-
+      const isSmallScreen = window.innerWidth < 1024;
       const gridContainer = document.getElementById('timetableGridContainer');
-      gridContainer.innerHTML = `
-        <table class="timetable-table">
-          <thead>
-            <tr>
-              <th style="width:92px; text-align:center;">Time (${filterDateVal})</th>
-              ${visibleRooms.map(r => `
-                <th>
-                  <div style="display:flex; align-items:center; gap:6px;">
-                    <span style="width:10px; height:10px; border-radius:50%; background:${r.color || '#1863dc'}; display:inline-block;"></span>
-                    <span>${r.name}</span>
-                  </div>
-                  <div style="font-size:0.7rem; font-weight:500; color:#64748b; margin-top:2px;">
-                    ${r.floor || 'HQ'} • ${r.capacity} pax
-                  </div>
-                </th>
-              `).join('')}
-            </tr>
-          </thead>
-          <tbody>
-            ${timeSlots.map((slotStart, idx) => {
-              const nextHour = String(Number(slotStart.slice(0, 2)) + 1).padStart(2, '0') + ':00';
-              return `
-                <tr>
-                  <td class="time-col-cell">${slotStart} – ${nextHour}</td>
-                  ${visibleRooms.map(room => {
-                    if (room.status === 'maintenance') {
-                      return `<td style="background:#fffbeb; text-align:center; vertical-align:middle; font-size:0.74rem; color:#b45309; font-weight:700;">🛠️ Under Maintenance</td>`;
-                    }
-                    // Find any booking overlapping this 1-hour slot
-                    const overlapping = dayBookings.filter(
-                      b => b.roomId === room.id && b.startTime < nextHour && b.endTime > slotStart
-                    );
-                    if (overlapping.length > 0) {
-                      return `<td>${overlapping.map(b => {
-                        const waUrl = buildWhatsAppBookingUrl(b, room, 'confirmed');
-                        const outlookUrls = buildOutlookCalendarUrls(b, room);
-                        return `
-                          <div class="slot-booked-card" style="border-left-color:${room.color || '#1863dc'};">
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
-                              <span class="slot-booked-title">🔒 ${b.title}</span>
-                              <span class="dept-pill">${b.department}</span>
-                            </div>
-                            <div class="slot-booked-meta">
-                              <strong>⏰ ${b.startTime}–${b.endTime}</strong>
-                              <span>👤 ${b.organizer || 'Staff'}</span>
-                              ${b.phone ? `<span>📱 ${b.phone}</span>` : ''}
-                            </div>
-                            <div class="slot-action-row">
-                              <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="mini-action-btn outlook" title="Add to Outlook 365 Calendar">📅 Outlook</a>
-                              <button type="button" class="mini-action-btn outlook" onclick="triggerIcsDownload('${b.id}')" title="Download Outlook .ics">📥 .ics</button>
-                              <a href="${waUrl}" target="_blank" rel="noopener" class="mini-action-btn wa" title="Notify Booker via WhatsApp">💬 WhatsApp</a>
-                              ${isAdmin ? `
-                                <button type="button" class="mini-action-btn" style="background:#f1f5f9; color:#0f172a;" onclick="openEditBooking('${b.id}')">✎</button>
-                                <button type="button" class="mini-action-btn" style="background:#fee2e2; color:#b91c1c;" onclick="cancelBooking('${b.id}')">🗑</button>
-                              ` : ''}
-                            </div>
-                          </div>
-                        `;
-                      }).join('')}</td>`;
-                    }
-                    return `
-                      <td>
-                        <button type="button" class="slot-free-btn" onclick="quickPickSlot('${room.id}', '${filterDateVal}', '${slotStart}', '${nextHour}')">
-                          <span>+ Available</span>
+      // 6. Below 1024px: If "ALL" rooms selected, collapse into a responsive Day Agenda (or tap a Room Pill for 1-room track)
+      if (isSmallScreen && (!filterRoomVal || filterRoomVal === 'ALL')) {
+        gridContainer.innerHTML = `
+          <div style="padding:12px;">
+            <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; padding:9px 12px; border-radius:9px; font-size:0.76rem; font-weight:600; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span>📱 <strong>Day Agenda (${filterDateVal})</strong> — Tap any room pill above to view a single-room track</span>
+              ${allRooms[0] ? `<button type="button" class="preset-chip" onclick="selectRoomFilter('${allRooms[0].id}')">View ${allRooms[0].name} Track →</button>` : ''}
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              ${timeSlots.map(slotStart => {
+                const nextHour = String(Number(slotStart.slice(0, 2)) + 1).padStart(2, '0') + ':00';
+                const slotBookings = dayBookings.filter(b => b.startTime < nextHour && b.endTime > slotStart);
+                const freeRooms = allRooms.filter(r =>
+                  r.status !== 'maintenance' &&
+                  !slotBookings.some(b => b.roomId === r.id)
+                );
+                return `
+                  <div style="border:1px solid var(--cc-border); border-radius:10px; padding:10px 12px; background:#ffffff; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-weight:800; font-size:0.8rem; color:var(--cc-navy);">⏰ ${slotStart} – ${nextHour}</span>
+                      <span style="font-size:0.7rem; color:#64748b; font-weight:600;">${freeRooms.length} of ${allRooms.length} rooms free</span>
+                    </div>
+                    ${slotBookings.length > 0 ? `
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        ${slotBookings.map(b => {
+                          const rm = roomMap[b.roomId] || { name: b.roomId };
+                          const theme = getDeptTheme(b.department);
+                          const initials = getInitials(b.organizer || b.department);
+                          return `
+                            <button type="button" class="slot-booked-card"
+                              style="background:${theme.bg}; border-left-color:${theme.border}; color:${theme.text};"
+                              onclick="openBookingPopover('${b.id}')">
+                              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                                <span class="slot-booked-title">${b.title}</span>
+                                <span class="slot-time-badge">${b.startTime}–${b.endTime}</span>
+                              </div>
+                              <div class="slot-booked-footer" style="margin-top:2px;">
+                                <span style="font-size:0.7rem; font-weight:700;">📍 ${rm.name}</span>
+                                <span class="slot-dept-chip" style="background:${theme.pillBg}; color:${theme.pillText};">
+                                  <span class="slot-dept-avatar" style="background:${theme.avatarBg};">${initials}</span>
+                                  <span>${theme.label}</span>
+                                </span>
+                              </div>
+                            </button>
+                          `;
+                        }).join('')}
+                      </div>
+                    ` : ''}
+                    <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                      ${freeRooms.map(r => `
+                        <button type="button" class="preset-chip" style="background:#f8fafc;" onclick="quickPickSlot('${r.id}', '${filterDateVal}', '${slotStart}', '${nextHour}')">
+                          ＋ ${r.name}
                         </button>
-                      </td>
-                    `;
-                  }).join('')}
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      `;
-
-      // Also render List View
+                      `).join('')}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        // 5. Sticky Table Headers with Embedded Room Metadata, Equipment Pills & (i) Info Tooltip
+        gridContainer.innerHTML = `
+          <table class="timetable-table">
+            <thead>
+              <tr>
+                <th>Time<br/><span style="font-size:0.66rem; font-weight:600; color:#64748b;">${filterDateVal}</span></th>
+                ${visibleRooms.map(r => {
+                  const isMaint = r.status === 'maintenance';
+                  const busy = isRoomBusyNow(r.id, currentState.bookings || []);
+                  const todayCount = dayBookings.filter(b => b.roomId === r.id).length;
+                  const shortAmenities = (r.amenities || []).slice(0, 2);
+                  const extraCount = Math.max(0, (r.amenities || []).length - 2);
+                  return `
+                    <th>
+                      <div class="th-room-top">
+                        <div class="th-room-title" onclick="selectRoomFilter('${r.id}')" title="Click to filter schedule to ${r.name}">
+                          <span style="width:9px; height:9px; border-radius:50%; background:${r.color || '#1863dc'}; display:inline-block; flex-shrink:0;"></span>
+                          <span>${r.name}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px;">
+                          ${isMaint
+                            ? `<span class="maint-room-badge">Maint</span>`
+                            : busy
+                              ? `<span class="live-room-badge">● Live</span>`
+                              : ''
+                          }
+                          <span class="room-info-trigger" tabindex="0" aria-label="Room specifications for ${r.name}">
+                            i
+                            <div class="room-info-tooltip">
+                              <div style="font-weight:800; font-size:0.78rem; margin-bottom:3px; color:#fff;">${r.name}</div>
+                              <div style="color:#94a3b8; margin-bottom:6px;">📍 ${r.floor || 'HQ'} • 👥 Capacity: ${r.capacity} pax</div>
+                              <div style="font-weight:700; color:#cbd5e1; margin-bottom:2px;">Equipment & Specs:</div>
+                              <div style="color:#e2e8f0; margin-bottom:6px;">• ${(r.amenities || []).join('<br/>• ')}</div>
+                              <div style="color:#38bdf8; font-weight:700;">📅 ${todayCount} reservation${todayCount === 1 ? '' : 's'} on this date</div>
+                            </div>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="th-room-meta">
+                        <span class="th-meta-pill">👥 ${r.capacity}p</span>
+                        ${shortAmenities.map(a => `<span class="th-meta-pill">${a}</span>`).join('')}
+                        ${extraCount > 0 ? `<span class="th-meta-pill">+${extraCount}</span>` : ''}
+                      </div>
+                    </th>
+                  `;
+                }).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${timeSlots.map((slotStart) => {
+                const nextHour = String(Number(slotStart.slice(0, 2)) + 1).padStart(2, '0') + ':00';
+                return `
+                  <tr>
+                    <td class="time-col-cell">${slotStart} – ${nextHour}</td>
+                    ${visibleRooms.map(room => {
+                      if (room.status === 'maintenance') {
+                        return `<td style="background:#fffbeb; text-align:center; vertical-align:middle; font-size:0.72rem; color:#b45309; font-weight:700;">🛠️ Maintenance</td>`;
+                      }
+                      const overlapping = dayBookings.filter(
+                        b => b.roomId === room.id && b.startTime < nextHour && b.endTime > slotStart
+                      );
+                      if (overlapping.length > 0) {
+                        // 3. De-cluttered Scannable Cells: Only Meeting Title, Time Badge, and Department Tag/Avatar
+                        return `<td>${overlapping.map(b => {
+                          const theme = getDeptTheme(b.department);
+                          const initials = getInitials(b.organizer || b.department);
+                          return `
+                            <button type="button" class="slot-booked-card"
+                              style="background:${theme.bg}; border-left-color:${theme.border}; color:${theme.text};"
+                              onclick="openBookingPopover('${b.id}')"
+                              title="Click to view details, WhatsApp alert & Outlook calendar options">
+                              <div class="slot-booked-title">${b.title}</div>
+                              <div class="slot-booked-footer">
+                                <span class="slot-time-badge">${b.startTime}–${b.endTime}</span>
+                                <span class="slot-dept-chip" style="background:${theme.pillBg}; color:${theme.pillText};">
+                                  <span class="slot-dept-avatar" style="background:${theme.avatarBg};">${initials}</span>
+                                  <span>${theme.label}</span>
+                                </span>
+                              </div>
+                            </button>
+                          `;
+                        }).join('')}</td>`;
+                      }
+                      const slotKey = `${room.id}|${filterDateVal}|${slotStart}`;
+                      const isSelectedSlot = activeClickedSlotKey === slotKey;
+                      return `
+                        <td>
+                          <button type="button" class="slot-free-btn ${isSelectedSlot ? 'selected-slot' : ''}" onclick="quickPickSlot('${room.id}', '${filterDateVal}', '${slotStart}', '${nextHour}')">
+                            <span>${isSelectedSlot ? '✓ Selected' : '+ Available'}</span>
+                          </button>
+                        </td>
+                      `;
+                    }).join('')}
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+      // Also render List / Day Agenda View
       let filtered = [...(currentState.bookings || [])];
       if (!showAllDates && filterDateVal) {
         filtered = filtered.filter(b => b.date === filterDateVal);
@@ -1353,106 +2248,142 @@
       if (filterRoomVal && filterRoomVal !== 'ALL') {
         filtered = filtered.filter(b => b.roomId === filterRoomVal);
       }
-
       filtered.sort((a, b) => {
         if (a.date !== b.date) return a.date.localeCompare(b.date);
         return a.startTime.localeCompare(b.startTime);
       });
-
+      document.getElementById('roomsCountHeading').textContent =
+        filterRoomVal && filterRoomVal !== 'ALL' && roomMap[filterRoomVal]
+          ? `📊 Schedule — ${roomMap[filterRoomVal].name}`
+          : `📊 HQ Room Booking Schedule (${allRooms.length} Rooms)`;
       document.getElementById('scheduleSubtitle').textContent = showAllDates
-        ? `Showing all ${filtered.length} scheduled reservations`
-        : `Schedule for ${filterDateVal} (${dayBookings.length} reservation${dayBookings.length === 1 ? '' : 's'})`;
-
+        ? `Showing all ${filtered.length} upcoming reservations`
+        : `${filterDateVal} • ${dayBookings.length} reservation${dayBookings.length === 1 ? '' : 's'} • Click any empty slot to book or booked card for options`;
       const container = document.getElementById('bookingsContainer');
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty-box">
-            <div style="font-size: 2rem; margin-bottom: 8px;">📅</div>
-            <div style="font-weight: 700; color: var(--cc-navy);">No room reservations found for this date/filter</div>
-            <div style="font-size: 0.85rem; margin-top: 4px;">Click any "+ Available" slot in the Schedule Grid or use the form on the left.</div>
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">📅</div>
+            <div style="font-weight: 700; color: var(--cc-navy);">No room reservations for this filter</div>
+            <div style="font-size: 0.82rem; margin-top: 4px;">Click any "+ Available" slot in the Schedule Grid to book immediately.</div>
           </div>
         `;
         return;
       }
-
       container.innerHTML = filtered.map(b => {
         const room = roomMap[b.roomId] || { name: b.roomId, color: '#1863dc' };
+        const theme = getDeptTheme(b.department);
         const waUrl = buildWhatsAppBookingUrl(b, room, 'confirmed');
         const outlookUrls = buildOutlookCalendarUrls(b, room);
-
-        const actionsHtml = `
-          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-            <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="mini-action-btn outlook" style="padding:6px 10px; font-size:0.75rem;">📅 Add to Outlook</a>
-            <button type="button" class="mini-action-btn outlook" style="padding:6px 10px; font-size:0.75rem;" onclick="triggerIcsDownload('${b.id}')">📥 .ics</button>
-            <a href="${waUrl}" target="_blank" rel="noopener" class="mini-action-btn wa" style="padding:6px 10px; font-size:0.75rem;">💬 WhatsApp</a>
-            ${isAdmin
-              ? `<button type="button" class="btn-edit" onclick="openEditBooking('${b.id}')">✎ Edit</button>
-                 <button type="button" class="btn-delete" onclick="cancelBooking('${b.id}')">🗑 Delete</button>`
-              : `<a href="/login.html?redirect=/booking/" class="staff-lock-note">🔒 Admin Edit</a>`
-            }
-          </div>
-        `;
-
         return `
-          <div class="booking-item" style="border-left-color: ${room.color || '#1863dc'};">
-            <div class="booking-time-box">
+          <div class="booking-item" style="border-left-color: ${theme.border}; background:${theme.bg};">
+            <div class="booking-time-box" style="background:#ffffff;">
               <div class="booking-time">${b.startTime} – ${b.endTime}</div>
               <div class="booking-date">${b.date}</div>
             </div>
             <div class="booking-details">
-              <div class="booking-title">${b.title}</div>
+              <div class="booking-title" style="color:${theme.text};">${b.title}</div>
               <div class="booking-meta">
-                <strong>📍 ${room.name}</strong>
-                <span class="dept-pill">${b.department}</span>
+                <strong style="color:var(--cc-navy);">📍 ${room.name}</strong>
+                <span class="dept-pill" style="background:${theme.pillBg}; color:${theme.pillText};">${b.department}</span>
                 <span>👤 ${b.organizer || 'HQ Staff'}</span>
                 ${b.phone ? `<span>📱 ${b.phone}</span>` : ''}
               </div>
-              ${b.notes ? `<div style="font-size: 0.79rem; color: #475569; margin-top: 5px;">💬 ${b.notes}</div>` : ''}
+              ${b.notes ? `<div style="font-size: 0.78rem; color: #475569; margin-top: 4px;">💬 ${b.notes}</div>` : ''}
             </div>
-            ${actionsHtml}
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+              <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="mini-action-btn outlook">📅 Outlook</a>
+              <button type="button" class="mini-action-btn outlook" onclick="triggerIcsDownload('${b.id}')">📥 .ics</button>
+              <a href="${waUrl}" target="_blank" rel="noopener" class="mini-action-btn wa">💬 WhatsApp</a>
+              ${isAdmin
+                ? `<button type="button" class="btn-edit" onclick="openEditBooking('${b.id}')">✎ Edit</button>
+                   <button type="button" class="btn-delete" onclick="cancelBooking('${b.id}')">🗑 Delete</button>`
+                : `<a href="/login.html?redirect=/booking/" class="staff-lock-note">🔒 Admin Edit</a>`
+              }
+            </div>
           </div>
         `;
       }).join('');
     }
-
-    // Click any open cell in the Schedule Timetable Grid to pre-fill the reservation form
+    // =========================================================================
+    // 3. BOOKED SLOT POPOVER MODAL (SECONDARY ACTIONS, NOTES, EQUIPMENT)
+    // =========================================================================
+    window.openBookingPopover = (bookingId) => {
+      const b = (currentState?.bookings || []).find(item => item.id === bookingId);
+      if (!b) return;
+      const room = (currentState?.rooms || []).find(r => r.id === b.roomId) || { name: b.roomId, floor: 'HQ', amenities: [] };
+      const theme = getDeptTheme(b.department);
+      const waUrl = buildWhatsAppBookingUrl(b, room, 'confirmed');
+      const outlookUrls = buildOutlookCalendarUrls(b, room);
+      const content = document.getElementById('bookingPopoverContent');
+      content.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px;">
+          <div>
+            <span class="dept-pill" style="background:${theme.pillBg}; color:${theme.pillText}; display:inline-block; margin-bottom:6px;">
+              ${b.department}
+            </span>
+            <h3 style="font-size:1.05rem; font-weight:800; color:var(--cc-navy); line-height:1.3;">${b.title}</h3>
+          </div>
+          <button type="button" onclick="closeBookingPopover()" style="background:#f1f5f9; border:none; width:28px; height:28px; border-radius:7px; font-size:1.1rem; cursor:pointer; color:#475569;">&times;</button>
+        </div>
+        <div style="background:#f8fafc; border:1px solid var(--cc-border); border-radius:10px; padding:12px; font-size:0.8rem; display:flex; flex-direction:column; gap:6px; margin-bottom:14px;">
+          <div><strong>📍 Room:</strong> ${room.name} <span style="color:var(--cc-muted);">(${room.floor || 'HQ'})</span></div>
+          <div><strong>⏰ Time:</strong> ${b.date} • ${b.startTime} – ${b.endTime}</div>
+          <div><strong>👤 Organizer:</strong> ${b.organizer || 'HQ Staff'}${b.phone ? ` • 📱 ${b.phone}` : ''}${b.email ? ` • ✉️ ${b.email}` : ''}</div>
+          ${(room.amenities && room.amenities.length) ? `<div><strong>🛠️ Room Specs:</strong> ${room.amenities.join(', ')}</div>` : ''}
+          ${b.notes ? `<div style="padding-top:4px; border-top:1px dashed #cbd5e1; color:#334155;"><strong>💬 Notes:</strong> ${b.notes}</div>` : ''}
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <a href="${waUrl}" target="_blank" rel="noopener" class="mini-action-btn wa" style="justify-content:center; padding:9px;">
+              💬 Notify WhatsApp
+            </a>
+            <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="mini-action-btn outlook" style="justify-content:center; padding:9px;">
+              📅 Open in Outlook
+            </a>
+          </div>
+          <button type="button" class="btn-chip" style="width:100%; padding:8px;" onclick="triggerIcsDownload('${b.id}')">
+            📥 Download Outlook Calendar Invite (.ics)
+          </button>
+          ${isAdmin ? `
+            <div style="display:flex; gap:8px; margin-top:4px; padding-top:8px; border-top:1px solid var(--cc-border);">
+              <button type="button" class="btn-edit" style="flex:1;" onclick="closeBookingPopover(); openEditBooking('${b.id}')">✎ Edit Booking</button>
+              <button type="button" class="btn-delete" style="flex:1;" onclick="closeBookingPopover(); cancelBooking('${b.id}')">🗑 Delete</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      document.getElementById('bookingDetailPopover').classList.add('open');
+    };
+    window.closeBookingPopover = () => {
+      document.getElementById('bookingDetailPopover').classList.remove('open');
+    };
+    // =========================================================================
+    // 2. CLICK-TO-BOOK SLOT INTERACTION (INSTANT PRE-FILL + 1H DEFAULT)
+    // =========================================================================
     window.quickPickSlot = (roomId, dateStr, startTime, endTime) => {
+      activeClickedSlotKey = `${roomId}|${dateStr}|${startTime}`;
       document.getElementById('roomId').value = roomId;
       document.getElementById('date').value = dateStr;
       document.getElementById('startTime').value = startTime;
-      document.getElementById('endTime').value = endTime;
-      validateLiveSlot();
-      const titleInput = document.getElementById('title');
-      titleInput.focus();
-      document.getElementById('bookingFormPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      selectedDurationMins = 60; // Default 1 hour (e.g. 14:00 -> 15:00)
+      syncEndTimeFromStartAndDuration();
+      renderSchedule();
+      openBookingDrawerOrFocus();
     };
-
     window.triggerIcsDownload = (bookingId) => {
       const b = (currentState?.bookings || []).find(item => item.id === bookingId);
       if (!b) return;
       const room = (currentState?.rooms || []).find(r => r.id === b.roomId);
       downloadOutlookIcs(b, room);
     };
-
-    window.selectRoomCard = (roomId) => {
-      const roomObj = (currentState?.rooms || []).find(r => r.id === roomId);
-      if (roomObj && roomObj.status !== 'maintenance') {
-        document.getElementById('roomId').value = roomId;
-      }
-      const filterRoom = document.getElementById('filterRoom');
-      filterRoom.value = filterRoom.value === roomId ? 'ALL' : roomId;
-      renderAll();
-    };
-
     window.closeConfirmedModal = () => {
       document.getElementById('confirmedModal').style.display = 'none';
     };
-
-    // Handle New Booking with Strict Non-Redundant Check + Outlook Calendar + WhatsApp Alert
+    // Handle New Booking Submission
     document.getElementById('bookingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!validateLiveSlot()) return;
-
       const roomId = document.getElementById('roomId').value;
       const title = document.getElementById('title').value.trim();
       const department = document.getElementById('department').value;
@@ -1465,7 +2396,7 @@
       const notes = document.getElementById('notes').value.trim();
       const autoOutlook = document.getElementById('chkAutoOutlook').checked;
       const notifyWhatsapp = document.getElementById('chkWhatsappAlert').checked;
-
+      saveStaffSessionProfile({ organizer, department, phone, email });
       try {
         const created = await addRoomBooking({
           roomId,
@@ -1480,28 +2411,22 @@
           notes,
           notifyWhatsapp
         });
-
         const room = (currentState?.rooms || []).find(r => r.id === roomId) || { name: roomId, floor: 'HQ' };
-        lastConfirmedBooking = { booking: created, room };
-
+        activeClickedSlotKey = null;
         document.getElementById('title').value = '';
         document.getElementById('notes').value = '';
         document.getElementById('filterDate').value = date;
         showAllDates = false;
+        closeBookingDrawer();
         showAlert('Room booked and synced to HQ Schedule!');
-
-        // Populate & open Confirmation Modal with Outlook Calendar + WhatsApp links
         const outlookUrls = buildOutlookCalendarUrls(created, room);
         const waUrl = buildWhatsAppBookingUrl(created, room, 'confirmed');
-
         document.getElementById('confirmedModalSummary').textContent =
-          `${room.name} • ${date} (${startTime} – ${endTime}) • Booked by ${organizer} (${phone})`;
+          `${room.name} • ${date} (${startTime} – ${endTime}) • Booked by ${organizer}`;
         document.getElementById('btnModalOutlook365').href = outlookUrls.office365Url;
         document.getElementById('btnModalWhatsApp').href = waUrl;
         document.getElementById('btnModalOutlookIcs').onclick = () => downloadOutlookIcs(created, room);
         document.getElementById('confirmedModal').style.display = 'flex';
-
-        // If user checked "Add reservation to my Microsoft Outlook Calendar", automatically download the Outlook .ics calendar invite!
         if (autoOutlook) {
           downloadOutlookIcs(created, room);
         }
@@ -1509,7 +2434,6 @@
         showAlert(err.message || 'Unable to book room due to schedule conflict.', true);
       }
     });
-
     // =========================================================================
     // ADMIN EDIT / DELETE BOOKING HANDLERS
     // =========================================================================
@@ -1531,11 +2455,9 @@
       document.getElementById('editNotes').value = b.notes || '';
       document.getElementById('editModal').style.display = 'flex';
     };
-
     window.closeEditBooking = () => {
       document.getElementById('editModal').style.display = 'none';
     };
-
     document.getElementById('editBookingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdmin) return;
@@ -1550,7 +2472,6 @@
       const startTime = document.getElementById('editStartTime').value;
       const endTime = document.getElementById('editEndTime').value;
       const notes = document.getElementById('editNotes').value.trim();
-
       try {
         await updateRoomBooking(id, { roomId, title, department, organizer, phone, email, date, startTime, endTime, notes });
         window.closeEditBooking();
@@ -1561,7 +2482,6 @@
         errEl.style.display = 'block';
       }
     });
-
     window.cancelBooking = async (id) => {
       if (!isAdmin) return;
       if (confirm('Cancel and delete this room reservation?')) {
@@ -1569,9 +2489,8 @@
         showAlert('Reservation deleted.');
       }
     };
-
     // =========================================================================
-    // ADMIN MEETING ROOM CUSTOMIZATION MANAGER (Add / Edit / Delete Rooms)
+    // ADMIN MEETING ROOM CUSTOMIZATION MANAGER
     // =========================================================================
     window.openRoomManagerModal = () => {
       if (!isAdmin) return;
@@ -1579,11 +2498,9 @@
       renderRoomManagerList();
       document.getElementById('roomManagerModal').style.display = 'flex';
     };
-
     window.closeRoomManagerModal = () => {
       document.getElementById('roomManagerModal').style.display = 'none';
     };
-
     window.resetRoomConfigForm = () => {
       document.getElementById('cfgRoomId').value = '';
       document.getElementById('cfgRoomName').value = '';
@@ -1596,7 +2513,6 @@
       document.getElementById('btnSaveRoomConfig').textContent = 'Add Meeting Room';
       document.getElementById('btnCancelRoomEdit').style.display = 'none';
     };
-
     window.startEditRoomConfig = (roomId) => {
       const room = (currentState?.rooms || []).find(r => r.id === roomId);
       if (!room) return;
@@ -1611,7 +2527,6 @@
       document.getElementById('btnSaveRoomConfig').textContent = 'Save Room Changes';
       document.getElementById('btnCancelRoomEdit').style.display = 'inline-block';
     };
-
     window.removeRoomConfig = async (roomId) => {
       if (!isAdmin) return;
       const room = (currentState?.rooms || []).find(r => r.id === roomId);
@@ -1622,7 +2537,6 @@
         alert(err.message);
       }
     };
-
     function renderRoomManagerList() {
       const rooms = currentState?.rooms || [];
       document.getElementById('modalRoomCount').textContent = rooms.length;
@@ -1630,27 +2544,26 @@
       listEl.innerHTML = rooms.map(r => `
         <div class="room-admin-item" style="border-left-color:${r.color || '#1863dc'};">
           <div>
-            <div style="font-weight:800; font-size:0.94rem; color:var(--cc-navy);">
+            <div style="font-weight:800; font-size:0.9rem; color:var(--cc-navy);">
               ${r.name}
-              <span class="occ-badge ${r.status === 'maintenance' ? 'occ-maint' : 'occ-free'}" style="margin-left:6px;">
+              <span class="${r.status === 'maintenance' ? 'maint-room-badge' : 'free-room-badge'}" style="margin-left:6px;">
                 ${r.status === 'maintenance' ? 'Maintenance' : 'Available'}
               </span>
             </div>
-            <div style="font-size:0.78rem; color:var(--cc-muted); margin-top:2px;">
+            <div style="font-size:0.76rem; color:var(--cc-muted); margin-top:2px;">
               📍 ${r.floor || 'HQ'} • 👥 Up to ${r.capacity} pax
             </div>
-            <div style="font-size:0.75rem; color:#475569; margin-top:4px;">
+            <div style="font-size:0.74rem; color:#475569; margin-top:3px;">
               🛠️ ${(r.amenities || []).join(' • ')}
             </div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button type="button" class="btn-edit" onclick="startEditRoomConfig('${r.id}')">✎ Edit Details</button>
+            <button type="button" class="btn-edit" onclick="startEditRoomConfig('${r.id}')">✎ Edit</button>
             <button type="button" class="btn-delete" onclick="removeRoomConfig('${r.id}')">🗑 Remove</button>
           </div>
         </div>
       `).join('');
     }
-
     document.getElementById('roomConfigForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!isAdmin) return;
@@ -1661,7 +2574,6 @@
       const status = document.getElementById('cfgRoomStatus').value;
       const color = document.getElementById('cfgRoomColor').value;
       const amenities = document.getElementById('cfgRoomAmenities').value.split(',').map(s => s.trim()).filter(Boolean);
-
       try {
         if (id) {
           await updateMeetingRoom(id, { name, floor, capacity, status, color, amenities });
@@ -1678,7 +2590,6 @@
         alert(err.message);
       }
     });
-
     document.getElementById('btnShowToday').addEventListener('click', () => {
       showAllDates = false;
       document.getElementById('filterDate').value = todayStr;
@@ -1686,7 +2597,6 @@
       document.getElementById('btnShowAllDates').classList.remove('active');
       renderSchedule();
     });
-
     document.getElementById('btnShowAllDates').addEventListener('click', () => {
       showAllDates = true;
       setScheduleViewMode('list');
@@ -1694,15 +2604,21 @@
       document.getElementById('btnShowToday').classList.remove('active');
       renderSchedule();
     });
-
     document.getElementById('filterDate').addEventListener('change', () => {
       showAllDates = false;
       document.getElementById('btnShowToday').classList.remove('active');
       document.getElementById('btnShowAllDates').classList.remove('active');
       renderSchedule();
     });
-
     document.getElementById('filterRoom').addEventListener('change', renderAll);
+    let lastBreakpointSmall = window.innerWidth < 1024;
+    window.addEventListener('resize', () => {
+      const nowSmall = window.innerWidth < 1024;
+      if (nowSmall !== lastBreakpointSmall) {
+        lastBreakpointSmall = nowSmall;
+        renderSchedule();
+      }
+    });
   </script>
 </body>
 </html>
