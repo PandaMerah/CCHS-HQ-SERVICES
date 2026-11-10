@@ -3,21 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Careclinics HQ — Room Booking Schedule & Management</title>
+  <title>Careclinics HQ — Room Booking Schedule</title>
   <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --cc-navy: #112349;
-      --cc-blue: #1863dc;
-      --cc-sky: #8ed1fc;
-      --cc-bg: #f1f5f9;
+      --cc-navy: #0f172a;
+      --cc-brand: #112349;
+      --cc-blue: #2563eb;
+      --cc-blue-hover: #1d4ed8;
+      --cc-bg: #f8fafc;
       --cc-card: #ffffff;
       --cc-text: #0f172a;
       --cc-muted: #64748b;
       --cc-border: #e2e8f0;
+      --cc-grid-line: #eef2f6;
       --cc-green: #10b981;
       --cc-red: #ef4444;
       --cc-whatsapp: #16a34a;
@@ -30,84 +32,92 @@
       color: var(--cc-text);
       min-height: 100vh;
       overflow-x: clip;
+      -webkit-font-smoothing: antialiased;
     }
     /* =========================================================================
-       4. CONSOLIDATED TOP HEADER & APPS DROPDOWN MENU
+       MINIMALIST TOP HEADER & CONSOLIDATED APPS DROPDOWN
        ========================================================================= */
     .topbar {
-      background: var(--cc-navy);
+      background: var(--cc-brand);
       color: #ffffff;
-      padding: 10px 24px;
+      height: 54px;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      box-shadow: 0 2px 12px rgba(17, 35, 73, 0.15);
       position: sticky;
       top: 0;
       z-index: 60;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
     .brand-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
       color: #ffffff;
     }
     .brand-left img {
-      height: 34px;
-      border-radius: 7px;
-      background: rgba(255,255,255,0.08);
+      height: 30px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
       padding: 3px 6px;
     }
     .brand-title {
-      font-weight: 800;
-      font-size: 0.98rem;
+      font-weight: 700;
+      font-size: 0.92rem;
       letter-spacing: -0.01em;
     }
+    .brand-divider {
+      color: rgba(255, 255, 255, 0.25);
+      font-weight: 400;
+      margin: 0 4px;
+    }
     .brand-subtitle {
-      font-size: 0.72rem;
+      font-size: 0.76rem;
       color: #94a3b8;
+      font-weight: 500;
     }
     .nav-links {
       display: flex;
       gap: 8px;
       align-items: center;
-      position: relative;
     }
     .nav-btn {
       text-decoration: none;
       color: #e2e8f0;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 7px 13px;
-      border-radius: 8px;
-      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 0.78rem;
       font-weight: 600;
-      transition: all 0.18s;
+      transition: all 0.15s;
       border: 1px solid rgba(255, 255, 255, 0.08);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       white-space: nowrap;
     }
     .nav-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.16);
       color: #ffffff;
     }
     .nav-btn.primary-cta {
       background: var(--cc-blue);
       border-color: #3b82f6;
       color: #ffffff;
-      font-weight: 700;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
     }
     .nav-btn.primary-cta:hover {
-      background: #1d4ed8;
+      background: var(--cc-blue-hover);
     }
     .nav-btn.admin-login {
-      background: rgba(245, 158, 11, 0.18);
-      border: 1px solid rgba(245, 158, 11, 0.45);
-      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.14);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
     }
     /* Apps / Tools Dropdown Grid Menu */
     .tools-dropdown-wrap {
@@ -118,61 +128,51 @@
       position: absolute;
       top: calc(100% + 8px);
       right: 0;
-      width: 290px;
+      width: 280px;
       background: #ffffff;
       color: var(--cc-text);
-      border-radius: 14px;
+      border-radius: 12px;
       border: 1px solid var(--cc-border);
-      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.22);
-      padding: 12px;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.18);
+      padding: 10px;
       z-index: 90;
     }
     .tools-dropdown-menu.open {
       display: block;
     }
     .tools-dropdown-label {
-      font-size: 0.68rem;
-      font-weight: 800;
+      font-size: 0.65rem;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--cc-muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       padding: 0 4px;
     }
     .tools-icon-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 6px;
+      gap: 5px;
     }
     .tool-grid-item {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 3px;
-      padding: 9px 10px;
-      border-radius: 10px;
+      gap: 2px;
+      padding: 8px 9px;
+      border-radius: 8px;
       text-decoration: none;
       color: var(--cc-navy);
       background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      transition: all 0.15s;
+      border: 1px solid #f1f5f9;
+      transition: all 0.14s;
     }
     .tool-grid-item:hover {
       background: #eff6ff;
-      border-color: #93c5fd;
-      transform: translateY(-1px);
+      border-color: #bfdbfe;
     }
-    .tool-grid-item .tool-icon {
-      font-size: 1.15rem;
-    }
-    .tool-grid-item .tool-name {
-      font-size: 0.76rem;
-      font-weight: 700;
-    }
-    .tool-grid-item .tool-desc {
-      font-size: 0.65rem;
-      color: var(--cc-muted);
-    }
+    .tool-grid-item .tool-icon { font-size: 1.05rem; }
+    .tool-grid-item .tool-name { font-size: 0.74rem; font-weight: 700; }
+    .tool-grid-item .tool-desc { font-size: 0.64rem; color: var(--cc-muted); }
     /* =========================================================================
        COMPACT 36PX STATUS STRIP FOR "STARTING NOW" ALERT
        ========================================================================= */
@@ -180,14 +180,14 @@
       display: none;
       height: 36px;
       min-height: 36px;
-      background: linear-gradient(90deg, #065f46, #047857);
+      background: #065f46;
       color: #ffffff;
       padding: 0 24px;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      font-size: 0.78rem;
-      border-bottom: 1px solid #34d399;
+      font-size: 0.76rem;
+      border-bottom: 1px solid #10b981;
       z-index: 55;
     }
     .due-strip-left {
@@ -199,23 +199,17 @@
       text-overflow: ellipsis;
     }
     .live-pulse-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: #34d399;
-      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
       animation: pulseGlow 1.6s infinite;
       flex-shrink: 0;
     }
     @keyframes pulseGlow {
       0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.75); }
-      70% { box-shadow: 0 0 0 7px rgba(52, 211, 153, 0); }
+      70% { box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
       100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
-    }
-    @keyframes liveRedPulse {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.65); }
-      70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
     .due-strip-actions {
       display: flex;
@@ -224,10 +218,10 @@
       flex-shrink: 0;
     }
     .strip-btn {
-      font-size: 0.71rem;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 5px;
       text-decoration: none;
       color: #065f46;
       background: #ffffff;
@@ -251,315 +245,586 @@
       padding: 0 4px;
       line-height: 1;
     }
-    .strip-dismiss:hover { color: #ffffff; }
     /* =========================================================================
-       MAIN CONTAINER & COMPACT INTERACTIVE ROOM FILTER STRIP (RECLAIMS ~160PX)
+       MAIN WORKSPACE CONTAINER & MINIMALIST NAVIGATION BAR
        ========================================================================= */
     .container {
-      max-width: 1540px;
+      max-width: 1560px;
       margin: 0 auto;
-      padding: 14px 20px 48px;
+      padding: 16px 24px 48px;
     }
-    .top-control-strip {
+    /* Toast feedback banner on main page */
+    .page-toast {
+      display: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-toast.success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .page-toast.error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    /* Unified Minimalist Schedule Control Bar */
+    .schedule-shell {
+      background: var(--cc-card);
+      border: 1px solid var(--cc-border);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+      overflow: visible;
+    }
+    .schedule-toolbar {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--cc-border);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 12px;
     }
-    /* Interactive Room Switcher Pill Group (Replaces redundant 160px Room Cards) */
-    .room-switcher-bar {
+    /* Date Stepper Navigation (Easy for New Users) */
+    .date-nav-group {
       display: flex;
       align-items: center;
       gap: 6px;
+      flex-wrap: wrap;
+    }
+    .date-step-btn {
+      background: #ffffff;
+      border: 1px solid var(--cc-border);
+      color: var(--cc-text);
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.12s;
+    }
+    .date-step-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .date-display-label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--cc-navy);
+      padding: 0 6px;
+      letter-spacing: -0.01em;
+    }
+    .date-picker-input {
+      width: auto;
+      padding: 5px 9px;
+      border: 1px solid var(--cc-border);
+      border-radius: 7px;
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: var(--cc-muted);
+      background: #f8fafc;
+      height: 30px;
+      cursor: pointer;
+    }
+    .btn-today-pill {
+      background: #f1f5f9;
+      border: 1px solid var(--cc-border);
+      color: var(--cc-text);
+      padding: 0 10px;
+      height: 30px;
+      border-radius: 7px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .btn-today-pill:hover { background: #e2e8f0; }
+    .btn-today-pill.active {
+      background: var(--cc-navy);
+      color: #ffffff;
+      border-color: var(--cc-navy);
+    }
+    /* Right Toolbar: Room Filter Pills + View Switcher */
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .segmented-control {
+      display: inline-flex;
+      background: #f1f5f9;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--cc-border);
+    }
+    .seg-btn {
+      background: transparent;
+      border: none;
+      color: var(--cc-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s;
+      white-space: nowrap;
+    }
+    .seg-btn.active {
+      background: #ffffff;
+      color: var(--cc-navy);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+    /* Sub-toolbar: Minimalist Room Switcher Pills + New-User Hint + Dept Legend */
+    .schedule-subbar {
+      padding: 8px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--cc-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .room-switcher-bar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
       overflow-x: auto;
-      padding-bottom: 2px;
-      scrollbar-width: thin;
+      scrollbar-width: none;
       flex: 1;
       min-width: 0;
     }
     .room-pill-btn {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      color: var(--cc-navy);
-      font-size: 0.78rem;
-      font-weight: 700;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--cc-muted);
+      font-size: 0.74rem;
+      font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.15s;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+      transition: all 0.12s;
     }
     .room-pill-btn:hover {
-      border-color: var(--cc-blue);
-      background: #f8fafc;
+      background: #e2e8f0;
+      color: var(--cc-navy);
     }
     .room-pill-btn.active {
-      background: var(--cc-navy);
-      color: #ffffff;
-      border-color: var(--cc-navy);
-      box-shadow: 0 4px 10px rgba(17, 35, 73, 0.18);
+      background: #ffffff;
+      color: var(--cc-navy);
+      border-color: #cbd5e1;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
     }
     .room-pill-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .room-pill-cap {
+    .dept-legend-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
       font-size: 0.69rem;
-      font-weight: 600;
-      opacity: 0.75;
+      color: var(--cc-muted);
     }
-    .live-room-badge {
+    .dept-legend-item {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 0.63rem;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #fee2e2;
-      color: #dc2626;
-      border: 1px solid #fca5a5;
-      animation: liveRedPulse 1.8s infinite;
-      text-transform: uppercase;
+      font-weight: 500;
+      color: #475569;
     }
-    .free-room-badge {
+    .dept-swatch {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    /* =========================================================================
+       MINIMALIST HIGH-DENSITY TIMETABLE GRID & COLUMN HEADERS
+       ========================================================================= */
+    .timetable-wrapper {
+      position: relative;
+      background: #ffffff;
+      border-radius: 0 0 12px 12px;
+    }
+    .timetable-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+    }
+    /* Sticky Minimalist Column Headers */
+    .timetable-table th {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(6px);
+      color: var(--cc-navy);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--cc-border);
+      border-right: 1px solid var(--cc-grid-line);
+      text-align: left;
+      position: sticky;
+      top: 54px;
+      z-index: 20;
+      vertical-align: middle;
+    }
+    .timetable-table th:last-child,
+    .timetable-table td:last-child {
+      border-right: none;
+    }
+    .timetable-table th:first-child {
+      width: 68px;
+      text-align: center;
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--cc-muted);
+      background: #f8fafc;
+      z-index: 21;
+    }
+    .th-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .th-room-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--cc-navy);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .th-room-name:hover {
+      color: var(--cc-blue);
+    }
+    .th-room-sub {
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--cc-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* Subtle status indicators */
+    .live-room-badge {
       display: inline-flex;
       align-items: center;
       gap: 3px;
-      font-size: 0.63rem;
+      font-size: 0.6rem;
       font-weight: 700;
-      padding: 1px 6px;
-      border-radius: 999px;
-      background: #dcfce7;
-      color: #15803d;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      text-transform: uppercase;
+      flex-shrink: 0;
     }
     .maint-room-badge {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      font-size: 0.63rem;
+      font-size: 0.6rem;
       font-weight: 700;
-      padding: 1px 6px;
-      border-radius: 999px;
-      background: #fef3c7;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: #fffbeb;
       color: #b45309;
-    }
-    /* Layout Switcher Controls (Option A Sticky Split vs Option B Slide-over Drawer) */
-    .layout-mode-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      border: 1px solid #fde68a;
       flex-shrink: 0;
     }
-    .mode-switch-btn {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      color: #475569;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
+    /* Minimalist Info Tooltip (i) in Sticky Header */
+    .room-info-trigger {
+      position: relative;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      transition: all 0.15s;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      color: #94a3b8;
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: help;
+      flex-shrink: 0;
+      transition: color 0.12s, background 0.12s;
     }
-    .mode-switch-btn.active {
+    .room-info-trigger:hover {
+      background: #f1f5f9;
+      color: var(--cc-navy);
+    }
+    .room-info-tooltip {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      width: 220px;
+      background: var(--cc-navy);
+      color: #ffffff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 400;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
+      z-index: 45;
+      pointer-events: none;
+      line-height: 1.45;
+      text-align: left;
+    }
+    .room-info-trigger:hover .room-info-tooltip,
+    .room-info-trigger:focus .room-info-tooltip {
+      display: block;
+    }
+    /* High-Density Grid Cells */
+    .timetable-table td {
+      border-bottom: 1px solid var(--cc-grid-line);
+      border-right: 1px solid var(--cc-grid-line);
+      padding: 3px 4px;
+      vertical-align: top;
+      height: 44px;
+      transition: background 0.1s;
+    }
+    .timetable-table tr:last-child td {
+      border-bottom: none;
+    }
+    .timetable-table tr.current-hour-row td {
+      background: rgba(239, 246, 255, 0.35);
+    }
+    .time-col-cell {
+      width: 68px;
+      background: #f8fafc !important;
+      font-weight: 600;
+      font-size: 0.71rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--cc-muted);
+      text-align: center;
+      vertical-align: middle !important;
+      white-space: nowrap;
+      border-right: 1px solid var(--cc-border) !important;
+    }
+    .now-tag {
+      display: block;
+      font-size: 0.56rem;
+      font-weight: 800;
+      color: var(--cc-blue);
+      letter-spacing: 0.04em;
+    }
+    /* Minimalist Click-to-Book Empty Slot (Quiet until hovered) */
+    .slot-free-btn {
+      width: 100%;
+      height: 100%;
+      min-height: 37px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: transparent;
+      color: transparent;
+      font-size: 0.71rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.12s ease;
+    }
+    .slot-free-btn:hover,
+    .slot-free-btn:focus-visible {
       background: #eff6ff;
-      border-color: var(--cc-blue);
+      border-color: #93c5fd;
       color: var(--cc-blue);
     }
+    /* Subtle plus dot on touch devices so mobile users still see tap targets */
+    @media (hover: none) {
+      .slot-free-btn {
+        color: #cbd5e1;
+      }
+    }
+    /* High-Density Minimalist Booked Slot Card */
+    .slot-booked-card {
+      border-radius: 6px;
+      padding: 5px 8px;
+      border-left: 3px solid var(--cc-blue);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2px;
+      cursor: pointer;
+      transition: filter 0.12s, transform 0.1s;
+      text-align: left;
+      width: 100%;
+      min-height: 37px;
+      border-top: none;
+      border-right: none;
+      border-bottom: none;
+    }
+    .slot-booked-card:hover {
+      filter: brightness(0.97);
+      transform: translateY(-1px);
+    }
+    .slot-booked-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .slot-booked-title {
+      font-weight: 700;
+      font-size: 0.74rem;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .slot-booked-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .slot-time-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      opacity: 0.85;
+      white-space: nowrap;
+    }
+    .slot-dept-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .slot-dept-avatar {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.52rem;
+      font-weight: 800;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
     /* =========================================================================
-       1. REBALANCED WORKSPACE LAYOUT: STICKY FORM (OPTION A) + SLIDE-OVER DRAWER (OPTION B)
+       CLICK-TO-BOOK MODAL (CLEAN, MINIMALIST, NEW-USER FRIENDLY)
        ========================================================================= */
-    .workspace-grid {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 18px;
-      align-items: start;
-      transition: all 0.2s ease;
-    }
-    /* Option A: Sticky Left Form so there is zero left-side dead space when scrolling to 20:00 */
-    .booking-form-panel {
-      background: var(--cc-card);
-      border: 1px solid var(--cc-border);
-      border-radius: 16px;
-      padding: 18px 20px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
-      position: sticky;
-      top: 1.5rem;
-      max-height: calc(100vh - 2.5rem);
-      overflow-y: auto;
-      scrollbar-width: thin;
-      z-index: 30;
-      transition: box-shadow 0.25s, border-color 0.25s, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .booking-form-panel.flash-highlight {
-      border-color: var(--cc-blue);
-      box-shadow: 0 0 0 4px rgba(24, 99, 220, 0.2), 0 12px 28px rgba(15, 23, 42, 0.1);
-    }
-    /* Option B: Full-Width Grid + 420px Slide-Over Drawer from Right */
-    .workspace-grid.drawer-mode {
-      grid-template-columns: 1fr;
-    }
-    .drawer-backdrop {
+    .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.45);
-      backdrop-filter: blur(2px);
-      z-index: 110;
-    }
-    .drawer-backdrop.open {
-      display: block;
-    }
-    .workspace-grid.drawer-mode .booking-form-panel {
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 420px;
-      max-width: 94vw;
-      height: 100vh;
-      max-height: 100vh;
-      border-radius: 18px 0 0 18px;
-      z-index: 120;
-      box-shadow: -12px 0 40px rgba(15, 23, 42, 0.25);
-      transform: translateX(105%);
-    }
-    .workspace-grid.drawer-mode .booking-form-panel.drawer-open {
-      transform: translateX(0);
-    }
-    .drawer-close-btn {
-      display: none;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: #334155;
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      line-height: 1;
-      cursor: pointer;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 140;
       align-items: center;
       justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
     }
-    .workspace-grid.drawer-mode .drawer-close-btn {
-      display: inline-flex;
+    .modal-backdrop.open {
+      display: flex;
     }
-    .panel {
-      background: var(--cc-card);
-      border: 1px solid var(--cc-border);
+    .modal-card {
+      background: #ffffff;
       border-radius: 16px;
-      padding: 18px 20px;
-      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
-      min-width: 0;
+      padding: 22px 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 44px rgba(15, 23, 42, 0.22);
+      border: 1px solid var(--cc-border);
+      animation: modalFadeIn 0.15s ease-out;
     }
-    .panel-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: var(--cc-navy);
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(6px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .panel-sub {
-      font-size: 0.77rem;
-      color: var(--cc-muted);
-      margin-top: 2px;
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
     }
-    /* =========================================================================
-       2. STREAMLINED BOOKING FORM (SESSION AUTO-FILL + QUICK DURATION PILLS)
-       ========================================================================= */
-    .session-autofill-bar {
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
+    .modal-close-x {
+      background: #f1f5f9;
+      border: none;
+      color: #475569;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .modal-close-x:hover { background: #e2e8f0; color: var(--cc-navy); }
+    /* Selected Slot Context Summary Pill inside Click-to-Book Modal */
+    .selected-slot-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
       border-radius: 10px;
-      padding: 8px 11px;
-      margin: 12px 0;
+      padding: 10px 12px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      font-size: 0.75rem;
-    }
-    .session-user-info {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: #0369a1;
-      font-weight: 600;
-      min-width: 0;
-    }
-    .session-avatar {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--cc-blue);
-      color: #ffffff;
-      font-weight: 800;
-      font-size: 0.7rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .session-toggle-btn {
-      background: #ffffff;
-      border: 1px solid #7dd3fc;
-      color: #0284c7;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .session-toggle-btn:hover { background: #e0f2fe; }
-    .profile-presets-row {
-      display: none;
       flex-wrap: wrap;
-      gap: 5px;
-      margin-bottom: 10px;
-      padding: 8px;
-      background: #f8fafc;
-      border-radius: 8px;
-      border: 1px dashed #cbd5e1;
     }
-    .profile-presets-row.open {
-      display: flex;
-    }
-    .preset-chip {
-      font-size: 0.68rem;
+    .selected-slot-room {
+      font-size: 0.82rem;
       font-weight: 700;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .selected-slot-time {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--cc-blue);
+      background: #ffffff;
       padding: 3px 8px;
       border-radius: 6px;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      color: var(--cc-navy);
-      cursor: pointer;
+      border: 1px solid #bfdbfe;
+      font-variant-numeric: tabular-nums;
     }
-    .preset-chip:hover {
-      border-color: var(--cc-blue);
-      color: var(--cc-blue);
-    }
-    .form-group { margin-bottom: 10px; }
+    .form-group { margin-bottom: 12px; }
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 10px;
     }
     label {
       display: block;
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: var(--cc-navy);
-      margin-bottom: 3px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 4px;
     }
     input, select, textarea {
       width: 100%;
@@ -574,25 +839,25 @@
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--cc-blue);
-      box-shadow: 0 0 0 3px rgba(24, 99, 220, 0.13);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
     /* Quick Duration Pills (30m, 45m, 1h, 2h) */
     .duration-pills-group {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 5px;
+      gap: 6px;
     }
     .duration-pill {
       padding: 7px 4px;
-      border-radius: 8px;
+      border-radius: 7px;
       border: 1px solid #cbd5e1;
       background: #f8fafc;
       color: #334155;
-      font-size: 0.77rem;
-      font-weight: 700;
+      font-size: 0.76rem;
+      font-weight: 600;
       cursor: pointer;
       text-align: center;
-      transition: all 0.14s;
+      transition: all 0.12s;
     }
     .duration-pill:hover {
       border-color: var(--cc-blue);
@@ -602,62 +867,120 @@
       background: var(--cc-blue);
       border-color: var(--cc-blue);
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(24, 99, 220, 0.25);
-    }
-    .computed-time-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--cc-blue);
-      background: #eff6ff;
-      padding: 2px 8px;
-      border-radius: 6px;
     }
     /* Live Availability Check Box */
     .slot-status-box {
       padding: 8px 10px;
       border-radius: 8px;
-      font-size: 0.76rem;
-      font-weight: 700;
-      margin-bottom: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 7px;
     }
     .slot-status-box.ok {
-      background: #ecfdf5;
-      border: 1px solid #6ee7b7;
-      color: #065f46;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
     }
     .slot-status-box.conflict {
       background: #fef2f2;
-      border: 1px solid #fca5a5;
+      border: 1px solid #fecaca;
       color: #991b1b;
     }
-    .checkbox-group {
+    /* Collapsible Auto-Filled Booker Profile Bar (Reduces 6 manual inputs to 1 line) */
+    .session-autofill-bar {
       background: #f8fafc;
       border: 1px solid var(--cc-border);
-      border-radius: 8px;
+      border-radius: 9px;
       padding: 8px 10px;
       margin-bottom: 10px;
       display: flex;
-      flex-direction: column;
-      gap: 5px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
     }
-    .checkbox-row {
+    .session-user-info {
       display: flex;
       align-items: center;
-      gap: 7px;
-      font-size: 0.75rem;
+      gap: 8px;
+      min-width: 0;
+    }
+    .session-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--cc-brand);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.68rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .session-toggle-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
       font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .session-toggle-btn:hover { background: #f1f5f9; }
+    .booker-drawer-fields {
+      display: none;
+      background: #f8fafc;
+      border: 1px solid var(--cc-border);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    .booker-drawer-fields.open {
+      display: block;
+    }
+    .preset-chip {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: var(--cc-navy);
+      cursor: pointer;
+    }
+    .preset-chip:hover {
+      border-color: var(--cc-blue);
+      color: var(--cc-blue);
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border: 1px solid var(--cc-border);
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .checkbox-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.73rem;
+      font-weight: 500;
       color: #334155;
       cursor: pointer;
     }
     .checkbox-row input[type="checkbox"] {
-      width: 15px;
-      height: 15px;
+      width: 14px;
+      height: 14px;
       margin: 0;
     }
     .btn-primary {
@@ -667,20 +990,20 @@
       border: none;
       padding: 11px 16px;
       border-radius: 9px;
-      font-size: 0.88rem;
-      font-weight: 700;
+      font-size: 0.86rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.15s;
     }
-    .btn-primary:hover:not(:disabled) { background: #114fb3; }
+    .btn-primary:hover:not(:disabled) { background: var(--cc-blue-hover); }
     .btn-primary:disabled {
       background: #94a3b8;
       cursor: not-allowed;
     }
     .alert {
-      padding: 10px 12px;
+      padding: 9px 12px;
       border-radius: 8px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       margin-bottom: 10px;
       display: none;
@@ -688,340 +1011,19 @@
     .alert.success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
     .alert.error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
     /* =========================================================================
-       SCHEDULE FILTER BAR & DEPARTMENT COLOR LEGEND
-       ========================================================================= */
-    .filter-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--cc-border);
-    }
-    .filter-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .filter-controls input, .filter-controls select {
-      width: auto;
-      padding: 6px 10px;
-      font-size: 0.78rem;
-    }
-    .btn-chip {
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: var(--cc-navy);
-      padding: 6px 11px;
-      border-radius: 8px;
-      font-size: 0.76rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-chip:hover, .btn-chip.active {
-      background: var(--cc-navy);
-      color: #ffffff;
-      border-color: var(--cc-navy);
-    }
-    /* Department Color Legend Strip */
-    .dept-legend-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-      font-size: 0.71rem;
-      color: var(--cc-muted);
-    }
-    .dept-legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-weight: 600;
-      color: #334155;
-    }
-    .dept-swatch {
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-      display: inline-block;
-    }
-    /* =========================================================================
-       3 & 5. DE-CLUTTERED TIMETABLE GRID + MERGED STICKY ROOM COLUMN HEADERS
-       ========================================================================= */
-    .timetable-wrapper {
-      border: 1px solid var(--cc-border);
-      border-radius: 12px;
-      background: #ffffff;
-      position: relative;
-      overflow-x: auto;
-    }
-    .timetable-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      table-layout: fixed;
-    }
-    .timetable-table th {
-      background: #f8fafc;
-      color: var(--cc-navy);
-      font-size: 0.8rem;
-      font-weight: 800;
-      padding: 10px 10px;
-      border-bottom: 2px solid var(--cc-border);
-      border-right: 1px solid var(--cc-border);
-      text-align: left;
-      position: sticky;
-      top: 0;
-      z-index: 15;
-      vertical-align: top;
-    }
-    .timetable-table th:first-child {
-      width: 84px;
-      text-align: center;
-      vertical-align: middle;
-      z-index: 16;
-    }
-    .th-room-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 4px;
-    }
-    .th-room-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      font-weight: 800;
-      color: var(--cc-navy);
-      line-height: 1.2;
-      cursor: pointer;
-    }
-    .th-room-title:hover {
-      color: var(--cc-blue);
-    }
-    .th-room-meta {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-top: 5px;
-    }
-    .th-meta-pill {
-      font-size: 0.65rem;
-      font-weight: 600;
-      padding: 1px 6px;
-      border-radius: 5px;
-      background: #e2e8f0;
-      color: #334155;
-      white-space: nowrap;
-    }
-    /* Info Tooltip (i) in Sticky Table Header */
-    .room-info-trigger {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #e2e8f0;
-      color: #475569;
-      font-size: 0.68rem;
-      font-weight: 800;
-      cursor: help;
-      flex-shrink: 0;
-    }
-    .room-info-trigger:hover {
-      background: var(--cc-blue);
-      color: #ffffff;
-    }
-    .room-info-tooltip {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      right: 0;
-      width: 230px;
-      background: var(--cc-navy);
-      color: #ffffff;
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-size: 0.72rem;
-      font-weight: 500;
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.28);
-      z-index: 40;
-      pointer-events: none;
-      line-height: 1.4;
-    }
-    .room-info-trigger:hover .room-info-tooltip,
-    .room-info-trigger:focus .room-info-tooltip {
-      display: block;
-    }
-    .timetable-table td {
-      border-bottom: 1px solid #e2e8f0;
-      border-right: 1px solid #e2e8f0;
-      padding: 4px 5px;
-      vertical-align: top;
-      height: 52px;
-    }
-    .time-col-cell {
-      width: 84px;
-      background: #f8fafc;
-      font-weight: 700;
-      font-size: 0.73rem;
-      color: #475569;
-      text-align: center;
-      vertical-align: middle !important;
-      white-space: nowrap;
-    }
-    .slot-free-btn {
-      width: 100%;
-      height: 100%;
-      min-height: 42px;
-      border: 1px dashed #cbd5e1;
-      border-radius: 7px;
-      background: #f8fafc;
-      color: #64748b;
-      font-size: 0.72rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      transition: all 0.14s;
-    }
-    .slot-free-btn:hover {
-      background: #eff6ff;
-      border-color: var(--cc-blue);
-      color: var(--cc-blue);
-      font-weight: 700;
-    }
-    .slot-free-btn.selected-slot {
-      background: #dbeafe;
-      border: 2px solid var(--cc-blue);
-      color: #1e40af;
-      font-weight: 800;
-    }
-    /* De-cluttered Scannable Booked Slot Card (Only Title, Time Badge, Dept Tag/Avatar) */
-    .slot-booked-card {
-      border-radius: 8px;
-      padding: 6px 8px;
-      border-left: 4px solid var(--cc-blue);
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      cursor: pointer;
-      transition: transform 0.12s, box-shadow 0.12s;
-      text-align: left;
-      width: 100%;
-      border-top: 1px solid rgba(15, 23, 42, 0.05);
-      border-right: 1px solid rgba(15, 23, 42, 0.05);
-      border-bottom: 1px solid rgba(15, 23, 42, 0.05);
-    }
-    .slot-booked-card:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
-    }
-    .slot-booked-title {
-      font-weight: 800;
-      font-size: 0.76rem;
-      line-height: 1.25;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .slot-booked-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-    .slot-time-badge {
-      font-size: 0.66rem;
-      font-weight: 700;
-      padding: 1px 5px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.75);
-      color: #334155;
-      white-space: nowrap;
-    }
-    .slot-dept-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.64rem;
-      font-weight: 800;
-      padding: 1px 6px;
-      border-radius: 999px;
-      white-space: nowrap;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .slot-dept-avatar {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.55rem;
-      font-weight: 900;
-      color: #ffffff;
-      flex-shrink: 0;
-    }
-    /* =========================================================================
-       LIGHTWEIGHT POPOVER FOR BOOKED SLOT SECONDARY ACTIONS & DETAILS
-       ========================================================================= */
-    .booking-popover-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.25);
-      z-index: 130;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .booking-popover-backdrop.open {
-      display: flex;
-    }
-    .booking-popover-card {
-      background: #ffffff;
-      border-radius: 16px;
-      border: 1px solid var(--cc-border);
-      box-shadow: 0 20px 44px rgba(15, 23, 42, 0.24);
-      width: 100%;
-      max-width: 400px;
-      padding: 20px;
-      animation: popScale 0.16s ease-out;
-    }
-    @keyframes popScale {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    /* =========================================================================
-       BOOKINGS LIST / AGENDA VIEW
+       BOOKINGS LIST / AGENDA VIEW & POPOVER
        ========================================================================= */
     .booking-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      padding: 14px 16px;
     }
     .booking-item {
       border: 1px solid var(--cc-border);
-      border-left: 5px solid var(--cc-blue);
-      border-radius: 12px;
-      padding: 13px 16px;
+      border-left: 4px solid var(--cc-blue);
+      border-radius: 10px;
+      padding: 12px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1030,36 +1032,46 @@
       flex-wrap: wrap;
     }
     .booking-time-box {
-      min-width: 112px;
+      min-width: 108px;
       text-align: center;
-      padding: 8px 10px;
-      background: #f8fafc;
-      border-radius: 9px;
+      padding: 6px 10px;
+      background: #ffffff;
+      border-radius: 7px;
       border: 1px solid var(--cc-border);
     }
-    .booking-time { font-size: 0.88rem; font-weight: 800; color: var(--cc-navy); }
-    .booking-date { font-size: 0.72rem; color: var(--cc-muted); margin-top: 2px; }
+    .booking-time { font-size: 0.82rem; font-weight: 700; color: var(--cc-navy); font-variant-numeric: tabular-nums; }
+    .booking-date { font-size: 0.68rem; color: var(--cc-muted); margin-top: 1px; }
     .booking-details { flex: 1; min-width: 200px; }
-    .booking-title { font-size: 0.95rem; font-weight: 800; color: var(--cc-text); margin-bottom: 4px; }
+    .booking-title { font-size: 0.88rem; font-weight: 700; color: var(--cc-text); margin-bottom: 3px; }
     .booking-meta {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       color: var(--cc-muted);
       align-items: center;
     }
     .dept-pill {
       font-weight: 700;
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 6px;
+      font-size: 0.66rem;
+      padding: 2px 7px;
+      border-radius: 5px;
+    }
+    .btn-chip {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: var(--cc-navy);
+      padding: 6px 11px;
+      border-radius: 7px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
     }
     .mini-action-btn {
       font-size: 0.72rem;
-      font-weight: 700;
+      font-weight: 600;
       padding: 5px 10px;
-      border-radius: 7px;
+      border-radius: 6px;
       border: none;
       cursor: pointer;
       text-decoration: none;
@@ -1080,13 +1092,13 @@
     }
     .mini-action-btn.outlook:hover { background: #0078d4; color: #fff; }
     .btn-edit {
-      background: #e0f2fe;
-      color: #0369a1;
-      border: 1px solid #bae6fd;
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
       padding: 5px 10px;
-      border-radius: 7px;
-      font-size: 0.74rem;
-      font-weight: 700;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
       cursor: pointer;
     }
     .btn-delete {
@@ -1094,59 +1106,25 @@
       color: #b91c1c;
       border: 1px solid #fecaca;
       padding: 5px 10px;
-      border-radius: 7px;
-      font-size: 0.74rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .staff-lock-note {
-      font-size: 0.7rem;
-      color: #64748b;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 4px 8px;
       border-radius: 6px;
-      text-decoration: none;
+      font-size: 0.72rem;
       font-weight: 600;
+      cursor: pointer;
     }
     .empty-box {
       text-align: center;
       padding: 36px 20px;
       color: var(--cc-muted);
       background: #f8fafc;
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px dashed #cbd5e1;
-    }
-    /* Modals */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(3px);
-      z-index: 140;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      overflow-y: auto;
-    }
-    .modal-card {
-      background: #ffffff;
-      border-radius: 18px;
-      padding: 24px;
-      width: 100%;
-      max-width: 560px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 24px 48px rgba(15, 23, 42, 0.28);
-      border: 1px solid var(--cc-border);
     }
     .room-admin-item {
       border: 1px solid var(--cc-border);
-      border-left: 5px solid var(--cc-blue);
-      border-radius: 12px;
+      border-left: 4px solid var(--cc-blue);
+      border-radius: 10px;
       padding: 12px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       background: #f8fafc;
       display: flex;
       justify-content: space-between;
@@ -1154,9 +1132,7 @@
       gap: 12px;
       flex-wrap: wrap;
     }
-    /* =========================================================================
-       6. MOBILE & SMALL SCREEN ADAPTABILITY (< 1024px)
-       ========================================================================= */
+    /* Mobile Floating Action Button (< 1024px) */
     .mobile-book-fab {
       display: none;
       position: fixed;
@@ -1166,118 +1142,84 @@
       color: #ffffff;
       border: none;
       border-radius: 999px;
-      padding: 13px 20px;
-      font-size: 0.88rem;
-      font-weight: 800;
-      box-shadow: 0 10px 25px rgba(24, 99, 220, 0.38);
+      padding: 12px 18px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
       z-index: 95;
       cursor: pointer;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
     }
     @media (max-width: 1024px) {
-      .workspace-grid {
-        grid-template-columns: 1fr;
-      }
-      /* On tablet/mobile < 1024px, form always acts as a slide-over drawer */
-      .booking-form-panel {
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: 420px;
-        max-width: 92vw;
-        height: 100vh;
-        max-height: 100vh;
-        border-radius: 18px 0 0 18px;
-        z-index: 120;
-        box-shadow: -12px 0 40px rgba(15, 23, 42, 0.25);
-        transform: translateX(105%);
-      }
-      .booking-form-panel.drawer-open {
-        transform: translateX(0);
-      }
-      .drawer-close-btn {
-        display: inline-flex;
-      }
       .mobile-book-fab {
         display: inline-flex;
       }
-      .layout-mode-group {
+      .brand-subtitle, .brand-divider {
         display: none;
-      }
-      .timetable-table {
-        min-width: 100%;
       }
     }
     @media (max-width: 640px) {
-      .topbar {
-        padding: 10px 14px;
-      }
-      .brand-subtitle {
-        display: none;
-      }
-      .container {
-        padding: 10px 12px 70px;
-      }
-      .due-alert-strip {
-        padding: 0 12px;
-        font-size: 0.72rem;
-      }
+      .topbar { padding: 0 14px; }
+      .container { padding: 10px 10px 72px; }
+      .schedule-toolbar { padding: 10px 12px; }
+      .schedule-subbar { padding: 8px 12px; }
     }
   </style>
 </head>
 <body>
-  <!-- 4. Consolidated Top Header with Apps/Tools Dropdown -->
+  <!-- Consolidated Minimalist Top Header -->
   <header class="topbar">
     <a href="/" class="brand-left">
       <img src="/careclinic-logo.webp" alt="Logo" onerror="this.src='/images/acme-logo.svg'" />
       <div>
-        <div class="brand-title">Careclinics HQ Room Booking</div>
-        <div class="brand-subtitle">Click-to-Book Timetable • Department Color-Coding • WhatsApp & Outlook Sync</div>
+        <span class="brand-title">Careclinics HQ Room Booking</span>
+        <span class="brand-divider">|</span>
+        <span class="brand-subtitle">Click-to-Book Schedule</span>
       </div>
     </a>
     <div class="nav-links" id="bookingNavLinks">
-      <button type="button" class="nav-btn primary-cta" onclick="openBookingDrawerOrFocus()">
-        <span>＋ New Booking</span>
+      <button type="button" class="nav-btn primary-cta" onclick="openBookingModal()">
+        <span>＋ Book a Room</span>
       </button>
       <!-- Consolidated Apps / Tools Dropdown with Icon Grid -->
       <div class="tools-dropdown-wrap" id="toolsDropdownWrap">
         <button type="button" class="nav-btn" id="btnToolsMenu" onclick="toggleToolsDropdown(event)">
-          <span>⊞ HQ Tools</span>
-          <span style="font-size:0.65rem;">▾</span>
+          <span>⊞ Apps</span>
+          <span style="font-size:0.62rem; opacity:0.8;">▾</span>
         </button>
         <div class="tools-dropdown-menu" id="toolsDropdownMenu">
-          <div class="tools-dropdown-label">Careclinics HQ Workspace Apps</div>
+          <div class="tools-dropdown-label">Careclinics HQ Workspace</div>
           <div class="tools-icon-grid">
             <a href="/" class="tool-grid-item">
               <span class="tool-icon">🏠</span>
               <span class="tool-name">Staff Portal</span>
-              <span class="tool-desc">Main HQ Directory</span>
+              <span class="tool-desc">Main Directory</span>
             </a>
             <a href="/display/?mode=share" class="tool-grid-item">
               <span class="tool-icon">🖥️</span>
               <span class="tool-name">Share to TV</span>
-              <span class="tool-desc">Wireless Room Cast</span>
+              <span class="tool-desc">Wireless Cast</span>
             </a>
             <a href="/meeting/input.html" class="tool-grid-item">
               <span class="tool-icon">📝</span>
               <span class="tool-name">Dept Update</span>
-              <span class="tool-desc">Submit Weekly Input</span>
+              <span class="tool-desc">Weekly Input</span>
             </a>
             <a href="/pdf/" class="tool-grid-item">
               <span class="tool-icon">📄</span>
               <span class="tool-name">BentoPDF</span>
-              <span class="tool-desc">PDF Toolkit Suite</span>
+              <span class="tool-desc">PDF Toolkit</span>
             </a>
             <a href="/meeting/" class="tool-grid-item">
               <span class="tool-icon">📺</span>
               <span class="tool-name">Meeting TV</span>
-              <span class="tool-desc">Live Alignment Board</span>
+              <span class="tool-desc">Alignment Board</span>
             </a>
             <a href="/display/" class="tool-grid-item">
               <span class="tool-icon">📡</span>
               <span class="tool-name">Display Hub</span>
-              <span class="tool-desc">Signage & Screens</span>
+              <span class="tool-desc">Room Signage</span>
             </a>
           </div>
         </div>
@@ -1287,7 +1229,7 @@
       </span>
     </div>
   </header>
-  <!-- 4. Condensed 36px Dismissible Status Strip for "Starting Now" -->
+  <!-- Condensed 36px Dismissible Status Strip for "Starting Now" -->
   <div id="dueBookingBanner" class="due-alert-strip">
     <div class="due-strip-left">
       <span class="live-pulse-dot"></span>
@@ -1296,204 +1238,206 @@
     </div>
     <div class="due-strip-actions" id="dueBannerActions"></div>
   </div>
-  <!-- Slide-over Drawer Backdrop -->
-  <div id="drawerBackdrop" class="drawer-backdrop" onclick="closeBookingDrawer()"></div>
   <main class="container">
-    <!-- 5 & 6. Interactive Horizontal Room Switcher Pills + Layout Mode Toggle (Reclaims ~160px of vertical height) -->
-    <div class="top-control-strip">
-      <div class="room-switcher-bar" id="roomSwitcherBar" role="tablist" aria-label="Filter by Meeting Room"></div>
-      <div class="layout-mode-group">
-        <button type="button" class="mode-switch-btn active" id="btnLayoutSticky" onclick="setWorkspaceLayout('sticky')" title="Keep reservation form anchored on the left while scrolling">
-          📌 Sticky Split
-        </button>
-        <button type="button" class="mode-switch-btn" id="btnLayoutDrawer" onclick="setWorkspaceLayout('drawer')" title="100% full-width schedule grid with slide-over booking drawer">
-          ▭ Full-Width + Drawer
-        </button>
-        <span id="adminRoomConfigActions" style="display:none;">
-          <button type="button" class="mode-switch-btn" style="background:var(--cc-blue); color:#fff; border-color:var(--cc-blue);" onclick="openRoomManagerModal()">
-            ⚙️ Rooms
-          </button>
-        </span>
+    <div id="pageToast" class="page-toast"></div>
+    <!-- Full-Width Minimalist Schedule Shell -->
+    <section class="schedule-shell">
+      <!-- Primary Navigation Toolbar: Date Stepper + View Toggle -->
+      <div class="schedule-toolbar">
+        <div class="date-nav-group">
+          <button type="button" class="date-step-btn" onclick="stepDate(-1)" title="Previous Day" aria-label="Previous Day">‹</button>
+          <button type="button" class="btn-today-pill active" id="btnShowToday">Today</button>
+          <button type="button" class="date-step-btn" onclick="stepDate(1)" title="Next Day" aria-label="Next Day">›</button>
+          <span class="date-display-label" id="activeDateLabel">Today</span>
+          <input type="date" id="filterDate" class="date-picker-input" aria-label="Jump to Date" />
+        </div>
+        <div class="toolbar-right">
+          <span style="font-size:0.74rem; color:var(--cc-muted);" id="scheduleSubtitle">💡 Click any open slot to book</span>
+          <!-- Hidden room select synced with pills for compatibility -->
+          <select id="filterRoom" style="display:none;" aria-label="Filter Room">
+            <option value="ALL">All HQ Rooms</option>
+          </select>
+          <div class="segmented-control" role="tablist">
+            <button type="button" class="seg-btn active" id="btnViewGrid" onclick="setScheduleViewMode('grid')">⊞ Timetable</button>
+            <button type="button" class="seg-btn" id="btnViewList" onclick="setScheduleViewMode('list')">☰ Agenda</button>
+            <button type="button" class="seg-btn" id="btnShowAllDates">All Upcoming</button>
+          </div>
+          <span id="adminRoomConfigActions" style="display:none;">
+            <button type="button" class="btn-today-pill" style="background:var(--cc-blue); color:#fff; border-color:var(--cc-blue);" onclick="openRoomManagerModal()">
+              ⚙️ Manage Rooms
+            </button>
+          </span>
+        </div>
       </div>
-    </div>
-    <!-- 1. Workspace Grid (Supports Sticky Form Option A & 420px Slide-Over Drawer Option B) -->
-    <div class="workspace-grid" id="workspaceGrid">
-      <!-- Left / Slide-Over Reservation Form -->
-      <aside class="booking-form-panel" id="bookingFormPanel" aria-label="Room Reservation Form">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-          <div>
-            <div class="panel-title">📅 Reserve a Meeting Room</div>
-            <div class="panel-sub">Click any "+ Available" slot in the grid to pre-fill</div>
-          </div>
-          <button type="button" class="drawer-close-btn" onclick="closeBookingDrawer()" title="Close Drawer">&times;</button>
+      <!-- Secondary Subbar: Room Filter Pills + Compact Department Legend -->
+      <div class="schedule-subbar">
+        <div class="room-switcher-bar" id="roomSwitcherBar" role="tablist" aria-label="Filter by Meeting Room"></div>
+        <div class="dept-legend-bar" aria-label="Department Color Legend">
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#4f46e5;"></span>IT</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#10b981;"></span>Clinical</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#f59e0b;"></span>Management</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#0284c7;"></span>Finance</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#e11d48;"></span>HR</span>
+          <span class="dept-legend-item"><span class="dept-swatch" style="background:#7c3aed;"></span>Legal/Biz</span>
         </div>
-        <!-- 2. Internal Network / Portal Session Auto-Fill Banner -->
-        <div class="session-autofill-bar">
-          <div class="session-user-info">
-            <span class="session-avatar" id="sessionAvatar">AH</span>
-            <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-              <div style="font-size:0.73rem; font-weight:800; color:var(--cc-navy);" id="sessionSummaryName">Dr. Amirul Hakim (IT)</div>
-              <div style="font-size:0.66rem; color:#0369a1;" id="sessionSummaryContact">⚡ Auto-filled from HQ Session</div>
-            </div>
-          </div>
-          <button type="button" class="session-toggle-btn" onclick="toggleProfilePresets()">Switch / Edit</button>
+      </div>
+      <!-- 1. Minimalist High-Density Timetable Grid (08:00 to 20:00) -->
+      <div id="timetableGridContainer" class="timetable-wrapper"></div>
+      <!-- 2. Detailed Agenda List View -->
+      <div id="bookingsContainer" class="booking-list" style="display:none;"></div>
+    </section>
+  </main>
+  <!-- Mobile Floating Action Button (< 1024px) -->
+  <button type="button" class="mobile-book-fab" onclick="openBookingModal()">
+    <span>＋ Book Room</span>
+  </button>
+  <!-- =========================================================================
+       CLICK-TO-BOOK RESERVATION MODAL
+       ========================================================================= -->
+  <div class="modal-backdrop" id="bookingModalBackdrop" onclick="if(event.target===this) closeBookingModal()">
+    <div class="modal-card" role="dialog" aria-labelledby="bookingModalHeading">
+      <div class="modal-header">
+        <div>
+          <h3 id="bookingModalHeading" style="font-size:1.05rem; font-weight:800; color:var(--cc-navy);">Reserve Meeting Room</h3>
+          <p style="font-size:0.75rem; color:var(--cc-muted); margin-top:2px;">Instant sync • Overlapping slots are automatically prevented</p>
         </div>
-        <!-- Quick Staff Session Switcher Presets -->
-        <div class="profile-presets-row" id="profilePresetsRow">
-          <span style="width:100%; font-size:0.67rem; font-weight:700; color:var(--cc-muted);">Quick-Switch Portal Session Profile:</span>
-          <button type="button" class="preset-chip" onclick="applyStaffPreset('Dr. Amirul Hakim', 'IT', '012-3456789', 'amirul@careclinics.my')">💻 IT • Amirul</button>
-          <button type="button" class="preset-chip" onclick="applyStaffPreset('Dr. Sarah Lim', 'CLINICAL GOVERNANCE', '017-8899201', 'sarah.lim@careclinics.my')">🩺 Clinical • Dr. Sarah</button>
-          <button type="button" class="preset-chip" onclick="applyStaffPreset('En. Razak Dato', 'CEO OFFICE', '019-2233445', 'razak@careclinics.my')">👔 Management • Razak</button>
-          <button type="button" class="preset-chip" onclick="applyStaffPreset('Michelle Tan', 'FINANCE', '016-5544332', 'michelle@careclinics.my')">📊 Finance • Michelle</button>
+        <button type="button" class="modal-close-x" onclick="closeBookingModal()" title="Close">&times;</button>
+      </div>
+      <!-- Selected Slot Context Summary Pill -->
+      <div class="selected-slot-banner">
+        <div class="selected-slot-room" id="modalSelectedRoomLabel">📍 HQ Main Boardroom</div>
+        <div class="selected-slot-time" id="computedTimeBadge">10:00 → 11:00 (1h)</div>
+      </div>
+      <div id="bookingAlert" class="alert"></div>
+      <form id="bookingForm">
+        <div class="form-group">
+          <label for="title">Meeting Title / Purpose *</label>
+          <input type="text" id="title" placeholder="e.g. Weekly Clinical Governance Sync" required />
         </div>
-        <div id="bookingAlert" class="alert"></div>
-        <form id="bookingForm">
+        <div class="form-row">
           <div class="form-group">
-            <label for="roomId">Select HQ Meeting Room *</label>
+            <label for="roomId">Meeting Room *</label>
             <select id="roomId" required></select>
           </div>
           <div class="form-group">
-            <label for="title">Meeting Title / Purpose *</label>
-            <input type="text" id="title" placeholder="e.g. Monthly Clinical Governance Review" required />
+            <label for="date">Date *</label>
+            <input type="date" id="date" required />
           </div>
-          <!-- 2. Date + Start Time + Quick Duration Pills (Prevents reverse time selection) -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="date">Booking Date *</label>
-              <input type="date" id="date" required />
-            </div>
-            <div class="form-group">
-              <label for="startTime">Start Time *</label>
-              <input type="time" id="startTime" value="10:00" step="900" required />
-            </div>
+        </div>
+        <!-- Start Time + Quick Duration Pills (30m, 45m, 1h, 2h) -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startTime">Start Time *</label>
+            <input type="time" id="startTime" value="10:00" step="900" required />
           </div>
           <div class="form-group">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <label style="margin-bottom:0;">Duration *</label>
-              <span class="computed-time-badge" id="computedTimeBadge">10:00 → 11:00 (1h)</span>
-            </div>
+            <label>Duration *</label>
             <div class="duration-pills-group" id="durationPillsGroup">
               <button type="button" class="duration-pill" data-mins="30" onclick="selectDurationMinutes(30)">30m</button>
               <button type="button" class="duration-pill" data-mins="45" onclick="selectDurationMinutes(45)">45m</button>
               <button type="button" class="duration-pill active" data-mins="60" onclick="selectDurationMinutes(60)">1h</button>
               <button type="button" class="duration-pill" data-mins="120" onclick="selectDurationMinutes(120)">2h</button>
             </div>
-            <!-- Synced End Time input (kept for compatibility and custom inspection) -->
             <input type="hidden" id="endTime" value="11:00" />
           </div>
-          <!-- Real-Time Slot Conflict & Redundancy Indicator -->
-          <div id="liveSlotStatus" class="slot-status-box ok">
-            <span>🟢</span>
-            <span id="liveSlotText">Time slot is available for booking.</span>
+        </div>
+        <!-- Real-Time Slot Conflict Indicator -->
+        <div id="liveSlotStatus" class="slot-status-box ok">
+          <span>🟢</span>
+          <span id="liveSlotText">Time slot is open and available.</span>
+        </div>
+        <!-- Compact Auto-Filled Session Profile (1-line summary; click to expand/change) -->
+        <div class="session-autofill-bar">
+          <div class="session-user-info">
+            <span class="session-avatar" id="sessionAvatar">AH</span>
+            <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              <div style="font-size:0.75rem; font-weight:700; color:var(--cc-navy);" id="sessionSummaryName">Dr. Amirul Hakim (IT)</div>
+              <div style="font-size:0.68rem; color:var(--cc-muted);" id="sessionSummaryContact">⚡ Auto-filled • 012-3456789</div>
+            </div>
           </div>
-          <!-- Auto-Filled Booker Profile Fields (Compact & Editable) -->
+          <button type="button" class="session-toggle-btn" onclick="toggleBookerDrawer()">Change Booker ▾</button>
+        </div>
+        <!-- Expandable Booker Details & Quick Department Presets -->
+        <div class="booker-drawer-fields" id="bookerDrawerFields">
+          <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px;">
+            <span style="width:100%; font-size:0.66rem; font-weight:600; color:var(--cc-muted);">Quick Switch Portal Profile:</span>
+            <button type="button" class="preset-chip" onclick="applyStaffPreset('Dr. Amirul Hakim', 'IT', '012-3456789', 'amirul@careclinics.my')">💻 IT • Amirul</button>
+            <button type="button" class="preset-chip" onclick="applyStaffPreset('Dr. Sarah Lim', 'CLINICAL GOVERNANCE', '017-8899201', 'sarah.lim@careclinics.my')">🩺 Clinical • Sarah</button>
+            <button type="button" class="preset-chip" onclick="applyStaffPreset('En. Razak Dato', 'CEO OFFICE', '019-2233445', 'razak@careclinics.my')">👔 CEO Office • Razak</button>
+            <button type="button" class="preset-chip" onclick="applyStaffPreset('Michelle Tan', 'FINANCE', '016-5544332', 'michelle@careclinics.my')">📊 Finance • Michelle</button>
+          </div>
           <div class="form-row">
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:6px;">
               <label for="department">Department *</label>
               <select id="department" required></select>
             </div>
-            <div class="form-group">
-              <label for="organizer">Booked By (Name) *</label>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label for="organizer">Booked By *</label>
               <input type="text" id="organizer" placeholder="Full Name" required />
             </div>
           </div>
           <div class="form-row">
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label for="phone">WhatsApp No. *</label>
               <input type="tel" id="phone" placeholder="012-3456789" required />
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom:0;">
               <label for="email">Outlook Email</label>
               <input type="email" id="email" placeholder="name@careclinics.my" />
             </div>
           </div>
-          <div class="form-group">
-            <label for="notes">Equipment / Catering / Notes (Optional)</label>
-            <textarea id="notes" rows="2" placeholder="e.g. Require Zoom link on 75&quot; TV"></textarea>
-          </div>
-          <div class="checkbox-group">
-            <label class="checkbox-row">
-              <input type="checkbox" id="chkAutoOutlook" checked />
-              <span>📅 Auto-download <strong>Microsoft Outlook (.ics)</strong> invite</span>
-            </label>
-            <label class="checkbox-row">
-              <input type="checkbox" id="chkWhatsappAlert" checked />
-              <span>💬 Notify via <strong>WhatsApp</strong> when session starts</span>
-            </label>
-          </div>
-          <button type="submit" id="btnSubmitBooking" class="btn-primary">Confirm Room Reservation</button>
-        </form>
-      </aside>
-      <!-- Right: Room Booking Schedule Timetable Grid + List View -->
-      <section class="panel">
-        <div class="filter-bar">
-          <div>
-            <div class="panel-title" id="roomsCountHeading">📊 HQ Room Booking Schedule</div>
-            <div class="panel-sub" id="scheduleSubtitle">Click an empty slot to book, or click any booked card for actions</div>
-          </div>
-          <div class="filter-controls">
-            <button type="button" class="btn-chip active" id="btnViewGrid" onclick="setScheduleViewMode('grid')">📊 Schedule Grid</button>
-            <button type="button" class="btn-chip" id="btnViewList" onclick="setScheduleViewMode('list')">📋 Agenda List</button>
-            <button type="button" class="btn-chip active" id="btnShowToday">Today</button>
-            <button type="button" class="btn-chip" id="btnShowAllDates">All Upcoming</button>
-            <input type="date" id="filterDate" aria-label="Filter Date" />
-            <select id="filterRoom" aria-label="Filter Room">
-              <option value="ALL">All HQ Rooms</option>
-            </select>
-          </div>
         </div>
-        <!-- 3. Department Color-Coding Legend -->
-        <div class="dept-legend-bar" aria-label="Department Color Legend">
-          <span style="font-weight:700; color:var(--cc-navy);">Dept Color Key:</span>
-          <span class="dept-legend-item"><span class="dept-swatch" style="background:#4f46e5;"></span>IT / Tech (Indigo)</span>
-          <span class="dept-legend-item"><span class="dept-swatch" style="background:#10b981;"></span>Clinical / Health (Emerald)</span>
-          <span class="dept-legend-item"><span class="dept-swatch" style="background:#f59e0b;"></span>Management / Admin (Amber)</span>
-          <span class="dept-legend-item"><span class="dept-swatch" style="background:#0284c7;"></span>Finance / Procurement (Sky)</span>
-          <span class="dept-legend-item"><span class="dept-swatch" style="background:#e11d48;"></span>HR / Talent (Rose)</span>
-          <span class="dept-legend-item"><span class="dept-swatch" style="background:#7c3aed;"></span>Business / Legal (Violet)</span>
+        <div class="form-group">
+          <label for="notes">Equipment / Notes <span style="font-weight:400; color:var(--cc-muted);">(Optional)</span></label>
+          <input type="text" id="notes" placeholder="e.g. Require Zoom link on 75&quot; TV" />
         </div>
-        <!-- 1. Interactive Timetable Schedule Grid (08:00 to 20:00) -->
-        <div id="timetableGridContainer" class="timetable-wrapper"></div>
-        <!-- 2. Detailed Agenda List View -->
-        <div id="bookingsContainer" class="booking-list" style="display:none; margin-top:10px;"></div>
-      </section>
+        <div class="checkbox-group">
+          <label class="checkbox-row">
+            <input type="checkbox" id="chkAutoOutlook" checked />
+            <span>📅 Download Outlook (.ics)</span>
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" id="chkWhatsappAlert" checked />
+            <span>💬 WhatsApp start alert</span>
+          </label>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn-chip" style="padding:11px 16px;" onclick="closeBookingModal()">Cancel</button>
+          <button type="submit" id="btnSubmitBooking" class="btn-primary" style="flex:1;">Confirm Reservation</button>
+        </div>
+      </form>
     </div>
-  </main>
-  <!-- Mobile Floating Action Button (< 1024px) -->
-  <button type="button" class="mobile-book-fab" onclick="openBookingDrawerOrFocus()">
-    <span>📅 ＋ Book a Room</span>
-  </button>
-  <!-- 3. Lightweight Booked Slot Popover (Houses WhatsApp, Outlook, Notes, Equipment & Admin Actions) -->
-  <div class="booking-popover-backdrop" id="bookingDetailPopover" onclick="if(event.target===this) closeBookingPopover()">
-    <div class="booking-popover-card" id="bookingPopoverContent"></div>
+  </div>
+  <!-- Lightweight Booked Slot Popover Modal (Secondary Actions, Notes, Equipment) -->
+  <div class="modal-backdrop" id="bookingDetailPopover" onclick="if(event.target===this) closeBookingPopover()">
+    <div class="modal-card" style="max-width: 400px;" id="bookingPopoverContent"></div>
   </div>
   <!-- Post-Booking Confirmation + Outlook Calendar + WhatsApp Modal -->
-  <div class="modal-backdrop" id="confirmedModal">
-    <div class="modal-card" style="max-width: 480px; text-align: center;">
-      <div style="width:52px; height:52px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 10px;">✓</div>
-      <h3 style="color:var(--cc-navy); font-weight:900; font-size:1.2rem; margin-bottom:6px;">Room Reservation Confirmed!</h3>
-      <p style="font-size:0.84rem; color:var(--cc-muted); margin-bottom:14px;" id="confirmedModalSummary"></p>
-      <div style="display:flex; flex-direction:column; gap:8px; text-align:left; background:#f8fafc; padding:14px; border-radius:12px; border:1px solid var(--cc-border); margin-bottom:16px;">
-        <div style="font-size:0.74rem; font-weight:800; color:var(--cc-navy); text-transform:uppercase;">Sync with Outlook & WhatsApp</div>
+  <div class="modal-backdrop" id="confirmedModal" onclick="if(event.target===this) closeConfirmedModal()">
+    <div class="modal-card" style="max-width: 440px; text-align: center;">
+      <div style="width:48px; height:48px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin:0 auto 10px;">✓</div>
+      <h3 style="color:var(--cc-navy); font-weight:800; font-size:1.12rem; margin-bottom:4px;">Reservation Confirmed!</h3>
+      <p style="font-size:0.8rem; color:var(--cc-muted); margin-bottom:14px;" id="confirmedModalSummary"></p>
+      <div style="display:flex; flex-direction:column; gap:8px; text-align:left; background:#f8fafc; padding:12px; border-radius:10px; border:1px solid var(--cc-border); margin-bottom:14px;">
         <a id="btnModalOutlook365" href="#" target="_blank" rel="noopener" class="btn-primary" style="background:var(--cc-outlook); text-decoration:none; text-align:center; display:block;">
-          📅 Add to Outlook 365 / Web Calendar ↗
+          📅 Add to Outlook 365 Calendar ↗
         </a>
-        <button type="button" id="btnModalOutlookIcs" class="btn-chip" style="padding:10px; text-align:center; width:100%;">
-          📥 Download Outlook Desktop / Mobile Invite (.ics)
+        <button type="button" id="btnModalOutlookIcs" class="btn-chip" style="padding:9px; text-align:center; width:100%;">
+          📥 Download Outlook Invite (.ics)
         </button>
         <a id="btnModalWhatsApp" href="#" target="_blank" rel="noopener" class="btn-primary" style="background:var(--cc-whatsapp); text-decoration:none; text-align:center; display:block;">
-          💬 Send WhatsApp Booking Details ↗
+          💬 Send WhatsApp Confirmation ↗
         </a>
       </div>
-      <button type="button" class="btn-chip" style="padding:9px 24px;" onclick="closeConfirmedModal()">Done</button>
+      <button type="button" class="btn-chip" style="padding:8px 24px;" onclick="closeConfirmedModal()">Done</button>
     </div>
   </div>
   <!-- Admin Edit Booking Modal -->
-  <div class="modal-backdrop" id="editModal">
+  <div class="modal-backdrop" id="editModal" onclick="if(event.target===this) closeEditBooking()">
     <div class="modal-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 style="color:var(--cc-navy); font-weight:800;">✎ Edit Room Booking (Admin)</h3>
-        <button type="button" onclick="closeEditBooking()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:#64748b;">&times;</button>
+      <div class="modal-header">
+        <h3 style="color:var(--cc-navy); font-weight:800; font-size:1rem;">✎ Edit Room Booking (Admin)</h3>
+        <button type="button" class="modal-close-x" onclick="closeEditBooking()">&times;</button>
       </div>
       <div id="editModalAlert" class="alert error"></div>
       <form id="editBookingForm">
@@ -1544,26 +1488,26 @@
           <label>Notes</label>
           <textarea id="editNotes" rows="2"></textarea>
         </div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:12px;">
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
           <button type="button" class="btn-chip" onclick="closeEditBooking()">Cancel</button>
-          <button type="submit" class="btn-primary" style="width:auto; padding:10px 20px;">Save Booking Changes</button>
+          <button type="submit" class="btn-primary" style="width:auto; padding:9px 18px;">Save Changes</button>
         </div>
       </form>
     </div>
   </div>
   <!-- Admin Customize HQ Meeting Rooms Modal -->
-  <div class="modal-backdrop" id="roomManagerModal">
-    <div class="modal-card" style="max-width: 680px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+  <div class="modal-backdrop" id="roomManagerModal" onclick="if(event.target===this) closeRoomManagerModal()">
+    <div class="modal-card" style="max-width: 640px;">
+      <div class="modal-header">
         <div>
-          <h3 style="color:var(--cc-navy); font-weight:900; font-size:1.15rem;">🏢 Customize HQ Meeting Rooms (Admin)</h3>
-          <p style="font-size:0.78rem; color:var(--cc-muted);">Control meeting rooms, floor location, pax capacity, and equipment tags.</p>
+          <h3 style="color:var(--cc-navy); font-weight:800; font-size:1.05rem;">🏢 Customize HQ Meeting Rooms (Admin)</h3>
+          <p style="font-size:0.75rem; color:var(--cc-muted);">Manage rooms, floor location, capacity, and equipment specs.</p>
         </div>
-        <button type="button" onclick="closeRoomManagerModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#64748b;">&times;</button>
+        <button type="button" class="modal-close-x" onclick="closeRoomManagerModal()">&times;</button>
       </div>
       <div id="roomManagerAlert" class="alert"></div>
-      <form id="roomConfigForm" style="background:#f8fafc; border:1px solid var(--cc-border); border-radius:12px; padding:14px; margin-bottom:16px;">
-        <div style="font-weight:800; font-size:0.86rem; color:var(--cc-navy); margin-bottom:8px;" id="roomFormHeading">➕ Add a New Meeting Room</div>
+      <form id="roomConfigForm" style="background:#f8fafc; border:1px solid var(--cc-border); border-radius:10px; padding:14px; margin-bottom:14px;">
+        <div style="font-weight:700; font-size:0.82rem; color:var(--cc-navy); margin-bottom:8px;" id="roomFormHeading">➕ Add a New Meeting Room</div>
         <input type="hidden" id="cfgRoomId" value="" />
         <div class="form-row">
           <div class="form-group">
@@ -1587,7 +1531,7 @@
                 <option value="available">Available for Booking</option>
                 <option value="maintenance">Under Maintenance (Locked)</option>
               </select>
-              <input type="color" id="cfgRoomColor" value="#1863dc" style="width:44px; padding:2px; height:36px;" />
+              <input type="color" id="cfgRoomColor" value="#1863dc" style="width:42px; padding:2px; height:36px;" />
             </div>
           </div>
         </div>
@@ -1600,7 +1544,7 @@
           <button type="submit" class="btn-primary" style="width:auto; padding:8px 16px;" id="btnSaveRoomConfig">Save Meeting Room</button>
         </div>
       </form>
-      <div style="font-weight:800; font-size:0.86rem; color:var(--cc-navy); margin-bottom:8px;">Current HQ Meeting Rooms (<span id="modalRoomCount">0</span>)</div>
+      <div style="font-weight:700; font-size:0.82rem; color:var(--cc-navy); margin-bottom:8px;">Current HQ Meeting Rooms (<span id="modalRoomCount">0</span>)</div>
       <div id="roomManagerList"></div>
     </div>
   </div>
@@ -1625,15 +1569,15 @@
     if (isAdmin) {
       const adminControls = document.getElementById('adminNavControls');
       adminControls.innerHTML = `
-        <a href="/admin/" class="nav-btn" style="background:rgba(16,185,129,0.22); border:1px solid #10b981; color:#6ee7b7;">🛡️ Admin</a>
-        <button type="button" class="nav-btn" style="background:rgba(24,99,220,0.35); border:1px solid #8ed1fc; color:#fff;" onclick="openRoomManagerModal()">⚙️ Rooms</button>
-        <button id="bookingLogoutBtn" class="nav-btn" style="background:rgba(244,63,94,0.2); color:#fda4af;">Logout</button>
+        <a href="/admin/" class="nav-btn" style="background:rgba(16,185,129,0.2); border-color:#10b981; color:#6ee7b7;">🛡️ Admin</a>
+        <button type="button" class="nav-btn" onclick="openRoomManagerModal()">⚙️ Rooms</button>
+        <button id="bookingLogoutBtn" class="nav-btn" style="background:rgba(244,63,94,0.18); color:#fda4af;">Logout</button>
       `;
       document.getElementById('bookingLogoutBtn').addEventListener('click', () => logoutAdmin('/booking/'));
       document.getElementById('adminRoomConfigActions').style.display = 'inline-block';
     }
     // =========================================================================
-    // 3. CONSISTENT DEPARTMENT COLOR-CODING PALETTE
+    // DEPARTMENT COLOR-CODING PALETTE
     // =========================================================================
     const DEPT_THEMES = {
       'IT': { bg: '#eef2ff', border: '#4f46e5', text: '#312e81', pillBg: '#e0e7ff', pillText: '#3730a3', avatarBg: '#4f46e5', label: 'IT' },
@@ -1673,8 +1617,18 @@
       if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
       return (parts[0] || 'HQ').slice(0, 2).toUpperCase();
     }
+    function formatReadableDate(dateStr) {
+      try {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        const label = dt.toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+        return dateStr === todayStr ? `Today — ${label}` : label;
+      } catch (e) {
+        return dateStr;
+      }
+    }
     // =========================================================================
-    // 4. TOPBAR TOOLS DROPDOWN MENU
+    // TOPBAR TOOLS DROPDOWN MENU
     // =========================================================================
     window.toggleToolsDropdown = (e) => {
       e.stopPropagation();
@@ -1686,43 +1640,40 @@
         document.getElementById('toolsDropdownMenu')?.classList.remove('open');
       }
     });
-    // =========================================================================
-    // 1. WORKSPACE LAYOUT MODE (STICKY SPLIT vs SLIDE-OVER DRAWER)
-    // =========================================================================
-    const LAYOUT_PREF_KEY = 'cchs_hq_booking_layout_mode_v1';
-    let workspaceLayout = localStorage.getItem(LAYOUT_PREF_KEY) || 'sticky'; // 'sticky' | 'drawer'
-    window.setWorkspaceLayout = (mode) => {
-      workspaceLayout = mode;
-      localStorage.setItem(LAYOUT_PREF_KEY, mode);
-      const grid = document.getElementById('workspaceGrid');
-      grid.classList.toggle('drawer-mode', mode === 'drawer');
-      document.getElementById('btnLayoutSticky').classList.toggle('active', mode === 'sticky');
-      document.getElementById('btnLayoutDrawer').classList.toggle('active', mode === 'drawer');
-      if (mode === 'sticky') {
-        closeBookingDrawer();
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeBookingModal();
+        closeBookingPopover();
+        closeConfirmedModal();
+        closeEditBooking();
+        closeRoomManagerModal();
       }
-    };
-    window.openBookingDrawerOrFocus = () => {
-      const isSmallScreen = window.innerWidth <= 1024;
-      const panel = document.getElementById('bookingFormPanel');
-      if (workspaceLayout === 'drawer' || isSmallScreen) {
-        panel.classList.add('drawer-open');
-        document.getElementById('drawerBackdrop').classList.add('open');
-      } else {
-        panel.classList.remove('flash-highlight');
-        void panel.offsetWidth;
-        panel.classList.add('flash-highlight');
-        setTimeout(() => panel.classList.remove('flash-highlight'), 1200);
-      }
-      setTimeout(() => document.getElementById('title')?.focus(), 80);
-    };
-    window.closeBookingDrawer = () => {
-      document.getElementById('bookingFormPanel')?.classList.remove('drawer-open');
-      document.getElementById('drawerBackdrop')?.classList.remove('open');
-    };
-    setWorkspaceLayout(workspaceLayout);
+    });
     // =========================================================================
-    // 2. SESSION AUTO-FILL FOR BOOKER NAME, DEPARTMENT, WHATSAPP & EMAIL
+    // CLICK-TO-BOOK MODAL CONTROLS
+    // =========================================================================
+    window.openBookingModal = () => {
+      document.getElementById('bookingAlert').style.display = 'none';
+      syncModalHeaderSummary();
+      validateLiveSlot();
+      document.getElementById('bookingModalBackdrop').classList.add('open');
+      setTimeout(() => document.getElementById('title')?.focus(), 60);
+    };
+    window.closeBookingModal = () => {
+      document.getElementById('bookingModalBackdrop').classList.remove('open');
+    };
+    window.toggleBookerDrawer = () => {
+      document.getElementById('bookerDrawerFields').classList.toggle('open');
+    };
+    function syncModalHeaderSummary() {
+      const roomId = document.getElementById('roomId').value;
+      const room = (currentState?.rooms || []).find(r => r.id === roomId);
+      const dateVal = document.getElementById('date').value || todayStr;
+      const roomLabel = room ? `${room.name} (${room.capacity}p)` : 'Select Room';
+      document.getElementById('modalSelectedRoomLabel').textContent = `📍 ${roomLabel} • ${dateVal}`;
+    }
+    // =========================================================================
+    // SESSION AUTO-FILL FOR BOOKER NAME, DEPARTMENT, WHATSAPP & EMAIL
     // =========================================================================
     const STAFF_SESSION_KEY = 'cchs_hq_staff_session_profile_v1';
     function loadStaffSessionProfile() {
@@ -1759,9 +1710,6 @@
       document.getElementById('sessionSummaryName').textContent = `${profile.organizer} (${profile.department})`;
       document.getElementById('sessionSummaryContact').textContent = `⚡ Auto-filled • ${profile.phone || 'HQ Session'}`;
     }
-    window.toggleProfilePresets = () => {
-      document.getElementById('profilePresetsRow').classList.toggle('open');
-    };
     window.applyStaffPreset = (organizer, department, phone, email) => {
       document.getElementById('organizer').value = organizer;
       const deptSel = document.getElementById('department');
@@ -1771,13 +1719,11 @@
       document.getElementById('phone').value = phone;
       document.getElementById('email').value = email;
       saveStaffSessionProfile({ organizer, department, phone, email });
-      document.getElementById('profilePresetsRow').classList.remove('open');
     };
     // =========================================================================
-    // 2. START TIME + QUICK DURATION PILLS (30m, 45m, 1h, 2h)
+    // START TIME + QUICK DURATION PILLS (30m, 45m, 1h, 2h)
     // =========================================================================
     let selectedDurationMins = 60;
-    let activeClickedSlotKey = null;
     function computeEndTimeFromDuration(startHm, durationMins) {
       if (!startHm || !startHm.includes(':')) return '11:00';
       const [h, m] = startHm.split(':').map(Number);
@@ -1798,10 +1744,11 @@
       const endTime = computeEndTimeFromDuration(startTime, selectedDurationMins);
       document.getElementById('endTime').value = endTime;
       document.getElementById('computedTimeBadge').textContent =
-        `${startTime} → ${endTime} (${formatDurationLabel(selectedDurationMins)})`;
+        `⏰ ${startTime} → ${endTime} (${formatDurationLabel(selectedDurationMins)})`;
       document.querySelectorAll('#durationPillsGroup .duration-pill').forEach(btn => {
         btn.classList.toggle('active', Number(btn.dataset.mins) === selectedDurationMins);
       });
+      syncModalHeaderSummary();
       validateLiveSlot();
     }
     window.selectDurationMinutes = (mins) => {
@@ -1823,11 +1770,18 @@
       Notification.requestPermission().catch(() => {});
     }
     const alertEl = document.getElementById('bookingAlert');
+    const pageToastEl = document.getElementById('pageToast');
     function showAlert(msg, isError = false) {
-      alertEl.textContent = msg;
-      alertEl.className = `alert ${isError ? 'error' : 'success'}`;
-      alertEl.style.display = 'block';
-      setTimeout(() => { alertEl.style.display = 'none'; }, 5500);
+      if (isError) {
+        alertEl.textContent = msg;
+        alertEl.className = 'alert error';
+        alertEl.style.display = 'block';
+      } else {
+        pageToastEl.textContent = `✓ ${msg}`;
+        pageToastEl.className = 'page-toast success';
+        pageToastEl.style.display = 'flex';
+        setTimeout(() => { pageToastEl.style.display = 'none'; }, 4500);
+      }
     }
     function isRoomBusyNow(roomId, bookings) {
       const now = new Date();
@@ -1860,7 +1814,6 @@
         osc.stop(ctx.currentTime + 0.55);
       } catch (e) {}
     }
-    // 4. Compact 36px Dismissible Status Strip for Active Sessions
     window.dismissDueBanner = (bookingId) => {
       bannerDismissedForId = bookingId;
       document.getElementById('dueBookingBanner').style.display = 'none';
@@ -1888,7 +1841,7 @@
       const room = roomMap[b.roomId] || { name: b.roomId, floor: 'HQ' };
       const waUrl = buildWhatsAppBookingUrl(b, room, 'starting');
       const outlookUrls = buildOutlookCalendarUrls(b, room);
-      document.getElementById('dueBannerTitle').textContent = `LIVE SESSION (${b.startTime}–${b.endTime}):`;
+      document.getElementById('dueBannerTitle').textContent = `LIVE (${b.startTime}–${b.endTime}):`;
       document.getElementById('dueBannerDesc').textContent =
         `"${b.title}" in ${room.name} • ${b.organizer || 'Staff'} (${b.department})`;
       document.getElementById('dueBannerActions').innerHTML = `
@@ -1948,7 +1901,7 @@
       if (conflict) {
         box.className = 'slot-status-box conflict';
         box.firstElementChild.textContent = '🔴';
-        txt.textContent = `Conflict: Reserved ${conflict.startTime}–${conflict.endTime} for "${conflict.title}" (${conflict.department}).`;
+        txt.textContent = `Unavailable: Reserved ${conflict.startTime}–${conflict.endTime} for "${conflict.title}" (${conflict.department}).`;
         btn.disabled = true;
         return false;
       }
@@ -1958,8 +1911,14 @@
       btn.disabled = false;
       return true;
     }
-    document.getElementById('roomId').addEventListener('change', validateLiveSlot);
-    document.getElementById('date').addEventListener('change', validateLiveSlot);
+    document.getElementById('roomId').addEventListener('change', () => {
+      syncModalHeaderSummary();
+      validateLiveSlot();
+    });
+    document.getElementById('date').addEventListener('change', () => {
+      syncModalHeaderSummary();
+      validateLiveSlot();
+    });
     document.getElementById('startTime').addEventListener('change', syncEndTimeFromStartAndDuration);
     document.getElementById('startTime').addEventListener('input', syncEndTimeFromStartAndDuration);
     ['organizer', 'department', 'phone', 'email'].forEach(fieldId => {
@@ -2008,7 +1967,7 @@
         updateSessionBannerUI(profile);
         initialProfileLoaded = true;
       }
-      // 5 & 6. Render Interactive Room Switcher Pill Bar (Replaces redundant 160px Room Cards)
+      // Render Minimalist Room Switcher Pill Bar
       const switcherBar = document.getElementById('roomSwitcherBar');
       const activeFilter = filterRoom.value || 'ALL';
       switcherBar.innerHTML = `
@@ -2019,17 +1978,12 @@
           const isMaint = room.status === 'maintenance';
           const busy = isRoomBusyNow(room.id, bookings);
           const isSelected = activeFilter === room.id;
-          const statusBadge = isMaint
-            ? `<span class="maint-room-badge">🛠️ Maint</span>`
-            : busy
-              ? `<span class="live-room-badge">● Live</span>`
-              : `<span class="free-room-badge">● Free</span>`;
           return `
-            <button type="button" class="room-pill-btn ${isSelected ? 'active' : ''}" onclick="selectRoomFilter('${room.id}')" title="${room.floor || 'HQ'} • Capacity ${room.capacity} pax • ${(room.amenities || []).join(', ')}">
-              <span class="room-pill-dot" style="background:${room.color || '#1863dc'};"></span>
+            <button type="button" class="room-pill-btn ${isSelected ? 'active' : ''}" onclick="selectRoomFilter('${room.id}')" title="${room.floor || 'HQ'} • ${room.capacity} pax • ${(room.amenities || []).join(', ')}">
+              <span class="room-pill-dot" style="background:${isMaint ? '#f59e0b' : busy ? '#ef4444' : (room.color || '#2563eb')};"></span>
               <span>${room.name}</span>
-              <span class="room-pill-cap">${room.capacity}p</span>
-              ${statusBadge}
+              <span style="opacity:0.65; font-weight:500;">${room.capacity}p</span>
+              ${busy ? `<span class="live-room-badge">Live</span>` : ''}
             </button>
           `;
         }).join('')}
@@ -2053,10 +2007,26 @@
       }
       renderAll();
     };
+    window.stepDate = (offsetDays) => {
+      const input = document.getElementById('filterDate');
+      const cur = input.value || todayStr;
+      const [y, m, d] = cur.split('-').map(Number);
+      const dt = new Date(y, m - 1, d + offsetDays);
+      const nextStr = [
+        dt.getFullYear(),
+        String(dt.getMonth() + 1).padStart(2, '0'),
+        String(dt.getDate()).padStart(2, '0')
+      ].join('-');
+      input.value = nextStr;
+      showAllDates = false;
+      document.getElementById('btnShowToday').classList.toggle('active', nextStr === todayStr);
+      document.getElementById('btnShowAllDates').classList.remove('active');
+      renderSchedule();
+    };
     window.setScheduleViewMode = (mode) => {
       scheduleViewMode = mode;
-      document.getElementById('btnViewGrid').classList.toggle('active', mode === 'grid');
-      document.getElementById('btnViewList').classList.toggle('active', mode === 'list');
+      document.getElementById('btnViewGrid').classList.toggle('active', mode === 'grid' && !showAllDates);
+      document.getElementById('btnViewList').classList.toggle('active', mode === 'list' && !showAllDates);
       document.getElementById('timetableGridContainer').style.display = mode === 'grid' ? 'block' : 'none';
       document.getElementById('bookingsContainer').style.display = mode === 'list' ? 'flex' : 'none';
       renderSchedule();
@@ -2067,26 +2037,28 @@
       const roomMap = Object.fromEntries(allRooms.map(r => [r.id, r]));
       const filterDateVal = document.getElementById('filterDate').value || todayStr;
       const filterRoomVal = document.getElementById('filterRoom').value;
+      document.getElementById('activeDateLabel').textContent = formatReadableDate(filterDateVal);
       const visibleRooms = (filterRoomVal && filterRoomVal !== 'ALL')
         ? allRooms.filter(r => r.id === filterRoomVal)
         : allRooms;
       const dayBookings = (currentState.bookings || []).filter(b => b.date === filterDateVal);
-      // Full schedule slots from 08:00 down to 20:00
       const timeSlots = [
         '08:00', '09:00', '10:00', '11:00', '12:00',
         '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'
       ];
+      const currentHourStr = new Date().toTimeString().slice(0, 2) + ':00';
+      const isViewingToday = filterDateVal === todayStr;
       const isSmallScreen = window.innerWidth < 1024;
       const gridContainer = document.getElementById('timetableGridContainer');
-      // 6. Below 1024px: If "ALL" rooms selected, collapse into a responsive Day Agenda (or tap a Room Pill for 1-room track)
+      // Below 1024px: If "ALL" rooms selected, collapse into a clean Day Agenda
       if (isSmallScreen && (!filterRoomVal || filterRoomVal === 'ALL')) {
         gridContainer.innerHTML = `
           <div style="padding:12px;">
-            <div style="background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; padding:9px 12px; border-radius:9px; font-size:0.76rem; font-weight:600; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
-              <span>📱 <strong>Day Agenda (${filterDateVal})</strong> — Tap any room pill above to view a single-room track</span>
-              ${allRooms[0] ? `<button type="button" class="preset-chip" onclick="selectRoomFilter('${allRooms[0].id}')">View ${allRooms[0].name} Track →</button>` : ''}
+            <div style="background:#f8fafc; border:1px solid var(--cc-border); color:var(--cc-navy); padding:8px 12px; border-radius:8px; font-size:0.75rem; font-weight:600; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span>📱 <strong>Day Agenda</strong> — Tap any room above for a single-room track</span>
+              ${allRooms[0] ? `<button type="button" class="preset-chip" onclick="selectRoomFilter('${allRooms[0].id}')">View ${allRooms[0].name} →</button>` : ''}
             </div>
-            <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; flex-direction:column; gap:6px;">
               ${timeSlots.map(slotStart => {
                 const nextHour = String(Number(slotStart.slice(0, 2)) + 1).padStart(2, '0') + ':00';
                 const slotBookings = dayBookings.filter(b => b.startTime < nextHour && b.endTime > slotStart);
@@ -2095,40 +2067,36 @@
                   !slotBookings.some(b => b.roomId === r.id)
                 );
                 return `
-                  <div style="border:1px solid var(--cc-border); border-radius:10px; padding:10px 12px; background:#ffffff; display:flex; flex-direction:column; gap:8px;">
+                  <div style="border:1px solid var(--cc-border); border-radius:8px; padding:8px 10px; background:#ffffff; display:flex; flex-direction:column; gap:6px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-weight:800; font-size:0.8rem; color:var(--cc-navy);">⏰ ${slotStart} – ${nextHour}</span>
-                      <span style="font-size:0.7rem; color:#64748b; font-weight:600;">${freeRooms.length} of ${allRooms.length} rooms free</span>
+                      <span style="font-weight:700; font-size:0.76rem; color:var(--cc-navy); font-variant-numeric:tabular-nums;">${slotStart} – ${nextHour}</span>
+                      <span style="font-size:0.68rem; color:var(--cc-muted);">${freeRooms.length}/${allRooms.length} free</span>
                     </div>
-                    ${slotBookings.length > 0 ? `
-                      <div style="display:flex; flex-direction:column; gap:6px;">
-                        ${slotBookings.map(b => {
-                          const rm = roomMap[b.roomId] || { name: b.roomId };
-                          const theme = getDeptTheme(b.department);
-                          const initials = getInitials(b.organizer || b.department);
-                          return `
-                            <button type="button" class="slot-booked-card"
-                              style="background:${theme.bg}; border-left-color:${theme.border}; color:${theme.text};"
-                              onclick="openBookingPopover('${b.id}')">
-                              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-                                <span class="slot-booked-title">${b.title}</span>
-                                <span class="slot-time-badge">${b.startTime}–${b.endTime}</span>
-                              </div>
-                              <div class="slot-booked-footer" style="margin-top:2px;">
-                                <span style="font-size:0.7rem; font-weight:700;">📍 ${rm.name}</span>
-                                <span class="slot-dept-chip" style="background:${theme.pillBg}; color:${theme.pillText};">
-                                  <span class="slot-dept-avatar" style="background:${theme.avatarBg};">${initials}</span>
-                                  <span>${theme.label}</span>
-                                </span>
-                              </div>
-                            </button>
-                          `;
-                        }).join('')}
-                      </div>
-                    ` : ''}
-                    <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                    ${slotBookings.map(b => {
+                      const rm = roomMap[b.roomId] || { name: b.roomId };
+                      const theme = getDeptTheme(b.department);
+                      const initials = getInitials(b.organizer || b.department);
+                      return `
+                        <button type="button" class="slot-booked-card"
+                          style="background:${theme.bg}; border-left-color:${theme.border}; color:${theme.text};"
+                          onclick="openBookingPopover('${b.id}')">
+                          <div class="slot-booked-top">
+                            <span class="slot-booked-title">${b.title}</span>
+                            <span class="slot-time-badge">${b.startTime}–${b.endTime}</span>
+                          </div>
+                          <div class="slot-booked-footer">
+                            <span style="font-size:0.68rem; font-weight:600;">📍 ${rm.name}</span>
+                            <span class="slot-dept-chip" style="background:${theme.pillBg}; color:${theme.pillText};">
+                              <span class="slot-dept-avatar" style="background:${theme.avatarBg};">${initials}</span>
+                              <span>${theme.label}</span>
+                            </span>
+                          </div>
+                        </button>
+                      `;
+                    }).join('')}
+                    <div style="display:flex; flex-wrap:wrap; gap:4px;">
                       ${freeRooms.map(r => `
-                        <button type="button" class="preset-chip" style="background:#f8fafc;" onclick="quickPickSlot('${r.id}', '${filterDateVal}', '${slotStart}', '${nextHour}')">
+                        <button type="button" class="preset-chip" onclick="quickPickSlot('${r.id}', '${filterDateVal}', '${slotStart}', '${nextHour}')">
                           ＋ ${r.name}
                         </button>
                       `).join('')}
@@ -2140,26 +2108,26 @@
           </div>
         `;
       } else {
-        // 5. Sticky Table Headers with Embedded Room Metadata, Equipment Pills & (i) Info Tooltip
+        // Minimalist High-Density Timetable Grid
         gridContainer.innerHTML = `
           <table class="timetable-table">
             <thead>
               <tr>
-                <th>Time<br/><span style="font-size:0.66rem; font-weight:600; color:#64748b;">${filterDateVal}</span></th>
+                <th>Time</th>
                 ${visibleRooms.map(r => {
                   const isMaint = r.status === 'maintenance';
                   const busy = isRoomBusyNow(r.id, currentState.bookings || []);
                   const todayCount = dayBookings.filter(b => b.roomId === r.id).length;
-                  const shortAmenities = (r.amenities || []).slice(0, 2);
-                  const extraCount = Math.max(0, (r.amenities || []).length - 2);
+                  const shortFloor = (r.floor || 'HQ').split('-')[0].trim();
+                  const topEquip = (r.amenities || []).slice(0, 2).join(', ');
                   return `
                     <th>
-                      <div class="th-room-top">
-                        <div class="th-room-title" onclick="selectRoomFilter('${r.id}')" title="Click to filter schedule to ${r.name}">
-                          <span style="width:9px; height:9px; border-radius:50%; background:${r.color || '#1863dc'}; display:inline-block; flex-shrink:0;"></span>
+                      <div class="th-header-row">
+                        <div class="th-room-name" onclick="selectRoomFilter('${r.id}')" title="Click to filter schedule to ${r.name}">
+                          <span style="width:8px; height:8px; border-radius:50%; background:${r.color || '#2563eb'}; display:inline-block; flex-shrink:0;"></span>
                           <span>${r.name}</span>
                         </div>
-                        <div style="display:flex; align-items:center; gap:4px;">
+                        <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
                           ${isMaint
                             ? `<span class="maint-room-badge">Maint</span>`
                             : busy
@@ -2167,21 +2135,18 @@
                               : ''
                           }
                           <span class="room-info-trigger" tabindex="0" aria-label="Room specifications for ${r.name}">
-                            i
+                            ⓘ
                             <div class="room-info-tooltip">
-                              <div style="font-weight:800; font-size:0.78rem; margin-bottom:3px; color:#fff;">${r.name}</div>
-                              <div style="color:#94a3b8; margin-bottom:6px;">📍 ${r.floor || 'HQ'} • 👥 Capacity: ${r.capacity} pax</div>
-                              <div style="font-weight:700; color:#cbd5e1; margin-bottom:2px;">Equipment & Specs:</div>
-                              <div style="color:#e2e8f0; margin-bottom:6px;">• ${(r.amenities || []).join('<br/>• ')}</div>
-                              <div style="color:#38bdf8; font-weight:700;">📅 ${todayCount} reservation${todayCount === 1 ? '' : 's'} on this date</div>
+                              <div style="font-weight:700; font-size:0.75rem; margin-bottom:2px; color:#fff;">${r.name}</div>
+                              <div style="color:#94a3b8; margin-bottom:6px;">📍 ${r.floor || 'HQ'} • 👥 ${r.capacity} pax</div>
+                              <div style="color:#e2e8f0; margin-bottom:6px;">🛠️ ${(r.amenities || []).join(' • ')}</div>
+                              <div style="color:#38bdf8; font-weight:600;">📅 ${todayCount} booking${todayCount === 1 ? '' : 's'} on ${filterDateVal}</div>
                             </div>
                           </span>
                         </div>
                       </div>
-                      <div class="th-room-meta">
-                        <span class="th-meta-pill">👥 ${r.capacity}p</span>
-                        ${shortAmenities.map(a => `<span class="th-meta-pill">${a}</span>`).join('')}
-                        ${extraCount > 0 ? `<span class="th-meta-pill">+${extraCount}</span>` : ''}
+                      <div class="th-room-sub">
+                        ${shortFloor} • ${r.capacity} pax${topEquip ? ` • ${topEquip}` : ''}
                       </div>
                     </th>
                   `;
@@ -2191,18 +2156,21 @@
             <tbody>
               ${timeSlots.map((slotStart) => {
                 const nextHour = String(Number(slotStart.slice(0, 2)) + 1).padStart(2, '0') + ':00';
+                const isNowRow = isViewingToday && slotStart === currentHourStr;
                 return `
-                  <tr>
-                    <td class="time-col-cell">${slotStart} – ${nextHour}</td>
+                  <tr class="${isNowRow ? 'current-hour-row' : ''}">
+                    <td class="time-col-cell">
+                      ${slotStart}
+                      ${isNowRow ? `<span class="now-tag">NOW</span>` : ''}
+                    </td>
                     ${visibleRooms.map(room => {
                       if (room.status === 'maintenance') {
-                        return `<td style="background:#fffbeb; text-align:center; vertical-align:middle; font-size:0.72rem; color:#b45309; font-weight:700;">🛠️ Maintenance</td>`;
+                        return `<td style="background:#fffbeb; text-align:center; vertical-align:middle; font-size:0.68rem; color:#b45309; font-weight:600;">Maintenance</td>`;
                       }
                       const overlapping = dayBookings.filter(
                         b => b.roomId === room.id && b.startTime < nextHour && b.endTime > slotStart
                       );
                       if (overlapping.length > 0) {
-                        // 3. De-cluttered Scannable Cells: Only Meeting Title, Time Badge, and Department Tag/Avatar
                         return `<td>${overlapping.map(b => {
                           const theme = getDeptTheme(b.department);
                           const initials = getInitials(b.organizer || b.department);
@@ -2210,8 +2178,10 @@
                             <button type="button" class="slot-booked-card"
                               style="background:${theme.bg}; border-left-color:${theme.border}; color:${theme.text};"
                               onclick="openBookingPopover('${b.id}')"
-                              title="Click to view details, WhatsApp alert & Outlook calendar options">
-                              <div class="slot-booked-title">${b.title}</div>
+                              title="${b.title} (${b.startTime}–${b.endTime}) • Click for details">
+                              <div class="slot-booked-top">
+                                <span class="slot-booked-title">${b.title}</span>
+                              </div>
                               <div class="slot-booked-footer">
                                 <span class="slot-time-badge">${b.startTime}–${b.endTime}</span>
                                 <span class="slot-dept-chip" style="background:${theme.pillBg}; color:${theme.pillText};">
@@ -2223,12 +2193,10 @@
                           `;
                         }).join('')}</td>`;
                       }
-                      const slotKey = `${room.id}|${filterDateVal}|${slotStart}`;
-                      const isSelectedSlot = activeClickedSlotKey === slotKey;
                       return `
                         <td>
-                          <button type="button" class="slot-free-btn ${isSelectedSlot ? 'selected-slot' : ''}" onclick="quickPickSlot('${room.id}', '${filterDateVal}', '${slotStart}', '${nextHour}')">
-                            <span>${isSelectedSlot ? '✓ Selected' : '+ Available'}</span>
+                          <button type="button" class="slot-free-btn" onclick="quickPickSlot('${room.id}', '${filterDateVal}', '${slotStart}', '${nextHour}')" aria-label="Book ${room.name} at ${slotStart}">
+                            <span>＋ Book ${slotStart}</span>
                           </button>
                         </td>
                       `;
@@ -2240,7 +2208,7 @@
           </table>
         `;
       }
-      // Also render List / Day Agenda View
+      // Render List / Agenda View
       let filtered = [...(currentState.bookings || [])];
       if (!showAllDates && filterDateVal) {
         filtered = filtered.filter(b => b.date === filterDateVal);
@@ -2252,32 +2220,28 @@
         if (a.date !== b.date) return a.date.localeCompare(b.date);
         return a.startTime.localeCompare(b.startTime);
       });
-      document.getElementById('roomsCountHeading').textContent =
-        filterRoomVal && filterRoomVal !== 'ALL' && roomMap[filterRoomVal]
-          ? `📊 Schedule — ${roomMap[filterRoomVal].name}`
-          : `📊 HQ Room Booking Schedule (${allRooms.length} Rooms)`;
       document.getElementById('scheduleSubtitle').textContent = showAllDates
-        ? `Showing all ${filtered.length} upcoming reservations`
-        : `${filterDateVal} • ${dayBookings.length} reservation${dayBookings.length === 1 ? '' : 's'} • Click any empty slot to book or booked card for options`;
+        ? `${filtered.length} upcoming reservations`
+        : `${dayBookings.length} reservation${dayBookings.length === 1 ? '' : 's'} • Click any empty slot to book`;
       const container = document.getElementById('bookingsContainer');
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty-box">
-            <div style="font-size: 1.8rem; margin-bottom: 6px;">📅</div>
-            <div style="font-weight: 700; color: var(--cc-navy);">No room reservations for this filter</div>
-            <div style="font-size: 0.82rem; margin-top: 4px;">Click any "+ Available" slot in the Schedule Grid to book immediately.</div>
+            <div style="font-size: 1.6rem; margin-bottom: 6px;">📅</div>
+            <div style="font-weight: 700; color: var(--cc-navy);">No reservations for this date</div>
+            <div style="font-size: 0.78rem; margin-top: 4px;">Switch to Timetable and click any time slot to book a room.</div>
           </div>
         `;
         return;
       }
       container.innerHTML = filtered.map(b => {
-        const room = roomMap[b.roomId] || { name: b.roomId, color: '#1863dc' };
+        const room = roomMap[b.roomId] || { name: b.roomId, color: '#2563eb' };
         const theme = getDeptTheme(b.department);
         const waUrl = buildWhatsAppBookingUrl(b, room, 'confirmed');
         const outlookUrls = buildOutlookCalendarUrls(b, room);
         return `
           <div class="booking-item" style="border-left-color: ${theme.border}; background:${theme.bg};">
-            <div class="booking-time-box" style="background:#ffffff;">
+            <div class="booking-time-box">
               <div class="booking-time">${b.startTime} – ${b.endTime}</div>
               <div class="booking-date">${b.date}</div>
             </div>
@@ -2289,7 +2253,7 @@
                 <span>👤 ${b.organizer || 'HQ Staff'}</span>
                 ${b.phone ? `<span>📱 ${b.phone}</span>` : ''}
               </div>
-              ${b.notes ? `<div style="font-size: 0.78rem; color: #475569; margin-top: 4px;">💬 ${b.notes}</div>` : ''}
+              ${b.notes ? `<div style="font-size: 0.75rem; color: #475569; margin-top: 3px;">💬 ${b.notes}</div>` : ''}
             </div>
             <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
               <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="mini-action-btn outlook">📅 Outlook</a>
@@ -2298,7 +2262,7 @@
               ${isAdmin
                 ? `<button type="button" class="btn-edit" onclick="openEditBooking('${b.id}')">✎ Edit</button>
                    <button type="button" class="btn-delete" onclick="cancelBooking('${b.id}')">🗑 Delete</button>`
-                : `<a href="/login.html?redirect=/booking/" class="staff-lock-note">🔒 Admin Edit</a>`
+                : ''
               }
             </div>
           </div>
@@ -2306,7 +2270,7 @@
       }).join('');
     }
     // =========================================================================
-    // 3. BOOKED SLOT POPOVER MODAL (SECONDARY ACTIONS, NOTES, EQUIPMENT)
+    // BOOKED SLOT POPOVER MODAL (SECONDARY ACTIONS, NOTES, EQUIPMENT)
     // =========================================================================
     window.openBookingPopover = (bookingId) => {
       const b = (currentState?.bookings || []).find(item => item.id === bookingId);
@@ -2317,37 +2281,37 @@
       const outlookUrls = buildOutlookCalendarUrls(b, room);
       const content = document.getElementById('bookingPopoverContent');
       content.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px;">
+        <div class="modal-header" style="margin-bottom:10px;">
           <div>
-            <span class="dept-pill" style="background:${theme.pillBg}; color:${theme.pillText}; display:inline-block; margin-bottom:6px;">
+            <span class="dept-pill" style="background:${theme.pillBg}; color:${theme.pillText}; display:inline-block; margin-bottom:5px;">
               ${b.department}
             </span>
-            <h3 style="font-size:1.05rem; font-weight:800; color:var(--cc-navy); line-height:1.3;">${b.title}</h3>
+            <h3 style="font-size:1rem; font-weight:800; color:var(--cc-navy); line-height:1.3;">${b.title}</h3>
           </div>
-          <button type="button" onclick="closeBookingPopover()" style="background:#f1f5f9; border:none; width:28px; height:28px; border-radius:7px; font-size:1.1rem; cursor:pointer; color:#475569;">&times;</button>
+          <button type="button" class="modal-close-x" onclick="closeBookingPopover()">&times;</button>
         </div>
-        <div style="background:#f8fafc; border:1px solid var(--cc-border); border-radius:10px; padding:12px; font-size:0.8rem; display:flex; flex-direction:column; gap:6px; margin-bottom:14px;">
+        <div style="background:#f8fafc; border:1px solid var(--cc-border); border-radius:10px; padding:11px 12px; font-size:0.78rem; display:flex; flex-direction:column; gap:5px; margin-bottom:14px;">
           <div><strong>📍 Room:</strong> ${room.name} <span style="color:var(--cc-muted);">(${room.floor || 'HQ'})</span></div>
           <div><strong>⏰ Time:</strong> ${b.date} • ${b.startTime} – ${b.endTime}</div>
-          <div><strong>👤 Organizer:</strong> ${b.organizer || 'HQ Staff'}${b.phone ? ` • 📱 ${b.phone}` : ''}${b.email ? ` • ✉️ ${b.email}` : ''}</div>
-          ${(room.amenities && room.amenities.length) ? `<div><strong>🛠️ Room Specs:</strong> ${room.amenities.join(', ')}</div>` : ''}
+          <div><strong>👤 Booked By:</strong> ${b.organizer || 'HQ Staff'}${b.phone ? ` • 📱 ${b.phone}` : ''}</div>
+          ${(room.amenities && room.amenities.length) ? `<div><strong>🛠️ Equipment:</strong> ${room.amenities.join(', ')}</div>` : ''}
           ${b.notes ? `<div style="padding-top:4px; border-top:1px dashed #cbd5e1; color:#334155;"><strong>💬 Notes:</strong> ${b.notes}</div>` : ''}
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <a href="${waUrl}" target="_blank" rel="noopener" class="mini-action-btn wa" style="justify-content:center; padding:9px;">
-              💬 Notify WhatsApp
+            <a href="${waUrl}" target="_blank" rel="noopener" class="mini-action-btn wa" style="justify-content:center; padding:8px;">
+              💬 WhatsApp
             </a>
-            <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="mini-action-btn outlook" style="justify-content:center; padding:9px;">
-              📅 Open in Outlook
+            <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="mini-action-btn outlook" style="justify-content:center; padding:8px;">
+              📅 Outlook 365
             </a>
           </div>
           <button type="button" class="btn-chip" style="width:100%; padding:8px;" onclick="triggerIcsDownload('${b.id}')">
-            📥 Download Outlook Calendar Invite (.ics)
+            📥 Download Outlook Invite (.ics)
           </button>
           ${isAdmin ? `
             <div style="display:flex; gap:8px; margin-top:4px; padding-top:8px; border-top:1px solid var(--cc-border);">
-              <button type="button" class="btn-edit" style="flex:1;" onclick="closeBookingPopover(); openEditBooking('${b.id}')">✎ Edit Booking</button>
+              <button type="button" class="btn-edit" style="flex:1;" onclick="closeBookingPopover(); openEditBooking('${b.id}')">✎ Edit</button>
               <button type="button" class="btn-delete" style="flex:1;" onclick="closeBookingPopover(); cancelBooking('${b.id}')">🗑 Delete</button>
             </div>
           ` : ''}
@@ -2359,17 +2323,15 @@
       document.getElementById('bookingDetailPopover').classList.remove('open');
     };
     // =========================================================================
-    // 2. CLICK-TO-BOOK SLOT INTERACTION (INSTANT PRE-FILL + 1H DEFAULT)
+    // CLICK-TO-BOOK SLOT INTERACTION -> OPENS BOOKING MODAL PRE-FILLED
     // =========================================================================
     window.quickPickSlot = (roomId, dateStr, startTime, endTime) => {
-      activeClickedSlotKey = `${roomId}|${dateStr}|${startTime}`;
       document.getElementById('roomId').value = roomId;
       document.getElementById('date').value = dateStr;
       document.getElementById('startTime').value = startTime;
       selectedDurationMins = 60; // Default 1 hour (e.g. 14:00 -> 15:00)
       syncEndTimeFromStartAndDuration();
-      renderSchedule();
-      openBookingDrawerOrFocus();
+      openBookingModal();
     };
     window.triggerIcsDownload = (bookingId) => {
       const b = (currentState?.bookings || []).find(item => item.id === bookingId);
@@ -2378,7 +2340,7 @@
       downloadOutlookIcs(b, room);
     };
     window.closeConfirmedModal = () => {
-      document.getElementById('confirmedModal').style.display = 'none';
+      document.getElementById('confirmedModal').classList.remove('open');
     };
     // Handle New Booking Submission
     document.getElementById('bookingForm').addEventListener('submit', async (e) => {
@@ -2412,12 +2374,11 @@
           notifyWhatsapp
         });
         const room = (currentState?.rooms || []).find(r => r.id === roomId) || { name: roomId, floor: 'HQ' };
-        activeClickedSlotKey = null;
         document.getElementById('title').value = '';
         document.getElementById('notes').value = '';
         document.getElementById('filterDate').value = date;
         showAllDates = false;
-        closeBookingDrawer();
+        closeBookingModal();
         showAlert('Room booked and synced to HQ Schedule!');
         const outlookUrls = buildOutlookCalendarUrls(created, room);
         const waUrl = buildWhatsAppBookingUrl(created, room, 'confirmed');
@@ -2426,7 +2387,7 @@
         document.getElementById('btnModalOutlook365').href = outlookUrls.office365Url;
         document.getElementById('btnModalWhatsApp').href = waUrl;
         document.getElementById('btnModalOutlookIcs').onclick = () => downloadOutlookIcs(created, room);
-        document.getElementById('confirmedModal').style.display = 'flex';
+        document.getElementById('confirmedModal').classList.add('open');
         if (autoOutlook) {
           downloadOutlookIcs(created, room);
         }
@@ -2453,10 +2414,10 @@
       document.getElementById('editStartTime').value = b.startTime || '09:00';
       document.getElementById('editEndTime').value = b.endTime || '10:00';
       document.getElementById('editNotes').value = b.notes || '';
-      document.getElementById('editModal').style.display = 'flex';
+      document.getElementById('editModal').classList.add('open');
     };
     window.closeEditBooking = () => {
-      document.getElementById('editModal').style.display = 'none';
+      document.getElementById('editModal').classList.remove('open');
     };
     document.getElementById('editBookingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -2496,10 +2457,10 @@
       if (!isAdmin) return;
       resetRoomConfigForm();
       renderRoomManagerList();
-      document.getElementById('roomManagerModal').style.display = 'flex';
+      document.getElementById('roomManagerModal').classList.add('open');
     };
     window.closeRoomManagerModal = () => {
-      document.getElementById('roomManagerModal').style.display = 'none';
+      document.getElementById('roomManagerModal').classList.remove('open');
     };
     window.resetRoomConfigForm = () => {
       document.getElementById('cfgRoomId').value = '';
@@ -2542,19 +2503,16 @@
       document.getElementById('modalRoomCount').textContent = rooms.length;
       const listEl = document.getElementById('roomManagerList');
       listEl.innerHTML = rooms.map(r => `
-        <div class="room-admin-item" style="border-left-color:${r.color || '#1863dc'};">
+        <div class="room-admin-item" style="border-left-color:${r.color || '#2563eb'};">
           <div>
-            <div style="font-weight:800; font-size:0.9rem; color:var(--cc-navy);">
+            <div style="font-weight:700; font-size:0.86rem; color:var(--cc-navy);">
               ${r.name}
-              <span class="${r.status === 'maintenance' ? 'maint-room-badge' : 'free-room-badge'}" style="margin-left:6px;">
-                ${r.status === 'maintenance' ? 'Maintenance' : 'Available'}
+              <span class="${r.status === 'maintenance' ? 'maint-room-badge' : ''}" style="margin-left:6px;">
+                ${r.status === 'maintenance' ? 'Maintenance' : ''}
               </span>
             </div>
-            <div style="font-size:0.76rem; color:var(--cc-muted); margin-top:2px;">
-              📍 ${r.floor || 'HQ'} • 👥 Up to ${r.capacity} pax
-            </div>
-            <div style="font-size:0.74rem; color:#475569; margin-top:3px;">
-              🛠️ ${(r.amenities || []).join(' • ')}
+            <div style="font-size:0.74rem; color:var(--cc-muted); margin-top:2px;">
+              📍 ${r.floor || 'HQ'} • 👥 ${r.capacity} pax • 🛠️ ${(r.amenities || []).join(', ')}
             </div>
           </div>
           <div style="display:flex; gap:6px;">
@@ -2595,7 +2553,8 @@
       document.getElementById('filterDate').value = todayStr;
       document.getElementById('btnShowToday').classList.add('active');
       document.getElementById('btnShowAllDates').classList.remove('active');
-      renderSchedule();
+      if (scheduleViewMode === 'list') setScheduleViewMode('grid');
+      else renderSchedule();
     });
     document.getElementById('btnShowAllDates').addEventListener('click', () => {
       showAllDates = true;
@@ -2606,7 +2565,8 @@
     });
     document.getElementById('filterDate').addEventListener('change', () => {
       showAllDates = false;
-      document.getElementById('btnShowToday').classList.remove('active');
+      const v = document.getElementById('filterDate').value;
+      document.getElementById('btnShowToday').classList.toggle('active', v === todayStr);
       document.getElementById('btnShowAllDates').classList.remove('active');
       renderSchedule();
     });
