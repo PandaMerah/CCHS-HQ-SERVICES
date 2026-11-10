@@ -2,72 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Meeting Alignment TV — CareClinics HQ</title>
-    <link rel="icon" type="image/webp" href="/careclinic-logo.webp">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/shared/theme.css">
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+    <title>Care Clinics Group - Weekly Alignment</title>
+    <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg">
+    <link rel="stylesheet" href="/meeting/style.css">
 </head>
 <body>
+    <div class="app-layout">
+        <!-- Left Navy Sidebar with Logo, Clock & Date -->
+        <div class="sidebar">
+            <div>
+                <div class="brand-header">
+                    <img src="/careclinic-logo.webp" alt="Care Clinics Logo" class="sidebar-logo" onerror="this.src='/images/acme-logo.svg'">
+                    <div class="brand-subtitle">Weekly Alignment</div>
+                    
+                    <div class="sidebar-clock-container">
+                        <div class="sidebar-time" id="sidebar-time">--:--:--</div>
+                        <div class="sidebar-date" id="sidebar-date">-----, -- ---- ----</div>
+                    </div>
+                </div>
 
-<!-- Unified Minimal Top Navigation Bar -->
-<nav class="cchs-navbar">
-    <div class="cchs-navbar-inner">
-        <a href="/" class="cchs-brand">
-            <img src="/careclinic-logo.webp" alt="CareClinics Logo">
-            <div class="cchs-brand-text">
-                <span class="cchs-brand-title">CareClinics HQ</span>
-                <span class="cchs-brand-subtitle">Weekly Alignment Presentation TV</span>
+                <!-- Auto-generating Slide Navigation -->
+                <div class="dept-pill-list" id="sidebar-menu"></div>
             </div>
-        </a>
-        <div class="cchs-nav-links">
-            <a href="/" class="cchs-nav-link">Portal Home</a>
-            <a href="/booking/" class="cchs-nav-link">Room Booking</a>
-            <a href="/meeting/input.html" class="cchs-nav-link">Dept Update</a>
-            <a href="/meeting/" class="cchs-nav-link active">Meeting TV</a>
-            <a href="/display/?mode=share" class="cchs-nav-link">Share Screen</a>
-            <a href="/pdf/" class="cchs-nav-link">PDF Studio</a>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-nav-links">
+                    <a href="/">⌂ Staff Portal</a>
+                    <a href="/meeting/input.html">✎ Staff Input</a>
+                    <a href="/admin/">🛡️ Admin Portal</a>
+                </div>
+                <div>Careclinics Healthcare Services HQ</div>
+            </div>
         </div>
-        <div class="cchs-nav-right">
-            <a href="/meeting/admin.html" class="cchs-btn cchs-btn-secondary" style="min-height:38px;padding:0.4rem 0.85rem;font-size:0.8rem;">⚙️ Meeting Admin</a>
+
+        <!-- Right Main Viewport -->
+        <div class="main-viewport">
+            <div id="slides-container"></div>
         </div>
     </div>
-</nav>
 
-<div class="app-layout">
-    <!-- Left Sidebar -->
-    <aside class="sidebar">
-        <div class="brand-box">
-            <img src="/careclinic-logo.webp" alt="CareClinics Logo">
-            <div class="time-widget">
-                <div class="time" id="sidebar-time">00:00</div>
-                <div class="date" id="sidebar-date">Loading...</div>
-            </div>
-        </div>
+    <!-- On-Screen TV Navigation Overlay -->
+    <div class="tv-controls">
+        <button onclick="window.location.href='/'" title="Return to HQ Portal">⌂ HQ</button>
+        <button onclick="changeSlide(-1)">❮</button>
+        <span id="slide-indicator">1 / 1</span>
+        <button onclick="changeSlide(1)">❯</button>
+        <button onclick="toggleFullScreen()">⛶</button>
+        <button id="btn-autoplay" onclick="toggleAutoPlay()">▶ Auto</button>
+    </div>
 
-        <div class="dept-pill-list" id="sidebar-menu">
-            <!-- Populated by JS -->
-        </div>
-    </aside>
-
-    <!-- Main Content Viewport -->
-    <main class="main-viewport">
-        <div id="slides-container">
-            <!-- Populated by JS -->
-        </div>
-
-        <!-- TV Floating Controls -->
-        <div class="tv-controls">
-            <button class="tv-btn" onclick="prevSlide()" title="Previous Slide (Left Arrow)">◀</button>
-            <div class="slide-indicator" id="slide-indicator">1 / 1</div>
-            <button class="tv-btn" onclick="nextSlide()" title="Next Slide (Right Arrow)">▶</button>
-            <button class="tv-btn" id="btn-autoplay" onclick="toggleAutoplay()" title="Auto-Play Slides">▶ Auto</button>
-            <button class="tv-btn" onclick="toggleFullScreen()" title="Full Screen">⛶</button>
-        </div>
-    </main>
-</div>
-
-<script type="module" src="app.js"></script>
+    <script type="module" src="/meeting/app.js"></script>
 </body>
 </html>

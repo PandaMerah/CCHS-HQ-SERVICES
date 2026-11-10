@@ -3,493 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Department Update — CareClinics HQ</title>
-    <link rel="icon" type="image/webp" href="/careclinic-logo.webp">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/shared/theme.css">
+    <title>Care Clinics - Submit Weekly Update</title>
+    <link rel="icon" type="image/svg+xml" href="/images/acme-logo.svg">
     <style>
+        :root {
+            --cc-navy: #112349;
+            --cc-blue: #1863dc;
+            --cc-light-bg: #f0f4f8;
+            --cc-border: #d1d5db;
+        }
+
         body {
-            background-color: var(--bg-page);
-            color: var(--text-primary);
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--cc-light-bg);
+            color: #111827;
+            padding: 32px 20px;
+            margin: 0;
+        }
+
+        .top-nav {
+            max-width: 1200px;
+            margin: 0 auto 20px;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .main-container {
-            max-width: var(--container-max);
-            width: 100%;
-            margin: 0 auto;
-            padding: 2rem 1.5rem 3.5rem;
-            display: grid;
-            grid-template-columns: 1fr 1.15fr;
-            gap: 1.75rem;
-            align-items: start;
-            flex: 1;
+        .top-nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        /* Form Card */
-        .form-card {
-            background: var(--bg-card);
-            padding: 2rem;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .form-card h1 {
-            color: var(--text-primary);
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.3rem;
-        }
-
-        .form-card p.sub {
-            color: var(--text-secondary);
+        .nav-pill {
+            text-decoration: none;
+            font-weight: 600;
             font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--cc-navy);
+            border: 1px solid var(--cc-border);
+            transition: all 0.2s;
         }
 
-        .form-group {
-            margin-bottom: 1.25rem;
+        .nav-pill:hover {
+            background: var(--cc-navy);
+            color: #ffffff;
+        }
+
+        .container-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        @media (max-width: 900px) {
+            .container-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card-panel {
+            background: #ffffff;
+            padding: 36px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(17, 35, 73, 0.08);
+            border: 1px solid var(--cc-border);
+        }
+
+        .header {
+            border-bottom: 2px solid var(--cc-light-bg);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 { color: var(--cc-navy); margin: 0; }
+
+        .history-box {
+            background: var(--cc-light-bg);
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
         }
 
         label {
             display: block;
+            margin-top: 14px;
             font-weight: 600;
-            margin-bottom: 0.45rem;
-            color: var(--text-primary);
-            font-size: 0.85rem;
+            color: var(--cc-navy);
         }
 
-        select, textarea {
+        input[type="text"], select, textarea {
             width: 100%;
-            min-height: 46px;
-            padding: 0.65rem 0.9rem;
-            border: 1px solid var(--border-strong);
-            border-radius: var(--radius-sm);
-            font-size: 0.92rem;
+            padding: 12px;
+            box-sizing: border-box;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid var(--cc-border);
+            font-size: 1rem;
+            background: #ffffff;
             font-family: inherit;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: var(--focus-ring);
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 130px;
-            line-height: 1.55;
-        }
-
-        .btn-submit {
-            background: var(--color-primary);
-            color: #FFFFFF;
+        button {
+            background: var(--cc-blue);
+            color: white;
+            font-weight: bold;
             border: none;
-            padding: 0.8rem 1.25rem;
-            font-size: 0.95rem;
-            font-weight: 700;
-            border-radius: var(--radius-sm);
+            padding: 16px;
             cursor: pointer;
-            width: 100%;
-            min-height: 46px;
-            transition: background 0.15s ease;
-            box-shadow: var(--shadow-xs);
+            border-radius: 8px;
+            font-size: 1.05rem;
+            transition: background 0.2s;
         }
 
-        .btn-submit:hover:not(:disabled) {
-            background: var(--color-primary-hover);
+        button:hover { background: #114fb3; }
+
+        button.btn-clear {
+            background: #e5e7eb;
+            color: #374151;
+            width: 35%;
         }
 
-        .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        button.btn-clear:hover { background: #d1d5db; }
+
+        /* Preview Card Mirror */
+        .preview-tv-card {
+            background: #ffffff;
+            border: 2px solid var(--cc-blue);
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 15px 30px rgba(17, 35, 73, 0.1);
         }
 
-        .status-msg {
-            padding: 0.85rem 1rem;
-            border-radius: var(--radius-sm);
-            margin-bottom: 1.25rem;
-            font-weight: 600;
-            font-size: 0.88rem;
-            display: none;
-        }
-
-        .success {
-            background: var(--status-success-bg);
-            color: var(--status-success-text);
-            border: 1px solid var(--status-success-border);
-        }
-
-        .error {
-            background: var(--status-danger-bg);
-            color: var(--status-danger-text);
-            border: 1px solid var(--status-danger-border);
-        }
-
-        .history-box {
-            background: var(--bg-subtle);
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            margin-bottom: 1.25rem;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .history-box label {
-            color: var(--color-primary);
-            font-size: 0.82rem;
-        }
-
-        /* Live TV Slide Preview Card */
-        .preview-wrapper {
-            position: sticky;
-            top: 84px;
-        }
-
-        .preview-label {
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.65rem;
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-        }
-
-        .preview-label span {
-            width: 8px;
-            height: 8px;
-            background: var(--status-success-dot);
-            border-radius: 50%;
+        .cc-card-tag {
             display: inline-block;
-        }
-
-        .tv-mockup {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: var(--shadow-md);
-            min-height: 420px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .mock-tag {
-            display: inline-block;
-            background: var(--color-primary-soft);
-            border: 1px solid var(--color-primary-border);
-            color: var(--color-primary);
-            padding: 0.3rem 0.8rem;
-            border-radius: var(--radius-pill);
-            font-weight: 700;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            width: fit-content;
-            margin-bottom: 0.65rem;
-        }
-
-        .mock-title {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 1.25rem;
-            letter-spacing: -0.02em;
-        }
-
-        .mock-card {
-            background: var(--bg-subtle);
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            border: 1px solid var(--border-subtle);
-            flex: 1;
-            font-size: 1.08rem;
-            line-height: 1.6;
-            color: var(--text-primary);
-            font-weight: 500;
-            white-space: pre-wrap;
-        }
-
-        .mock-q {
-            margin-top: 1rem;
-            background: var(--status-warning-bg);
-            border-left: 4px solid #D97706;
-            padding: 1rem 1.25rem;
-            border-radius: var(--radius-sm);
-            display: none;
-        }
-
-        .mock-q h5 {
-            color: var(--status-warning-text);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            margin-bottom: 0.25rem;
-            font-weight: 700;
-        }
-
-        .mock-q p {
-            color: #78350F;
+            background: rgba(24, 99, 220, 0.1);
+            color: var(--cc-blue);
             font-size: 0.95rem;
-            font-weight: 600;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
         }
 
-        @media (max-width: 900px) {
-            .main-container {
-                grid-template-columns: 1fr;
-            }
-            .preview-wrapper {
-                position: static;
-            }
+        #status {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
         }
     </style>
 </head>
 <body>
+    <div class="top-nav">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="/careclinic-logo.webp" alt="Logo" style="height: 38px; background: var(--cc-navy); padding: 4px 10px; border-radius: 8px;" onerror="this.src='/images/acme-logo.svg'">
+            <strong style="color: var(--cc-navy);">Careclinics Weekly Alignment — Staff Submission</strong>
+        </div>
+        <div class="top-nav-links" id="inputNavLinks">
+            <a href="/" class="nav-pill">← Staff Portal</a>
+            <a href="/booking/" class="nav-pill">📅 Book Room</a>
+            <a href="/pdf/" class="nav-pill">📄 BentoPDF</a>
+            <a href="/login.html?redirect=/meeting/admin.html" class="nav-pill">🔒 Admin Login</a>
+        </div>
+    </div>
 
-<!-- Unified Minimal Top Navigation Bar -->
-<nav class="cchs-navbar">
-    <div class="cchs-navbar-inner">
-        <a href="/" class="cchs-brand">
-            <img src="/careclinic-logo.webp" alt="CareClinics Logo">
-            <div class="cchs-brand-text">
-                <span class="cchs-brand-title">CareClinics HQ</span>
-                <span class="cchs-brand-subtitle">Department Weekly Update</span>
+    <div class="container-layout">
+        <!-- Input Form Panel -->
+        <div class="card-panel">
+            <div class="header">
+                <div>
+                    <h2>Submit Department Update</h2>
+                    <span style="color: #6b7280;">Care Clinics Weekly Alignment</span>
+                </div>
             </div>
-        </a>
-        <div class="cchs-nav-links" id="inputNavLinks">
-            <a href="/" class="cchs-nav-link">Portal Home</a>
-            <a href="/booking/" class="cchs-nav-link">Room Booking</a>
-            <a href="/meeting/input.html" class="cchs-nav-link active">Dept Update</a>
-            <a href="/meeting/" class="cchs-nav-link">Meeting TV</a>
-            <a href="/display/?mode=share" class="cchs-nav-link">Share Screen</a>
-            <a href="/pdf/" class="cchs-nav-link">PDF Studio</a>
-        </div>
-    </div>
-</nav>
 
-<div class="main-container">
-    <!-- Left: Single-Column User-Friendly Form -->
-    <div class="form-card">
-        <h1>Submit Department Update</h1>
-        <p class="sub">Enter your department's weekly achievements, operational status, and leadership Q&amp;A topics below.</p>
+            <div id="status"></div>
 
-        <div id="status" class="status-msg"></div>
+            <label>Select Department:</label>
+            <select id="department" onchange="onDeptChange()"></select>
 
-        <div class="form-group">
-            <label for="department">1. Select Your Department</label>
-            <select id="department" onchange="loadDeptData()">
-                <option value="">Loading departments...</option>
-            </select>
+            <div class="history-box">
+                <label style="margin-top: 0;">Load Previous Update (Optional):</label>
+                <select id="historyDropdown" onchange="populateFromHistory()"></select>
+            </div>
+
+            <label>Weekly Update Text:</label>
+            <textarea id="updateText" rows="5" placeholder="Enter your department's weekly update..." oninput="updatePreview()"></textarea>
+
+            <label>Department Specific Question (For Q&A):</label>
+            <input type="text" id="questionText" placeholder="Enter question for other departments..." oninput="updatePreview()">
+
+            <div class="btn-group">
+                <button type="button" class="btn-clear" onclick="clearInputFields()">Clear Text</button>
+                <button type="button" id="submitBtn" style="flex: 1;" onclick="submitUpdate()">Save & Broadcast Live to TV</button>
+            </div>
         </div>
 
-        <div class="history-box">
-            <label for="historyDropdown">🕒 View or Restore Past Submissions</label>
-            <select id="historyDropdown" onchange="loadHistoryItem()">
-                <option value="">-- Current Active Submission --</option>
-            </select>
-        </div>
+        <!-- Live Preview Panel -->
+        <div class="card-panel" style="background: var(--cc-light-bg);">
+            <div class="header">
+                <div>
+                    <h2>Live TV Slide Preview</h2>
+                    <span style="color: #6b7280;">Real-time view of broadcast slide</span>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="updateText">2. Key Updates / Achievements / Roadblocks</label>
-            <textarea id="updateText" placeholder="• Completed Q2 clinical audit&#10;• Onboarded 3 new branch clinics&#10;• Pending IT hardware approval..." oninput="updatePreview()"></textarea>
-        </div>
+            <div class="preview-tv-card">
+                <div class="cc-card-tag" id="prevTag">IT</div>
+                <h3 style="color: var(--cc-blue); margin-top: 0;">Weekly Department Update</h3>
+                <p id="prevUpdate" style="font-size: 1.25rem; color: #111827; line-height: 1.5; min-height: 100px; white-space: pre-line;">Your update text will appear here...</p>
 
-        <div class="form-group">
-            <label for="questionText">3. Questions for Management / Other Depts (Optional)</label>
-            <textarea id="questionText" style="min-height: 88px;" placeholder="Any cross-department questions or clarifications needed?" oninput="updatePreview()"></textarea>
-        </div>
+                <hr style="border: none; border-top: 1px solid var(--cc-border); margin: 20px 0;">
 
-        <button class="btn-submit" onclick="submitUpdate()" id="submitBtn">Save &amp; Publish to TV →</button>
-    </div>
-
-    <!-- Right: Live Slide Preview -->
-    <div class="preview-wrapper">
-        <div class="preview-label"><span></span> Live TV Slide Preview</div>
-        <div class="tv-mockup">
-            <div class="mock-tag" id="prevTag">Department Update</div>
-            <div class="mock-title">Key Highlights &amp; Progress</div>
-            <div class="mock-card" id="prevUpdate">Select your department and start typing to preview how your slide will appear on the meeting room TV...</div>
-            <div class="mock-q" id="prevQBox">
-                <h5>💬 Question / Discussion Point</h5>
-                <p id="prevQuestion"></p>
+                <div class="cc-card-tag" style="background: rgba(245, 158, 11, 0.15); color: #d97706;">Q&A Question</div>
+                <p id="prevQuestion" style="font-size: 1.1rem; color: #111827; margin: 0; white-space: pre-line;">Your question will appear here...</p>
             </div>
         </div>
     </div>
-</div>
 
-<script type="module">
-    import { db, ref, onValue, set } from './firebase-config.js';
-    import { isAdminLoggedIn } from '/shared/auth.js';
+    <script type="module">
+        import { subscribeState, submitDepartmentUpdate } from '/shared/cloud-store.js';
+        import { isAdminLoggedIn } from '/shared/auth.js';
 
-    if (isAdminLoggedIn()) {
-        const nav = document.getElementById('inputNavLinks');
-        if (nav) {
-            const adminLink = document.createElement('a');
-            adminLink.href = '/meeting/admin.html';
-            adminLink.className = 'cchs-nav-link admin-pill';
-            adminLink.textContent = '⚙️ Meeting Admin';
-            nav.appendChild(adminLink);
+        if (isAdminLoggedIn()) {
+            document.getElementById('inputNavLinks').innerHTML = `
+                <a href="/admin/" class="nav-pill" style="background:var(--cc-navy); color:#fff;">🛡️ Admin Portal</a>
+                <a href="/" class="nav-pill">Staff View</a>
+                <a href="/meeting/" class="nav-pill">📺 Open TV Display</a>
+                <a href="/meeting/admin.html" class="nav-pill">⚙ Alignment Admin</a>
+            `;
         }
-    }
 
-    let allUpdates = {};
-    let departments = [];
-    const defaultDepts = [
-        "Business Development (BD)", "Information Technology (IT)", " Project",
-        "Purchasing", "Human Resources (HR)", "Finance", " Wing",
-        "Roving", "Customer Service (CS)", "Marketing", " Media",
-        "Warehouse", "Admin"
-    ];
+        let fullHistory = [];
+        let departmentData = {};
+        let initialized = false;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const preselectDept = urlParams.get('dept');
+        subscribeState((data) => {
+            if (!data) return;
+            fullHistory = data.history || [];
+            departmentData = data.departments || {};
 
-    onValue(ref(db, 'settings/departments'), (snap) => {
-        departments = snap.val() || defaultDepts;
-        const select = document.getElementById('department');
-        const currentVal = select.value || preselectDept;
-        select.innerHTML = '<option value="">-- Choose Department --</option>';
-        departments.forEach(d => {
-            select.innerHTML += `<option value="${d}">${d}</option>`;
+            const deptSelect = document.getElementById('department');
+            const prevSelected = deptSelect.value;
+            const keys = Object.keys(departmentData);
+            deptSelect.innerHTML = keys.map(d => `<option value="${d}">${d}</option>`).join('');
+
+            if (prevSelected && keys.includes(prevSelected)) {
+                deptSelect.value = prevSelected;
+            }
+
+            loadHistoryDropdown();
+            if (!initialized) {
+                populateCurrentDeptData();
+                updatePreview();
+                initialized = true;
+            }
         });
-        if (currentVal && departments.includes(currentVal)) {
-            select.value = currentVal;
-            loadDeptData();
+
+        function onDeptChange() {
+            loadHistoryDropdown();
+            populateCurrentDeptData();
+            updatePreview();
         }
-    });
 
-    onValue(ref(db, 'updates'), (snap) => {
-        allUpdates = snap.val() || {};
-        if (document.getElementById('department').value) {
-            populateHistoryDropdown();
-        }
-    });
-
-    window.loadDeptData = () => {
-        const dept = document.getElementById('department').value;
-        const updateEl = document.getElementById('updateText');
-        const qEl = document.getElementById('questionText');
-
-        if (dept && allUpdates[dept]) {
-            updateEl.value = allUpdates[dept].update || '';
-            qEl.value = allUpdates[dept].question || '';
-        } else {
-            updateEl.value = '';
-            qEl.value = '';
-        }
-        populateHistoryDropdown();
-        updatePreview();
-    };
-
-    function populateHistoryDropdown() {
-        const dept = document.getElementById('department').value;
-        const histSelect = document.getElementById('historyDropdown');
-        histSelect.innerHTML = '<option value="">-- Current Active Submission --</option>';
-
-        if (dept && allUpdates[dept] && allUpdates[dept].history) {
-            const historyList = allUpdates[dept].history;
-            historyList.slice().reverse().forEach((item, index) => {
-                const realIndex = historyList.length - 1 - index;
-                const dateStr = new Date(item.timestamp).toLocaleString('en-MY', {
-                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
-                histSelect.innerHTML += `<option value="${realIndex}">Saved on ${dateStr}</option>`;
-            });
-        }
-    }
-
-    window.loadHistoryItem = () => {
-        const dept = document.getElementById('department').value;
-        const idx = document.getElementById('historyDropdown').value;
-        if (!dept || !allUpdates[dept]) return;
-
-        if (idx === "") {
-            document.getElementById('updateText').value = allUpdates[dept].update || '';
-            document.getElementById('questionText').value = allUpdates[dept].question || '';
-        } else {
-            const pastItem = allUpdates[dept].history[idx];
-            if (pastItem) {
-                document.getElementById('updateText').value = pastItem.update || '';
-                document.getElementById('questionText').value = pastItem.question || '';
+        function populateCurrentDeptData() {
+            const selectedDept = document.getElementById('department').value;
+            if (departmentData[selectedDept]) {
+                document.getElementById('updateText').value = departmentData[selectedDept].update || "";
+                document.getElementById('questionText').value = departmentData[selectedDept].question || "";
             }
         }
-        updatePreview();
-    };
 
-    window.updatePreview = () => {
-        const dept = document.getElementById('department').value;
-        const uText = document.getElementById('updateText').value.trim();
-        const qText = document.getElementById('questionText').value.trim();
+        function loadHistoryDropdown() {
+            const dept = document.getElementById('department').value;
+            const dropdown = document.getElementById('historyDropdown');
+            dropdown.innerHTML = '<option value="">-- Select a past update --</option>';
 
-        document.getElementById('prevTag').innerText = dept || 'Department Update';
-        document.getElementById('prevUpdate').innerText = uText || 'Start typing your update to see it appear here...';
-        document.getElementById('prevUpdate').style.color = uText ? 'var(--text-primary)' : 'var(--text-muted)';
-
-        const qBox = document.getElementById('prevQBox');
-        if (qText) {
-            qBox.style.display = 'block';
-            document.getElementById('prevQuestion').innerText = qText;
-        } else {
-            qBox.style.display = 'none';
-        }
-    };
-
-    window.submitUpdate = () => {
-        const dept = document.getElementById('department').value;
-        const update = document.getElementById('updateText').value.trim();
-        const question = document.getElementById('questionText').value.trim();
-        const status = document.getElementById('status');
-        const btn = document.getElementById('submitBtn');
-
-        if (!dept) {
-            status.innerText = "⚠️ Please select your department first.";
-            status.className = "status-msg error";
-            status.style.display = "block";
-            return;
-        }
-
-        btn.innerText = "Publishing...";
-        btn.disabled = true;
-
-        let existingHistory = (allUpdates[dept] && allUpdates[dept].history) ? allUpdates[dept].history : [];
-        if (update !== "") {
-            existingHistory.push({
-                update: update,
-                question: question,
-                timestamp: Date.now()
+            const deptHistory = fullHistory.filter(h => h.department === dept);
+            deptHistory.forEach((item, index) => {
+                dropdown.innerHTML += `<option value="${index}">${item.dateString}</option>`;
             });
-            if (existingHistory.length > 10) existingHistory = existingHistory.slice(-10);
         }
 
-        set(ref(db, 'updates/' + dept), {
-            update: update,
-            question: question,
-            timestamp: Date.now(),
-            history: existingHistory
-        }).then(() => {
-            status.innerText = "✅ Successfully published to the TV presentation!";
-            status.className = "status-msg success";
-            status.style.display = "block";
-            btn.innerText = "Save & Publish to TV →";
-            btn.disabled = false;
+        function populateFromHistory() {
+            const dropdown = document.getElementById('historyDropdown');
+            const dept = document.getElementById('department').value;
+            const deptHistory = fullHistory.filter(h => h.department === dept);
+
+            if (dropdown.value !== "") {
+                const selectedData = deptHistory[dropdown.value];
+                if (selectedData) {
+                    document.getElementById('updateText').value = selectedData.update || "";
+                    document.getElementById('questionText').value = selectedData.question || "";
+                    updatePreview();
+                }
+            }
+        }
+
+        function clearInputFields() {
+            document.getElementById('updateText').value = "";
+            document.getElementById('questionText').value = "";
             document.getElementById('historyDropdown').value = "";
-            setTimeout(() => status.style.display = "none", 4000);
-        }).catch((err) => {
-            status.innerText = "❌ Error saving: " + err.message;
-            status.className = "status-msg error";
-            status.style.display = "block";
-            btn.innerText = "Save & Publish to TV →";
-            btn.disabled = false;
-        });
-    };
-</script>
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const dept = document.getElementById('department').value || "Department";
+            document.getElementById('prevTag').innerText = dept;
+            document.getElementById('prevUpdate').innerText = document.getElementById('updateText').value || "Your update text will appear here...";
+            document.getElementById('prevQuestion').innerText = document.getElementById('questionText').value || "Your question will appear here...";
+        }
+
+        async function submitUpdate() {
+            const btn = document.getElementById('submitBtn');
+            const department = document.getElementById('department').value;
+            const updateText = document.getElementById('updateText').value;
+            const questionText = document.getElementById('questionText').value;
+
+            btn.disabled = true;
+            btn.textContent = "Broadcasting...";
+            try {
+                await submitDepartmentUpdate({ department, updateText, questionText });
+                showStatus("Update successfully broadcasted to TV!", false);
+            } catch (err) {
+                showStatus("Error submitting update: " + err.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Save & Broadcast Live to TV";
+            }
+        }
+
+        function showStatus(msg, isError) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerText = msg;
+            statusEl.style.display = 'block';
+            statusEl.style.background = isError ? '#fde8e8' : '#e6f4ea';
+            statusEl.style.color = isError ? '#9b1c1c' : '#0e6251';
+            statusEl.style.border = `1px solid ${isError ? '#f8b4b4' : '#a3e0b5'}`;
+
+            setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+        }
+
+        window.onDeptChange = onDeptChange;
+        window.populateFromHistory = populateFromHistory;
+        window.clearInputFields = clearInputFields;
+        window.updatePreview = updatePreview;
+        window.submitUpdate = submitUpdate;
+    </script>
 </body>
 </html>
