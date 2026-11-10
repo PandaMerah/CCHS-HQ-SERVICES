@@ -10,6 +10,11 @@ import {
   get,
   update
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+import {
+  getAuth,
+  signInAnonymously,
+  signInWithCustomToken
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAqu7Wz8f1ZGcsqTyn3AzzkOk3jvTRReDg",
@@ -216,29 +221,43 @@ const bc = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("cchs_
 
 let app = null;
 let db = null;
+let auth = null;
 try {
   app = initializeApp(firebaseConfig);
   db = getDatabase(app);
+  auth = getAuth(app);
 } catch (err) {
   console.warn("Firebase initialization warning:", err);
 }
 
 let syncMode = "connecting"; // 'firebase' | 'cloud-api' | 'local'
+let syncDetail = "Connecting to Firebase Realtime DB...";
 let firebaseConnected = false;
 let lastLocalModeChangeAt = 0;
+let lastLocalMutationAt = 0;
 let currentState = loadLocalState();
 const listeners = new Set();
 const statusListeners = new Set();
 
+function normalizeFirebaseArray(val) {
+  if (!val) return null;
+  if (Array.isArray(val)) return val.filter(Boolean);
+  if (typeof val === "object") return Object.values(val).filter(Boolean);
+  return null;
+}
+
 function deepMergeSeed(raw) {
   const base = JSON.parse(JSON.stringify(INITIAL_SEED_DATA));
   if (!raw || typeof raw !== "object") return base;
+  const normRooms = normalizeFirebaseArray(raw.rooms);
+  const normBookings = normalizeFirebaseArray(raw.bookings);
+  const normHistory = normalizeFirebaseArray(raw.history);
   return {
     config: { ...base.config, ...(raw.config || {}) },
     departments: raw.departments && Object.keys(raw.departments).length > 0 ? raw.departments : base.departments,
-    history: Array.isArray(raw.history) ? raw.history : base.history,
-    rooms: Array.isArray(raw.rooms) && raw.rooms.length > 0 ? raw.rooms : base.rooms,
-    bookings: Array.isArray(raw.bookings) ? raw.bookings : base.bookings,
+    history: Array.isArray(normHistory) ? normHistory : base.history,
+    rooms: Array.isArray(normRooms) && normRooms.length > 0 ? normRooms : base.rooms,
+    bookings: Array.isArray(normBookings) ? normBookings : base.bookings,
     remoteDisplay: {
       ...base.remoteDisplay,
       ...(raw.remoteDisplay || {}),
@@ -250,7 +269,7 @@ function deepMergeSeed(raw) {
   };
 }
 
-// Merge incoming state while protecting newer local mode switches from stale poll snapshots
+// Merge incoming state while protecting newer local mode switches & room/booking writes from stale poll snapshots
 function mergeIncomingState(incomingRaw) {
   const next = deepMergeSeed(incomingRaw);
   const localRd = currentState?.remoteDisplay || {};
@@ -263,6 +282,16 @@ function mergeIncomingState(incomingRaw) {
     next.remoteDisplay.activeMode = localRd.activeMode;
     next.remoteDisplay.activePresenterId = localRd.activePresenterId;
     next.remoteDisplay.modeUpdatedAt = localModeTime;
+  }
+
+  // Protect recent room / booking mutations from stale poll snapshots
+  if ((Date.now() - lastLocalMutationAt) < 5000 && currentState) {
+    if (Array.isArray(currentState.rooms) && currentState.rooms.length > 0) {
+      next.rooms = currentState.rooms;
+    }
+    if (Array.isArray(currentState.bookings)) {
+      next.bookings = currentState.bookings;
+    }
   }
   return next;
 }
@@ -299,9 +328,10 @@ function notifyListeners() {
 
 function setSyncStatus(mode, detail = "") {
   syncMode = mode;
+  syncDetail = detail || syncDetail;
   for (const cb of statusListeners) {
     try {
-      cb({ mode: syncMode, detail, firebaseConnected });
+      cb({ mode: syncMode, detail: syncDetail, firebaseConnected, databaseURL: firebaseConfig.databaseURL, projectId: firebaseConfig.projectId });
     } catch (e) {
       console.error("Status listener error:", e);
     }
@@ -334,8 +364,8 @@ async function fetchApiState() {
   try {
     const res = await fetch("/api/data", { cache: "no-store" });
     if (res.ok) {
-      // Ignore poll responses that started before our latest local mode mutation
-      if (fetchStartedAt < lastLocalModeChangeAt) {
+      // Ignore poll responses that started before our latest local mode or room/booking mutation
+      if (fetchStartedAt < lastLocalModeChangeAt || fetchStartedAt < lastLocalMutationAt) {
         return true;
       }
       const apiData = await res.json();
@@ -344,7 +374,7 @@ async function fetchApiState() {
         saveLocalState(currentState);
         notifyListeners();
         if (!firebaseConnected) {
-          setSyncStatus("cloud-api", "Synced via Vercel API + Local Store");
+          setSyncStatus("cloud-api", "Firebase Rules Locked (401) • Persisted on HQ Cloud Server");
         }
         return true;
       }
@@ -395,22 +425,94 @@ async function pushApiAction(action, payload) {
   }
 }
 
-// Initialize Firebase Realtime Listener with graceful fallback
-function initRealtimeSync() {
+// Push specific node (`rooms` or `bookings`) directly to Firebase Realtime Database FIRST
+async function pushFirebaseNode(nodePath, data) {
+  if (!db) return false;
+  try {
+    await set(ref(db, nodePath), data);
+    firebaseConnected = true;
+    setSyncStatus("firebase", `Saved to Firebase (${firebaseConfig.projectId}/${nodePath})`);
+    return true;
+  } catch (err) {
+    console.info(`Firebase write to /${nodePath} blocked by security rules:`, err.message);
+    return false;
+  }
+}
+
+// Initialize Firebase Realtime Listener (including dedicated /rooms and /bookings listeners)
+async function initRealtimeSync() {
   if (!db) {
-    setSyncStatus("cloud-api", "Using Vercel API Sync");
+    setSyncStatus("cloud-api", "Using HQ Cloud API Sync");
     fetchApiState();
     return;
   }
 
+  // Attempt Firebase Auth sign-in if custom token is configured or anonymous auth is enabled
+  if (auth) {
+    try {
+      const customToken = typeof localStorage !== "undefined" ? localStorage.getItem("cchs_firebase_custom_token") : null;
+      if (customToken) {
+        await signInWithCustomToken(auth, customToken);
+      } else {
+        await signInAnonymously(auth);
+      }
+    } catch (authErr) {
+      // Anonymous auth not enabled or custom token not set; proceed with standard RTDB connection
+    }
+  }
+
   const rootRef = ref(db, "/");
+  const roomsRef = ref(db, "rooms");
+  const bookingsRef = ref(db, "bookings");
+
+  // Dedicated listener on /rooms in Firebase Realtime Database
+  onValue(
+    roomsRef,
+    async (snapshot) => {
+      firebaseConnected = true;
+      const val = normalizeFirebaseArray(snapshot.val());
+      if (val && val.length > 0) {
+        currentState = { ...currentState, rooms: val };
+        saveLocalState(currentState);
+        notifyListeners();
+      } else if (Array.isArray(currentState.rooms) && currentState.rooms.length > 0) {
+        try {
+          await set(roomsRef, currentState.rooms);
+        } catch (e) {}
+      }
+      setSyncStatus("firebase", `Firebase RTDB Live (${firebaseConfig.projectId})`);
+    },
+    () => {}
+  );
+
+  // Dedicated listener on /bookings in Firebase Realtime Database
+  onValue(
+    bookingsRef,
+    async (snapshot) => {
+      firebaseConnected = true;
+      const val = normalizeFirebaseArray(snapshot.val());
+      if (val) {
+        currentState = { ...currentState, bookings: val };
+        saveLocalState(currentState);
+        notifyListeners();
+      } else if (Array.isArray(currentState.bookings) && currentState.bookings.length > 0) {
+        try {
+          await set(bookingsRef, currentState.bookings);
+        } catch (e) {}
+      }
+      setSyncStatus("firebase", `Firebase RTDB Live (${firebaseConfig.projectId})`);
+    },
+    () => {}
+  );
+
+  // Root state listener
   onValue(
     rootRef,
     async (snapshot) => {
       firebaseConnected = true;
       const val = snapshot.val();
-      if (!val || (!val.departments && !val.config)) {
-        // Seed Firebase automatically with our initial data.json state!
+      if (!val || (!val.departments && !val.config && !val.rooms && !val.bookings)) {
+        // Seed Firebase automatically with our initial state (including rooms and bookings)
         try {
           await set(rootRef, currentState);
         } catch (seedErr) {
@@ -419,18 +521,25 @@ function initRealtimeSync() {
       } else {
         currentState = mergeIncomingState(val);
         saveLocalState(currentState);
+        // Ensure /rooms and /bookings exist in Firebase if missing from root
+        if (!val.rooms && Array.isArray(currentState.rooms)) {
+          try { await set(roomsRef, currentState.rooms); } catch (e) {}
+        }
+        if (!val.bookings && Array.isArray(currentState.bookings)) {
+          try { await set(bookingsRef, currentState.bookings); } catch (e) {}
+        }
       }
-      setSyncStatus("firebase", "Firebase Realtime DB Live");
+      setSyncStatus("firebase", `Firebase RTDB Live (${firebaseConfig.projectId})`);
       notifyListeners();
     },
     async (error) => {
       firebaseConnected = false;
-      console.info("Firebase RTDB notice (using API/Local fallback):", error.message);
+      console.info("Firebase RTDB notice (using API/Server store while RTDB rules are locked):", error.message);
       const ok = await fetchApiState();
       if (!ok) {
-        setSyncStatus("local", "Local Realtime Sync (Firebase rules locked)");
+        setSyncStatus("local", "Firebase Rules Locked (permission_denied) • Offline Cache");
       } else {
-        setSyncStatus("cloud-api", "Vercel Cloud API Sync Active");
+        setSyncStatus("cloud-api", "Firebase Rules Locked (permission_denied) • Saved on HQ Cloud Server");
       }
       notifyListeners();
     }
@@ -454,7 +563,7 @@ export function subscribeState(callback) {
 
 export function subscribeSyncStatus(callback) {
   statusListeners.add(callback);
-  callback({ mode: syncMode, firebaseConnected });
+  callback({ mode: syncMode, detail: syncDetail, firebaseConnected, databaseURL: firebaseConfig.databaseURL, projectId: firebaseConfig.projectId });
   return () => statusListeners.delete(callback);
 }
 
@@ -544,6 +653,7 @@ export function checkBookingConflict(bookings, { roomId, date, startTime, endTim
 }
 
 export async function addRoomBooking(booking) {
+  lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
   if (!Array.isArray(state.bookings)) state.bookings = [];
 
@@ -582,17 +692,17 @@ export async function addRoomBooking(booking) {
   if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   notifyListeners();
 
+  // 1. Write directly to Firebase Realtime Database (/bookings) first
+  await pushFirebaseNode("bookings", currentState.bookings);
+
+  // 2. Persist to HQ Cloud Server (/api/data -> CCHSMeetingDashboard/data.json)
   await pushApiAction("ADD_BOOKING", { booking: newBooking });
 
-  if (db) {
-    try {
-      await set(ref(db, "bookings"), currentState.bookings);
-    } catch (e) {}
-  }
   return newBooking;
 }
 
 export async function updateRoomBooking(bookingId, updatedFields) {
+  lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
   if (!Array.isArray(state.bookings)) state.bookings = [];
   const idx = state.bookings.findIndex((b) => b.id === bookingId);
@@ -631,17 +741,17 @@ export async function updateRoomBooking(bookingId, updatedFields) {
   if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   notifyListeners();
 
+  // 1. Write directly to Firebase Realtime Database (/bookings) first
+  await pushFirebaseNode("bookings", currentState.bookings);
+
+  // 2. Persist to HQ Cloud Server (/api/data -> CCHSMeetingDashboard/data.json)
   await pushApiAction("UPDATE_BOOKING", { bookingId, updatedFields });
 
-  if (db) {
-    try {
-      await set(ref(db, "bookings"), currentState.bookings);
-    } catch (e) {}
-  }
   return state.bookings[idx];
 }
 
 export async function deleteRoomBooking(bookingId) {
+  lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
   state.bookings = (state.bookings || []).filter((b) => b.id !== bookingId);
   currentState = deepMergeSeed(state);
@@ -649,17 +759,17 @@ export async function deleteRoomBooking(bookingId) {
   if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   notifyListeners();
 
+  // 1. Write directly to Firebase Realtime Database (/bookings) first
+  await pushFirebaseNode("bookings", currentState.bookings);
+
+  // 2. Persist to HQ Cloud Server (/api/data -> CCHSMeetingDashboard/data.json)
   await pushApiAction("DELETE_BOOKING", { bookingId });
 
-  if (db) {
-    try {
-      await set(ref(db, "bookings"), currentState.bookings);
-    } catch (e) {}
-  }
   return currentState;
 }
 
 export async function markBookingNotified(bookingId) {
+  lastLocalMutationAt = Date.now();
   if (!Array.isArray(currentState.bookings)) return currentState;
   const idx = currentState.bookings.findIndex((b) => b.id === bookingId);
   if (idx === -1) return currentState;
@@ -669,13 +779,9 @@ export async function markBookingNotified(bookingId) {
   if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   notifyListeners();
 
+  await pushFirebaseNode("bookings", currentState.bookings);
   await pushApiAction("MARK_BOOKING_NOTIFIED", { bookingId });
 
-  if (db) {
-    try {
-      await set(ref(db, "bookings"), currentState.bookings);
-    } catch (e) {}
-  }
   return currentState;
 }
 
@@ -683,6 +789,7 @@ export async function markBookingNotified(bookingId) {
 // ADMIN MEETING ROOM CUSTOMIZATION (Quantity, Name, Floor, Capacity, Details)
 // ============================================================================
 export async function saveMeetingRooms(roomsList) {
+  lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
   state.rooms = Array.isArray(roomsList) ? roomsList : [];
   currentState = deepMergeSeed(state);
@@ -690,13 +797,12 @@ export async function saveMeetingRooms(roomsList) {
   if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   notifyListeners();
 
+  // 1. Write directly to Firebase Realtime Database (/rooms) first
+  await pushFirebaseNode("rooms", state.rooms);
+
+  // 2. Persist to HQ Cloud Server (/api/data -> CCHSMeetingDashboard/data.json)
   await pushApiAction("SAVE_ROOMS", { rooms: state.rooms });
 
-  if (db) {
-    try {
-      await set(ref(db, "rooms"), state.rooms);
-    } catch (e) {}
-  }
   return currentState.rooms;
 }
 

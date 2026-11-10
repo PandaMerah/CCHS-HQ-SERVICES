@@ -116,5 +116,109 @@
       "update": "- This month will start to do inventory asset update for all HQ staff (laptop, monitor)\n- ⁠and the same time we will do IT audit for each laptop user..",
       "question": "What will be going for this month activity for IT department"
     }
+  ],
+  "rooms": [
+    {
+      "id": "boardroom-main",
+      "name": "HQ Main Boardroom",
+      "floor": "Level 1 - Executive Wing",
+      "capacity": 20,
+      "amenities": [
+        "75\" 4K Smart TV",
+        "Video Conferencing",
+        "Glass Whiteboard",
+        "HDMI / Wireless Cast"
+      ],
+      "color": "#1863dc",
+      "status": "available"
+    },
+    {
+      "id": "discussion-a",
+      "name": "Discussion Room A (CareHub)",
+      "floor": "Level 1 - Central Zone",
+      "capacity": 8,
+      "amenities": [
+        "55\" TV Display",
+        "Whiteboard",
+        "Speakerphone"
+      ],
+      "color": "#00b894",
+      "status": "available"
+    },
+    {
+      "id": "discussion-b",
+      "name": "Discussion Room B (Clinical)",
+      "floor": "Level 1 - Operations Wing",
+      "capacity": 6,
+      "amenities": [
+        "50\" Monitor",
+        "Whiteboard"
+      ],
+      "color": "#6c5ce7",
+      "status": "available"
+    },
+    {
+      "id": "townhall-hub",
+      "name": "Townhall & Training Suite",
+      "floor": "Level 2 - Training Center",
+      "capacity": 50,
+      "amenities": [
+        "Dual Projector / TV",
+        "Wireless Mic System",
+        "Livestream Setup"
+      ],
+      "color": "#e17055",
+      "status": "available"
+    },
+    {
+      "id": "pod-telehealth",
+      "name": "Focus Pod 1 (Telehealth / PMI)",
+      "floor": "Level 1 - Quiet Zone",
+      "capacity": 4,
+      "amenities": [
+        "Acoustic Soundproofing",
+        "Ring Light & Webcam"
+      ],
+      "color": "#0984e3",
+      "status": "available"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "bk-seed-1",
+      "roomId": "boardroom-main",
+      "title": "Weekly HQ Management Alignment",
+      "department": "CEO OFFICE",
+      "organizer": "HQ Management",
+      "date": "2026-11-10",
+      "startTime": "09:00",
+      "endTime": "10:30",
+      "notes": "Monthly & Weekly Department Alignment Broadcast on Main TV.",
+      "createdAt": 1762755600000
+    },
+    {
+      "id": "bk-seed-2",
+      "roomId": "discussion-a",
+      "title": "IT Asset Audit & Laptop Inventory Sync",
+      "department": "IT",
+      "organizer": "IT Support Team",
+      "date": "2026-11-10",
+      "startTime": "11:00",
+      "endTime": "12:00",
+      "notes": "Reviewing HQ staff laptop and monitor serial numbers.",
+      "createdAt": 1762759200000
+    },
+    {
+      "id": "bk-seed-3",
+      "roomId": "townhall-hub",
+      "title": "TPP SystmOne Clinical Workflow Onboarding",
+      "department": "TPP SYSTMONE",
+      "organizer": "Clinical & SystmOne Team",
+      "date": "2026-11-10",
+      "startTime": "14:00",
+      "endTime": "16:00",
+      "notes": "Training session for clinic operations and digital integration.",
+      "createdAt": 1762762800000
+    }
   ]
 }
