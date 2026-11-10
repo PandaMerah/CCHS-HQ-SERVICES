@@ -573,7 +573,7 @@
           </div>
 
           <div style="background: rgba(24, 99, 220, 0.15); border: 1px solid rgba(142, 209, 252, 0.3); border-radius: 12px; padding: 12px 16px; font-size: 0.83rem; color: #dbeafe;">
-            💡 <strong>Audio Sharing Tip:</strong> When the browser prompt appears, select a <strong>Browser Tab</strong> (with <em>"Also share tab audio"</em> checked) or <strong>Entire Screen</strong> (with <em>"Also share system audio"</em> checked) to stream video sound to the TV.
+            💡 <strong>Audio Sharing Tip:</strong> When the browser prompt appears, select a <strong>Window</strong>, <strong>Browser Tab</strong>, or <strong>Entire Screen</strong> and turn on <em>"Share audio" / "Also share system audio"</em>. You can also toggle <strong>🎙️ Mic Voice</strong> below to speak live to the TV.
           </div>
         </div>
 
@@ -597,6 +597,9 @@
           </button>
           <button type="button" class="meet-btn secondary" id="btnToggleMicAudio" style="display: none;" onclick="toggleSharedAudioTrack()">
             🔊 Shared Audio: ON
+          </button>
+          <button type="button" class="meet-btn secondary" id="btnToggleVoiceMic" style="display: none;" onclick="togglePresenterMicVoice()">
+            🎙️ Mic Voice: OFF
           </button>
           <button type="button" class="meet-btn stop" id="btnStopShare" style="display: none;" onclick="stopStaffScreenShare()">
             ⏹ Stop Presenting
@@ -735,7 +738,10 @@
               <div class="card-title" style="margin-bottom: 2px;">Live TV Output Monitor</div>
               <div style="font-size: 0.8rem; color: #94a3b8;" id="monitorSubtitle">Real-time mirror of active HQ TV Receiver</div>
             </div>
-            <a href="/display/?mode=receiver" target="_blank" class="nav-btn primary">Open Fullscreen TV Receiver ↗</a>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" id="adminMonitorAudioBtn" class="nav-btn" onclick="toggleAdminMonitorAudio()">🔇 Monitor Audio: Muted</button>
+              <a href="/display/?mode=receiver" target="_blank" class="nav-btn primary">Open Fullscreen TV Receiver ↗</a>
+            </div>
           </div>
 
           <div class="monitor-frame" id="previewMonitor"></div>
@@ -749,15 +755,16 @@
        ========================================================================= -->
   <div id="receiverRoot">
     <button type="button" id="tvUnmuteBtn" class="unmute-overlay-btn" onclick="enableTvAudio()">
-      🔊 Click to Unmute TV Audio
+      🔊 Click to Enable TV Audio
     </button>
     <div id="receiverViewport" style="width: 100%; height: 100%;"></div>
     <div class="receiver-controls">
       <a href="/display/?mode=share" target="_blank">🖥️ Share Screen</a>
       <a href="/admin/">⚙ Admin Switcher</a>
-      <button onclick="document.documentElement.requestFullscreen()">⛶ Fullscreen</button>
+      <button onclick="enableTvAudio(); document.documentElement.requestFullscreen()">⛶ Fullscreen</button>
     </div>
   </div>
+  <audio id="tvLiveStreamAudio" autoplay playsinline style="display:none;"></audio>
 
   <script type="module">
     import {
@@ -804,7 +811,7 @@
     let selectedMode = 'meeting-tv';
     let formInitialized = false;
 
-    // Boost WebRTC video sender to Full HD 1080p/1440p (8 Mbps + maintain-resolution) for razor-sharp slides & video
+    // Boost WebRTC video (8 Mbps 1080p) & audio (128 kbps fullband stereo/voice) senders
     async function boostWebRTCHighQuality(call) {
       if (!call) return;
       const applyParams = async () => {
@@ -824,9 +831,20 @@
               if ('priority' in params.encodings[0]) params.encodings[0].priority = 'high';
               if ('networkPriority' in params.encodings[0]) params.encodings[0].networkPriority = 'high';
               await sender.setParameters(params);
-            } catch (e) {
-              // Ignore browser-specific parameter warnings
-            }
+            } catch (e) {}
+          } else if (sender.track && sender.track.kind === 'audio') {
+            try {
+              sender.track.enabled = true;
+              const params = sender.getParameters();
+              if (!params.encodings || params.encodings.length === 0) {
+                params.encodings = [{}];
+              }
+              params.encodings[0].maxBitrate = 128000; // 128 kbps high-clarity audio
+              if ('dtx' in params.encodings[0]) params.encodings[0].dtx = 'disabled';
+              if ('priority' in params.encodings[0]) params.encodings[0].priority = 'high';
+              if ('networkPriority' in params.encodings[0]) params.encodings[0].networkPriority = 'high';
+              await sender.setParameters(params);
+            } catch (e) {}
           }
         }
       };
@@ -851,10 +869,163 @@
     let myPeerId = null;
     let myPeer = null;
     let localStream = null;
+    let micStream = null;
+    let outboundStream = null;
+    let presenterAudioCtx = null;
+    let presenterAudioDest = null;
+    let displayAudioSource = null;
+    let micAudioSource = null;
     let frameCaptureTimer = null;
     let shareStartedAt = 0;
     let missingFromQueueCount = 0;
     const activeReceiverCalls = new Set();
+    const knownReceiverPeerIds = new Set();
+    const lastCallTimeByPeer = new Map();
+
+    function getDisplayMediaOptions() {
+      return {
+        video: {
+          cursor: 'always',
+          width: { ideal: 1920, max: 2560 },
+          height: { ideal: 1080, max: 1440 },
+          frameRate: { ideal: 30, max: 60 }
+        },
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          suppressLocalAudioPlayback: false
+        },
+        // Enables system/window audio capture even when user selects a Window in Chromium browsers
+        systemAudio: 'include',
+        windowAudio: 'system',
+        surfaceSwitching: 'include',
+        selfBrowserSurface: 'include'
+      };
+    }
+
+    // Build unified outbound MediaStream with video + mixed (or direct) audio track so WebRTC always negotiates m=audio
+    function buildOutboundStream() {
+      if (!localStream) return null;
+      const videoTracks = localStream.getVideoTracks();
+      const displayAudioTracks = localStream.getAudioTracks();
+      const micAudioTracks = micStream ? micStream.getAudioTracks() : [];
+
+      displayAudioTracks.forEach(t => {
+        try {
+          if ('contentHint' in t) t.contentHint = 'music';
+        } catch (e) {}
+      });
+
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          if (!presenterAudioCtx || presenterAudioCtx.state === 'closed') {
+            presenterAudioCtx = new AudioCtx();
+            presenterAudioDest = presenterAudioCtx.createMediaStreamDestination();
+          }
+          if (presenterAudioCtx.state === 'suspended') {
+            presenterAudioCtx.resume().catch(() => {});
+          }
+
+          if (displayAudioSource) {
+            try { displayAudioSource.disconnect(); } catch (e) {}
+            displayAudioSource = null;
+          }
+          if (micAudioSource) {
+            try { micAudioSource.disconnect(); } catch (e) {}
+            micAudioSource = null;
+          }
+
+          if (displayAudioTracks.length > 0) {
+            displayAudioSource = presenterAudioCtx.createMediaStreamSource(new MediaStream([displayAudioTracks[0]]));
+            displayAudioSource.connect(presenterAudioDest);
+          }
+          if (micAudioTracks.length > 0) {
+            micAudioSource = presenterAudioCtx.createMediaStreamSource(new MediaStream([micAudioTracks[0]]));
+            micAudioSource.connect(presenterAudioDest);
+          }
+
+          // If only display audio is active (no mic), use the raw display audio track if available, or mixed track when both are active
+          if (displayAudioTracks.length > 0 && micAudioTracks.length === 0) {
+            outboundStream = new MediaStream([...videoTracks, displayAudioTracks[0]]);
+            return outboundStream;
+          }
+          if (micAudioTracks.length > 0 && displayAudioTracks.length === 0) {
+            outboundStream = new MediaStream([...videoTracks, micAudioTracks[0]]);
+            return outboundStream;
+          }
+          if (presenterAudioDest && presenterAudioDest.stream.getAudioTracks().length > 0) {
+            outboundStream = new MediaStream([...videoTracks, presenterAudioDest.stream.getAudioTracks()[0]]);
+            return outboundStream;
+          }
+        }
+      } catch (e) {}
+
+      const chosenAudio = displayAudioTracks[0] || micAudioTracks[0];
+      outboundStream = chosenAudio
+        ? new MediaStream([...videoTracks, chosenAudio])
+        : new MediaStream([...videoTracks]);
+      return outboundStream;
+    }
+
+    function sendStreamToReceiver(receiverPeerId, forceReconnect = false) {
+      if (!receiverPeerId || !myPeer || myPeer.destroyed || !localStream) return;
+      knownReceiverPeerIds.add(receiverPeerId);
+      const now = Date.now();
+      if (!forceReconnect && (now - (lastCallTimeByPeer.get(receiverPeerId) || 0)) < 1200) {
+        return;
+      }
+      lastCallTimeByPeer.set(receiverPeerId, now);
+
+      const streamToSend = buildOutboundStream();
+      if (!streamToSend) return;
+
+      try {
+        const call = myPeer.call(receiverPeerId, streamToSend);
+        if (call) {
+          activeReceiverCalls.add(call);
+          boostWebRTCHighQuality(call);
+          call.on('close', () => activeReceiverCalls.delete(call));
+          call.on('error', () => activeReceiverCalls.delete(call));
+        }
+      } catch (e) {}
+    }
+
+    function syncTracksToActiveReceivers() {
+      const streamToSend = buildOutboundStream();
+      if (!streamToSend) return;
+      const videoTrack = streamToSend.getVideoTracks()[0] || null;
+      const audioTrack = streamToSend.getAudioTracks()[0] || null;
+
+      for (const existingCall of activeReceiverCalls) {
+        try {
+          const pc = existingCall.peerConnection;
+          if (pc && pc.getSenders) {
+            let hasAudioSender = false;
+            for (const sender of pc.getSenders()) {
+              if (sender.track && sender.track.kind === 'video' && videoTrack) {
+                sender.replaceTrack(videoTrack).catch(() => {});
+              } else if (sender.track && sender.track.kind === 'audio') {
+                hasAudioSender = true;
+                if (audioTrack) {
+                  sender.replaceTrack(audioTrack).catch(() => {});
+                }
+              }
+            }
+            // If an audio track was newly added and previous PeerConnection had no audio sender, renegotiate via fresh call
+            if (audioTrack && !hasAudioSender && existingCall.peer) {
+              sendStreamToReceiver(existingCall.peer, true);
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Also push fresh call to any known receivers so audio + video tracks are guaranteed live
+      for (const recPeerId of knownReceiverPeerIds) {
+        sendStreamToReceiver(recPeerId, true);
+      }
+    }
 
     async function startStaffScreenShare() {
       const nameInput = document.getElementById('presName');
@@ -866,21 +1037,7 @@
       const title = titleInput.value.trim() || 'Screen Presentation';
 
       try {
-        // Request Full HD / QHD Screen + System/Tab Audio
-        const stream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            cursor: 'always',
-            width: { ideal: 1920, max: 2560 },
-            height: { ideal: 1080, max: 1440 },
-            frameRate: { ideal: 30, max: 60 }
-          },
-          audio: {
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false
-          }
-        });
-
+        const stream = await navigator.mediaDevices.getDisplayMedia(getDisplayMediaOptions());
         await attachLocalShareStream(stream, { name, department, title });
       } catch (err) {
         if (err.name !== 'NotAllowedError') {
@@ -889,8 +1046,44 @@
       }
     }
 
+    function updatePresenterAudioButtons() {
+      const displayAudioTracks = localStream ? localStream.getAudioTracks() : [];
+      const micAudioTracks = micStream ? micStream.getAudioTracks() : [];
+      const hasDisplayAudio = displayAudioTracks.length > 0;
+      const displayEnabled = hasDisplayAudio && displayAudioTracks[0].enabled;
+      const hasMicAudio = micAudioTracks.length > 0 && micAudioTracks[0].enabled;
+
+      const audioBtn = document.getElementById('btnToggleMicAudio');
+      if (audioBtn) {
+        audioBtn.style.display = 'inline-flex';
+        if (hasDisplayAudio) {
+          audioBtn.textContent = displayEnabled ? '🔊 Shared Audio: ON' : '🔇 Shared Audio: MUTED';
+        } else {
+          audioBtn.textContent = '🔇 Window Audio Not Captured (Click to Reshare w/ Audio)';
+        }
+      }
+
+      const micBtn = document.getElementById('btnToggleVoiceMic');
+      if (micBtn) {
+        micBtn.style.display = 'inline-flex';
+        micBtn.textContent = hasMicAudio ? '🎙️ Mic Voice: ON' : '🎙️ Mic Voice: OFF';
+        micBtn.style.background = hasMicAudio ? 'rgba(16, 185, 129, 0.28)' : 'rgba(255, 255, 255, 0.1)';
+        micBtn.style.borderColor = hasMicAudio ? '#10b981' : 'var(--cc-border)';
+      }
+
+      const anyAudio = (hasDisplayAudio && displayEnabled) || hasMicAudio;
+      const badgeEl = document.getElementById('sharePeerBadge');
+      if (badgeEl && myPeer && myPeer.open) {
+        badgeEl.textContent = `● HD WebRTC Stream Ready (${anyAudio ? '1080p Video + Audio' : '1080p Video'})`;
+      }
+
+      if (myPresenterId) {
+        updatePresenterStreamData(myPresenterId, { hasAudio: anyAudio });
+      }
+    }
+
     async function attachLocalShareStream(stream, meta) {
-      if (localStream) {
+      if (localStream && localStream !== stream) {
         localStream.getTracks().forEach(t => t.stop());
       }
       localStream = stream;
@@ -909,7 +1102,9 @@
 
       const videoEl = document.getElementById('localSharePreview');
       videoEl.srcObject = stream;
+      videoEl.muted = true;
       videoEl.style.display = 'block';
+      videoEl.play().catch(() => {});
       document.getElementById('meetPlaceholder').style.display = 'none';
 
       document.getElementById('btnStartShare').style.display = 'none';
@@ -917,71 +1112,71 @@
       document.getElementById('btnStopShare').style.display = 'inline-flex';
       document.getElementById('shareLiveBanner').style.display = 'flex';
 
-      const audioTracks = stream.getAudioTracks();
-      const hasAudio = audioTracks.length > 0;
-      const audioBtn = document.getElementById('btnToggleMicAudio');
-      if (hasAudio) {
-        audioBtn.style.display = 'inline-flex';
-        audioBtn.textContent = '🔊 Shared Audio: ON';
-      } else {
-        audioBtn.style.display = 'none';
-      }
+      buildOutboundStream();
+      updatePresenterAudioButtons();
 
       // Listen for native browser "Stop sharing" button
-      videoTrack.addEventListener('ended', () => {
-        stopStaffScreenShare();
-      });
+      if (videoTrack) {
+        videoTrack.addEventListener('ended', () => {
+          stopStaffScreenShare();
+        });
+      }
 
       if (!myPresenterId) {
         myPresenterId = 'pres-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
         myPeerId = 'cchs-' + myPresenterId;
       }
 
-      // Update any already-connected receivers with the new tracks seamlessly
-      for (const existingCall of activeReceiverCalls) {
-        try {
-          const pc = existingCall.peerConnection;
-          if (pc && pc.getSenders) {
-            for (const sender of pc.getSenders()) {
-              if (sender.track && sender.track.kind === 'video' && videoTrack) {
-                sender.replaceTrack(videoTrack);
-              }
-            }
-          }
-        } catch (e) {}
-      }
-
-      // Initialize PeerJS WebRTC Broadcaster once
+      // Initialize PeerJS WebRTC Broadcaster and wait for signaling open so TV connects on first attempt
       if (!myPeer || myPeer.destroyed) {
         if (window.Peer) {
           myPeer = new window.Peer(myPeerId, { config: { iceServers: ICE_SERVERS } });
           myPeer.on('open', () => {
-            document.getElementById('sharePeerBadge').textContent = `● HD WebRTC Stream Ready (${hasAudio ? '1080p Video + Audio' : '1080p Video'})`;
+            updatePresenterAudioButtons();
+            for (const recPeerId of knownReceiverPeerIds) {
+              sendStreamToReceiver(recPeerId, true);
+            }
           });
-          // When a TV Receiver or Admin Monitor connects via data channel requesting our stream, call it with our Full HD MediaStream
+          // As soon as a TV Receiver or Admin Monitor opens a signaling connection, immediately call it with our stream
           myPeer.on('connection', (conn) => {
+            if (conn && conn.peer) {
+              sendStreamToReceiver(conn.peer);
+            }
             conn.on('data', (msg) => {
-              if (msg && msg.type === 'REQUEST_STREAM' && msg.receiverPeerId && localStream) {
-                const call = myPeer.call(msg.receiverPeerId, localStream);
-                if (call) {
-                  activeReceiverCalls.add(call);
-                  boostWebRTCHighQuality(call);
-                }
+              if (msg && msg.type === 'REQUEST_STREAM' && msg.receiverPeerId) {
+                sendStreamToReceiver(msg.receiverPeerId, true);
               }
             });
           });
           myPeer.on('call', (call) => {
-            if (localStream) {
-              call.answer(localStream);
+            const streamToSend = buildOutboundStream();
+            if (streamToSend) {
+              if (call.peer) knownReceiverPeerIds.add(call.peer);
+              call.answer(streamToSend);
               activeReceiverCalls.add(call);
               boostWebRTCHighQuality(call);
             }
           });
         }
+      } else {
+        // Update already-connected receivers with the new video + audio tracks seamlessly
+        syncTracksToActiveReceivers();
       }
 
-      // Wait briefly for video dimensions to populate before capturing initial HD frame
-      await new Promise(r => setTimeout(r, 250));
+      // Wait briefly for PeerJS signaling to open (up to 1.8s) and video dimensions to populate
+      if (myPeer && !myPeer.open) {
+        await new Promise((resolve) => {
+          const timer = setTimeout(resolve, 1800);
+          myPeer.once('open', () => {
+            clearTimeout(timer);
+            resolve();
+          });
+        });
+      } else {
+        await new Promise(r => setTimeout(r, 250));
+      }
+
+      const hasAudio = (outboundStream ? outboundStream.getAudioTracks().length : 0) > 0;
       const initialFrame = captureVideoThumbnail(videoEl, true);
       await registerPresenter({
         id: myPresenterId,
@@ -1012,10 +1207,15 @@
           missingFromQueueCount = 0;
         }
 
+        if (myPeer && myPeer.disconnected && !myPeer.destroyed) {
+          try { myPeer.reconnect(); } catch (e) {}
+        }
+
         const isLiveOnTv = rd.activeMode === 'screen-share' && rd.activePresenterId === myPresenterId;
         const frame = captureVideoThumbnail(videoEl, isLiveOnTv);
         if (frame) {
-          updatePresenterStreamData(myPresenterId, { previewFrame: frame });
+          const currentHasAudio = (outboundStream ? outboundStream.getAudioTracks().length : 0) > 0;
+          updatePresenterStreamData(myPresenterId, { previewFrame: frame, hasAudio: currentHasAudio });
         }
       }, 2500);
     }
@@ -1045,28 +1245,52 @@
       const department = document.getElementById('presDept').value || 'IT';
       const title = document.getElementById('presTitle').value.trim() || 'Screen Presentation';
       try {
-        const nextStream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            cursor: 'always',
-            width: { ideal: 1920, max: 2560 },
-            height: { ideal: 1080, max: 1440 },
-            frameRate: { ideal: 30, max: 60 }
-          },
-          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-        });
+        const nextStream = await navigator.mediaDevices.getDisplayMedia(getDisplayMediaOptions());
         await attachLocalShareStream(nextStream, { name, department, title });
       } catch (e) {
         // User cancelled window picker
       }
     }
 
-    function toggleSharedAudioTrack() {
+    async function toggleSharedAudioTrack() {
       if (!localStream) return;
       const tracks = localStream.getAudioTracks();
-      if (!tracks.length) return;
+      if (!tracks.length) {
+        // If user selected a window without checking "Share audio", let them re-pick with audio enabled
+        await switchSharedScreen();
+        return;
+      }
       tracks[0].enabled = !tracks[0].enabled;
-      const btn = document.getElementById('btnToggleMicAudio');
-      btn.textContent = tracks[0].enabled ? '🔊 Shared Audio: ON' : '🔇 Shared Audio: MUTED';
+      updatePresenterAudioButtons();
+      syncTracksToActiveReceivers();
+    }
+
+    async function togglePresenterMicVoice() {
+      if (micStream && micStream.getAudioTracks().length > 0) {
+        const track = micStream.getAudioTracks()[0];
+        if (track.enabled) {
+          micStream.getTracks().forEach(t => t.stop());
+          micStream = null;
+        } else {
+          track.enabled = true;
+        }
+      } else {
+        try {
+          micStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true
+            },
+            video: false
+          });
+        } catch (err) {
+          alert('Unable to access microphone: ' + err.message);
+          return;
+        }
+      }
+      updatePresenterAudioButtons();
+      syncTracksToActiveReceivers();
     }
 
     async function stopStaffScreenShare(skipStoreRemove = false) {
@@ -1078,11 +1302,23 @@
         localStream.getTracks().forEach(t => t.stop());
         localStream = null;
       }
+      if (micStream) {
+        micStream.getTracks().forEach(t => t.stop());
+        micStream = null;
+      }
+      outboundStream = null;
+      if (presenterAudioCtx) {
+        try { presenterAudioCtx.close(); } catch (e) {}
+        presenterAudioCtx = null;
+        presenterAudioDest = null;
+      }
       if (myPeer) {
         try { myPeer.destroy(); } catch (e) {}
         myPeer = null;
       }
       activeReceiverCalls.clear();
+      knownReceiverPeerIds.clear();
+      lastCallTimeByPeer.clear();
       const idToRemove = myPresenterId;
       myPresenterId = null;
 
@@ -1095,6 +1331,7 @@
       document.getElementById('btnStartShare').style.display = 'inline-flex';
       document.getElementById('btnSwitchSource').style.display = 'none';
       document.getElementById('btnToggleMicAudio').style.display = 'none';
+      document.getElementById('btnToggleVoiceMic').style.display = 'none';
       document.getElementById('btnStopShare').style.display = 'none';
       document.getElementById('shareLiveBanner').style.display = 'none';
 
@@ -1112,6 +1349,7 @@
     window.startStaffScreenShare = startStaffScreenShare;
     window.switchSharedScreen = switchSharedScreen;
     window.toggleSharedAudioTrack = toggleSharedAudioTrack;
+    window.togglePresenterMicVoice = togglePresenterMicVoice;
     window.stopStaffScreenShare = stopStaffScreenShare;
 
     // =========================================================================
@@ -1123,9 +1361,48 @@
     let connectingPresenterPeerId = null;
     let connectionStartedAt = 0;
     let currentMediaStream = null;
+    let currentAttachedAudioTrackId = null;
+    let adminMonitorAudioEnabled = false;
+    let receiverAudioCtx = null;
+    let receiverAudioSource = null;
+
+    function unlockReceiverAudioContext() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          if (!receiverAudioCtx || receiverAudioCtx.state === 'closed') {
+            receiverAudioCtx = new AudioCtx();
+          }
+          if (receiverAudioCtx.state === 'suspended') {
+            receiverAudioCtx.resume().catch(() => {});
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Unlock TV audio on any click, touch, or keypress anywhere on the Receiver page
+    ['click', 'touchstart', 'keydown'].forEach(evtName => {
+      document.addEventListener(evtName, () => {
+        if (isReceiverMode || adminMonitorAudioEnabled) {
+          unlockReceiverAudioContext();
+          const audioEl = document.getElementById('tvLiveStreamAudio');
+          if (audioEl && audioEl.srcObject) {
+            audioEl.muted = false;
+            audioEl.volume = 1.0;
+            audioEl.play().then(() => {
+              const btn = document.getElementById('tvUnmuteBtn');
+              if (btn) btn.style.display = 'none';
+            }).catch(() => {});
+          }
+        }
+      }, { passive: true });
+    });
 
     function ensureReceiverPeer() {
       if (receiverPeer && !receiverPeer.destroyed) {
+        if (receiverPeer.disconnected) {
+          try { receiverPeer.reconnect(); } catch (e) {}
+        }
         return receiverPeer;
       }
       myReceiverPeerId = 'cchs-rec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
@@ -1133,14 +1410,71 @@
 
       receiverPeer.on('call', (call) => {
         call.answer();
-        call.on('stream', (remoteStream) => {
+        const handleIncomingStream = (remoteStream) => {
           currentMediaStream = remoteStream;
-          connectedPresenterPeerId = connectingPresenterPeerId || connectedPresenterPeerId;
+          connectedPresenterPeerId = call.peer || connectingPresenterPeerId || connectedPresenterPeerId;
           attachStreamToTvVideo(remoteStream);
-        });
+          // Also listen for late-arriving audio tracks on the same MediaStream
+          remoteStream.onaddtrack = () => {
+            syncReceiverAudioOutput(remoteStream, true);
+          };
+        };
+        call.on('stream', handleIncomingStream);
+        if (call.peerConnection) {
+          call.peerConnection.addEventListener('track', (evt) => {
+            if (evt.streams && evt.streams[0]) {
+              handleIncomingStream(evt.streams[0]);
+            }
+          });
+        }
+      });
+
+      receiverPeer.on('error', () => {
+        // Reset handshake lock on signaling/peer error so next poll retries immediately
+        connectingPresenterPeerId = null;
+        connectionStartedAt = 0;
       });
 
       return receiverPeer;
+    }
+
+    function syncReceiverAudioOutput(remoteStream, forceRebind = false) {
+      const audioEl = document.getElementById('tvLiveStreamAudio');
+      if (!audioEl || !remoteStream) return;
+
+      const audioTracks = remoteStream.getAudioTracks();
+      if (audioTracks.length === 0) {
+        currentAttachedAudioTrackId = null;
+        return;
+      }
+
+      audioTracks.forEach(t => { t.enabled = true; });
+      const primaryAudioTrack = audioTracks[0];
+      const shouldPlayAudio = isReceiverMode || adminMonitorAudioEnabled;
+
+      if (forceRebind || currentAttachedAudioTrackId !== primaryAudioTrack.id || !audioEl.srcObject) {
+        currentAttachedAudioTrackId = primaryAudioTrack.id;
+        const onlyAudioStream = new MediaStream(audioTracks);
+        audioEl.srcObject = onlyAudioStream;
+      }
+
+      if (shouldPlayAudio) {
+        audioEl.muted = false;
+        audioEl.volume = 1.0;
+        if (audioEl.paused) {
+          audioEl.play().then(() => {
+            const btn = document.getElementById('tvUnmuteBtn');
+            if (btn) btn.style.display = 'none';
+          }).catch(() => {
+            if (isReceiverMode) {
+              const btn = document.getElementById('tvUnmuteBtn');
+              if (btn) btn.style.display = 'inline-flex';
+            }
+          });
+        }
+      } else {
+        audioEl.muted = true;
+      }
     }
 
     function attachStreamToTvVideo(remoteStream) {
@@ -1149,47 +1483,31 @@
       if (vid.srcObject !== remoteStream) {
         vid.srcObject = remoteStream;
       }
+      // Keep video element muted so browser Autoplay Policy never pauses or blocks HD video rendering;
+      // audio is output cleanly via the dedicated #tvLiveStreamAudio element + Web Audio pipeline.
+      vid.muted = true;
       vid.style.display = 'block';
-      const fbImg = document.getElementById('tvFallbackFrame');
-      if (fbImg) fbImg.style.display = 'none';
-      const streamQualityBadge = document.getElementById('tvStreamQualityBadge');
-      if (streamQualityBadge) {
-        streamQualityBadge.textContent = '● HD LIVE STREAM';
-        streamQualityBadge.style.background = 'rgba(16, 185, 129, 0.28)';
-        streamQualityBadge.style.color = '#6ee7b7';
-      }
-
-      const activePres = (currentState?.remoteDisplay?.presenters || []).find(
-        p => p.peerId === connectedPresenterPeerId
-      );
-
-      if (isReceiverMode) {
-        vid.muted = false;
-        vid.play().catch(() => {
-          vid.muted = true;
-          vid.play().catch(() => {});
-          if (!activePres || activePres.hasAudio) {
-            document.getElementById('tvUnmuteBtn').style.display = 'inline-flex';
-          }
-        });
-      } else {
-        // Admin monitor preview is muted by default to avoid local audio echo
-        vid.muted = true;
+      if (vid.paused) {
         vid.play().catch(() => {});
       }
+
+      const fbImg = document.getElementById('tvFallbackFrame');
+      if (fbImg) fbImg.style.display = 'none';
+
+      syncReceiverAudioOutput(remoteStream);
     }
 
     function connectReceiverToPresenter(presenter) {
       if (!presenter || !presenter.peerId || !window.Peer) return;
 
-      // 1. If already streaming live from this exact presenter, just ensure video element is attached
+      // 1. If already streaming live from this exact presenter, ensure video & audio elements are synced
       if (connectedPresenterPeerId === presenter.peerId && currentMediaStream && currentMediaStream.active) {
         attachStreamToTvVideo(currentMediaStream);
         return;
       }
 
-      // 2. Crucial fix: Do NOT destroy/restart the connection while WebRTC handshake is already in progress (< 10s)
-      if (connectingPresenterPeerId === presenter.peerId && (Date.now() - connectionStartedAt) < 10000) {
+      // 2. Allow 3.5s for WebRTC handshake before retrying
+      if (connectingPresenterPeerId === presenter.peerId && (Date.now() - connectionStartedAt) < 3500) {
         return;
       }
 
@@ -1198,14 +1516,24 @@
       if (connectedPresenterPeerId !== presenter.peerId) {
         currentMediaStream = null;
         connectedPresenterPeerId = null;
+        currentAttachedAudioTrackId = null;
       }
 
       const peer = ensureReceiverPeer();
       const requestStreamFromPresenter = (recId) => {
-        const conn = peer.connect(presenter.peerId, { reliable: true });
-        conn.on('open', () => {
-          conn.send({ type: 'REQUEST_STREAM', receiverPeerId: recId });
-        });
+        try {
+          const conn = peer.connect(presenter.peerId, { reliable: true });
+          if (conn) {
+            conn.on('open', () => {
+              conn.send({ type: 'REQUEST_STREAM', receiverPeerId: recId });
+            });
+            conn.on('error', () => {
+              connectingPresenterPeerId = null;
+            });
+          }
+        } catch (e) {
+          connectingPresenterPeerId = null;
+        }
       };
 
       if (peer.open && peer.id) {
@@ -1218,13 +1546,34 @@
     }
 
     window.enableTvAudio = () => {
-      const vid = document.getElementById('tvLiveStreamVideo');
-      if (vid) {
-        vid.muted = false;
-        vid.volume = 1.0;
-        vid.play().catch(() => {});
+      unlockReceiverAudioContext();
+      const audioEl = document.getElementById('tvLiveStreamAudio');
+      if (audioEl) {
+        audioEl.muted = false;
+        audioEl.volume = 1.0;
+        if (currentMediaStream) {
+          syncReceiverAudioOutput(currentMediaStream, true);
+        }
+        audioEl.play().catch(() => {});
       }
-      document.getElementById('tvUnmuteBtn').style.display = 'none';
+      const btn = document.getElementById('tvUnmuteBtn');
+      if (btn) btn.style.display = 'none';
+    };
+
+    window.toggleAdminMonitorAudio = () => {
+      adminMonitorAudioEnabled = !adminMonitorAudioEnabled;
+      unlockReceiverAudioContext();
+      const btn = document.getElementById('adminMonitorAudioBtn');
+      if (btn) {
+        btn.textContent = adminMonitorAudioEnabled ? '🔊 Monitor Audio: ON' : '🔇 Monitor Audio: Muted';
+        btn.classList.toggle('primary', adminMonitorAudioEnabled);
+      }
+      if (currentMediaStream) {
+        syncReceiverAudioOutput(currentMediaStream, true);
+      } else {
+        const audioEl = document.getElementById('tvLiveStreamAudio');
+        if (audioEl) audioEl.muted = !adminMonitorAudioEnabled;
+      }
     };
 
     // =========================================================================
@@ -1449,18 +1798,8 @@
         if (!existingWrap) {
           targetEl.innerHTML = `
             <div data-presenter-id="${activePres.id}" style="width:100%; height:100%; background:#000; position:relative; display:flex; align-items:center; justify-content:center;">
-              <video id="tvLiveStreamVideo" autoplay playsinline style="width:100%; height:100%; object-fit:contain; display:${isWebRTCLive ? 'block' : 'none'};"></video>
+              <video id="tvLiveStreamVideo" autoplay muted playsinline style="width:100%; height:100%; object-fit:contain; display:${isWebRTCLive ? 'block' : 'none'};"></video>
               <img id="tvFallbackFrame" src="${activePres.previewFrame || ''}" style="width:100%; height:100%; object-fit:contain; display:${isWebRTCLive ? 'none' : 'block'};" alt="Live Screen Share" />
-              <div class="tv-presenter-badge">
-                <span style="width:10px; height:10px; border-radius:50%; background:#10b981; box-shadow:0 0 10px #10b981;"></span>
-                <strong>${activePres.name}</strong>
-                <span style="color:var(--cc-sky); font-weight:700;">(${activePres.department})</span>
-                <span style="opacity:0.8;">— ${activePres.title || 'Screen Share'}</span>
-                ${activePres.hasAudio ? `<span style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:#6ee7b7; padding:2px 8px; border-radius:999px;">🔊 Audio</span>` : ''}
-                <span id="tvStreamQualityBadge" style="font-size:0.72rem; background:${isWebRTCLive ? 'rgba(16,185,129,0.28)' : 'rgba(24,99,220,0.3)'}; color:${isWebRTCLive ? '#6ee7b7' : '#8ed1fc'}; padding:2px 8px; border-radius:999px; font-weight:700;">
-                  ${isWebRTCLive ? '● HD LIVE STREAM' : '● 1080p HD SYNC'}
-                </span>
-              </div>
             </div>
           `;
           connectReceiverToPresenter(activePres);
@@ -1479,6 +1818,13 @@
       connectedPresenterPeerId = null;
       connectingPresenterPeerId = null;
       currentMediaStream = null;
+      currentAttachedAudioTrackId = null;
+      const audioEl = document.getElementById('tvLiveStreamAudio');
+      if (audioEl && audioEl.srcObject) {
+        audioEl.srcObject = null;
+      }
+      const unmuteBtn = document.getElementById('tvUnmuteBtn');
+      if (unmuteBtn) unmuteBtn.style.display = 'none';
 
       if (mode === 'meeting-tv') {
         if (!targetEl.querySelector('iframe[src="/meeting/index.html"]')) {
