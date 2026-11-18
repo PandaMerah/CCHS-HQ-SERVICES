@@ -15,6 +15,7 @@ import {
   signInAnonymously,
   signInWithCustomToken
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAdminAuthHeaders } from "./auth.js";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAqu7Wz8f1ZGcsqTyn3AzzkOk3jvTRReDg",
@@ -27,7 +28,177 @@ export const firebaseConfig = {
   measurementId: "G-8QH9KJKQ8D"
 };
 
-// Seeded directly from CCHSMeetingDashboard/data.json + HQ Room Booking & Remote Display defaults
+const SERVICE_KEYS = ["departmentUpdate", "roomBooking", "screenShare", "pdfStudio"];
+const DEFAULT_SERVICE_TOGGLES = {
+  departmentUpdate: { enabled: true, notice: "", updatedAt: 0 },
+  roomBooking: { enabled: true, notice: "", updatedAt: 0 },
+  screenShare: { enabled: true, notice: "", updatedAt: 0 },
+  pdfStudio: { enabled: true, notice: "", updatedAt: 0 }
+};
+
+const DEFAULT_SLIDE_CONTROL = {
+  currentSlideIndex: 0,
+  totalSlides: 0,
+  currentSlideLabel: "Overview",
+  autoPlay: false,
+  autoPlayIntervalMs: 8000,
+  commandSeq: 0,
+  lastCommand: null,
+  refreshNonce: 0,
+  updatedAt: 0
+};
+
+function normalizeServiceToggles(rawToggles, fallbackToggles = DEFAULT_SERVICE_TOGGLES) {
+  const src = rawToggles && typeof rawToggles === "object" ? rawToggles : {};
+  const fb = fallbackToggles && typeof fallbackToggles === "object" ? fallbackToggles : DEFAULT_SERVICE_TOGGLES;
+  const out = {};
+  for (const key of SERVICE_KEYS) {
+    const baseEntry = fb[key] && typeof fb[key] === "object" ? fb[key] : DEFAULT_SERVICE_TOGGLES[key];
+    const entry = src[key];
+    if (entry === undefined) {
+      out[key] = {
+        enabled: baseEntry.enabled !== false,
+        notice: typeof baseEntry.notice === "string" ? baseEntry.notice : "",
+        updatedAt: Number.isFinite(Number(baseEntry.updatedAt)) ? Number(baseEntry.updatedAt) : 0
+      };
+    } else if (typeof entry === "boolean") {
+      out[key] = {
+        enabled: entry,
+        notice: typeof baseEntry.notice === "string" ? baseEntry.notice : "",
+        updatedAt: Number.isFinite(Number(baseEntry.updatedAt)) ? Number(baseEntry.updatedAt) : 0
+      };
+    } else if (entry && typeof entry === "object") {
+      out[key] = {
+        enabled: entry.enabled !== false,
+        notice: typeof entry.notice === "string" ? entry.notice : "",
+        updatedAt: Number.isFinite(Number(entry.updatedAt)) ? Number(entry.updatedAt) : (Number(baseEntry.updatedAt) || 0)
+      };
+    } else {
+      out[key] = { ...DEFAULT_SERVICE_TOGGLES[key] };
+    }
+  }
+  return out;
+}
+
+export function computeMeetingSlides(state) {
+  const departments = Object.keys((state && state.departments) || {});
+  const config = (state && state.config) || {};
+  const slides = [{ index: 0, label: "Overview", type: "overview", icon: "❯" }];
+
+  for (const dept of departments) {
+    slides.push({
+      index: slides.length,
+      label: `${dept} Update`,
+      type: "department-update",
+      department: dept,
+      icon: "❯"
+    });
+    if (config.showQnA !== false) {
+      slides.push({
+        index: slides.length,
+        label: `${dept} Q&A`,
+        type: "department-qna",
+        department: dept,
+        icon: "🎲"
+      });
+    }
+  }
+
+  if (config.showVisionMission !== false) {
+    slides.push({
+      index: slides.length,
+      label: "Vision & Mission",
+      type: "vision-mission",
+      icon: "❯"
+    });
+  }
+
+  slides.push({
+    index: slides.length,
+    label: "Tagline",
+    type: "tagline",
+    icon: "❯"
+  });
+
+  if (config.showDailyPhrases !== false) {
+    slides.push({
+      index: slides.length,
+      label: "Care Quality Phrases",
+      type: "phrases",
+      icon: "❯"
+    });
+  }
+
+  if (config.showLastMinuteSpeech === true) {
+    slides.push({
+      index: slides.length,
+      label: "C-Suite Closing Remarks",
+      type: "closing-remarks",
+      icon: "❯"
+    });
+  }
+
+  return slides;
+}
+
+function normalizeSlideControl(state) {
+  if (!state.remoteDisplay || typeof state.remoteDisplay !== "object") {
+    state.remoteDisplay = {
+      activeMode: "meeting-tv",
+      activePresenterId: null,
+      presenters: [],
+      modeUpdatedAt: 0
+    };
+  }
+  const slides = computeMeetingSlides(state);
+  const totalSlides = slides.length;
+  const rawSc = state.remoteDisplay.slideControl && typeof state.remoteDisplay.slideControl === "object"
+    ? state.remoteDisplay.slideControl
+    : {};
+
+  let idx = Math.trunc(Number(rawSc.currentSlideIndex) || 0);
+  if (!Number.isFinite(idx) || idx < 0) idx = 0;
+  if (idx >= totalSlides) idx = totalSlides - 1;
+
+  const rawInterval = Number(rawSc.autoPlayIntervalMs);
+  const autoPlayIntervalMs = Number.isFinite(rawInterval) && rawInterval >= 1000
+    ? Math.trunc(rawInterval)
+    : DEFAULT_SLIDE_CONTROL.autoPlayIntervalMs;
+
+  const rawSeq = Number(rawSc.commandSeq);
+  const commandSeq = Number.isFinite(rawSeq) && rawSeq >= 0 ? Math.trunc(rawSeq) : 0;
+
+  const rawNonce = Number(rawSc.refreshNonce);
+  const refreshNonce = Number.isFinite(rawNonce) && rawNonce >= 0 ? Math.trunc(rawNonce) : 0;
+
+  const rawUpdated = Number(rawSc.updatedAt);
+  const updatedAt = Number.isFinite(rawUpdated) && rawUpdated >= 0 ? rawUpdated : 0;
+
+  state.remoteDisplay.slideControl = {
+    currentSlideIndex: idx,
+    totalSlides,
+    currentSlideLabel: (slides[idx] && slides[idx].label) || "Overview",
+    autoPlay: Boolean(rawSc.autoPlay),
+    autoPlayIntervalMs,
+    commandSeq,
+    lastCommand: typeof rawSc.lastCommand === "string" ? rawSc.lastCommand : null,
+    refreshNonce,
+    updatedAt
+  };
+  return state.remoteDisplay.slideControl;
+}
+
+function getMaxRoomUpdatedAt(rooms) {
+  if (!Array.isArray(rooms) || rooms.length === 0) return 0;
+  let maxTs = 0;
+  for (const r of rooms) {
+    const ts = Number(r && r.updatedAt) || 0;
+    if (ts > maxTs) maxTs = ts;
+  }
+  return maxTs;
+}
+
+// Seeded fallback matching read-only CCHSMeetingDashboard/data.json + HQ Room Booking & Remote Display defaults
 export const INITIAL_SEED_DATA = {
   config: {
     showQnA: false,
@@ -37,7 +208,8 @@ export const INITIAL_SEED_DATA = {
     visionText: "Empower patients with the freedom to access quality healthcare services through digital integration anytime, anywhere.",
     missionText: "Deliver quality personalised care by merging of best medical practises with modern technology. ",
     phrases: ["Humanising Care."],
-    lastMinuteSpeechText: "Good afternoon, everyone. Thank you for being here today.As we look back at where we started this year, I want to begin with a simple thank you. We faced real shifts and unexpected hurdles. Because of your hard work, your creativity, and your care for one another, we did not just get through it—we adapted and grew. Every milestone we reached belongs to this team."
+    lastMinuteSpeechText: "Good afternoon, everyone. Thank you for being here today.As we look back at where we started this year, I want to begin with a simple thank you. We faced real shifts and unexpected hurdles. Because of your hard work, your creativity, and your care for one another, we did not just get through it—we adapted and grew. Every milestone we reached belongs to this team.",
+    serviceToggles: normalizeServiceToggles(DEFAULT_SERVICE_TOGGLES)
   },
   departments: {
     "IT": {
@@ -145,6 +317,8 @@ export const INITIAL_SEED_DATA = {
       color: "#0984e3"
     }
   ],
+  roomsUpdatedAt: 0,
+  roomsMeta: { updatedAt: 0, source: "seed" },
   bookings: [
     {
       id: "bk-seed-1",
@@ -212,11 +386,13 @@ export const INITIAL_SEED_DATA = {
       { id: "scr-door-boardroom", name: "Boardroom Door Tablet", location: "Outside Main Boardroom", assignedMode: "room-signage", roomId: "boardroom-main", lastSeen: Date.now() },
       { id: "scr-townhall", name: "Townhall Projector Display", location: "Level 2 Training Center", assignedMode: "follow-master", lastSeen: Date.now() }
     ],
+    slideControl: { ...DEFAULT_SLIDE_CONTROL },
     updatedAt: Date.now()
   }
 };
 
 const STORAGE_KEY = "cchs_hq_unified_state_v1";
+const BOOT_ID_STORAGE_KEY = "cchs_hq_server_boot_id_v1";
 const bc = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("cchs_hq_sync_channel") : null;
 
 let app = null;
@@ -235,6 +411,24 @@ let syncDetail = "Connecting to Firebase Realtime DB...";
 let firebaseConnected = false;
 let lastLocalModeChangeAt = 0;
 let lastLocalMutationAt = 0;
+let lastLocalSlideCommandAt = 0;
+let hasCompletedInitialApiSync = false;
+let lastKnownServerBootId = (() => {
+  try {
+    return typeof localStorage !== "undefined" ? localStorage.getItem(BOOT_ID_STORAGE_KEY) : null;
+  } catch (_) {
+    return null;
+  }
+})();
+function setLastKnownServerBootId(bootId) {
+  if (typeof bootId !== "string" || !bootId) return;
+  lastKnownServerBootId = bootId;
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(BOOT_ID_STORAGE_KEY, bootId);
+    }
+  } catch (_) {}
+}
 let currentState = loadLocalState();
 const listeners = new Set();
 const statusListeners = new Set();
@@ -248,15 +442,37 @@ function normalizeFirebaseArray(val) {
 
 function deepMergeSeed(raw) {
   const base = JSON.parse(JSON.stringify(INITIAL_SEED_DATA));
-  if (!raw || typeof raw !== "object") return base;
+  if (!raw || typeof raw !== "object") {
+    normalizeSlideControl(base);
+    return base;
+  }
   const normRooms = normalizeFirebaseArray(raw.rooms);
   const normBookings = normalizeFirebaseArray(raw.bookings);
   const normHistory = normalizeFirebaseArray(raw.history);
-  return {
-    config: { ...base.config, ...(raw.config || {}) },
+  const rooms = Array.isArray(normRooms) && normRooms.length > 0 ? normRooms : base.rooms;
+  const rawRoomsTs = Math.max(
+    Number(raw.roomsUpdatedAt) || 0,
+    Number(raw.roomsMeta?.updatedAt) || 0,
+    getMaxRoomUpdatedAt(rooms)
+  );
+  const rawConfig = raw.config && typeof raw.config === "object" ? raw.config : {};
+
+  const merged = {
+    config: {
+      ...base.config,
+      ...rawConfig,
+      serviceToggles: normalizeServiceToggles(rawConfig.serviceToggles, base.config.serviceToggles)
+    },
     departments: raw.departments && Object.keys(raw.departments).length > 0 ? raw.departments : base.departments,
     history: Array.isArray(normHistory) ? normHistory : base.history,
-    rooms: Array.isArray(normRooms) && normRooms.length > 0 ? normRooms : base.rooms,
+    rooms,
+    roomsUpdatedAt: rawRoomsTs,
+    roomsMeta: raw.roomsMeta && typeof raw.roomsMeta === "object"
+      ? {
+          updatedAt: Math.max(rawRoomsTs, Number(raw.roomsMeta.updatedAt) || 0),
+          source: raw.roomsMeta.source || (rawRoomsTs > 0 ? "persisted" : "seed")
+        }
+      : { updatedAt: rawRoomsTs, source: rawRoomsTs > 0 ? "persisted" : "seed" },
     bookings: Array.isArray(normBookings) ? normBookings : base.bookings,
     remoteDisplay: {
       ...base.remoteDisplay,
@@ -264,18 +480,24 @@ function deepMergeSeed(raw) {
       presenters: Array.isArray(raw.remoteDisplay?.presenters) ? raw.remoteDisplay.presenters : base.remoteDisplay.presenters,
       announcement: { ...base.remoteDisplay.announcement, ...(raw.remoteDisplay?.announcement || {}) },
       welcomeBoard: { ...base.remoteDisplay.welcomeBoard, ...(raw.remoteDisplay?.welcomeBoard || {}) },
-      screens: Array.isArray(raw.remoteDisplay?.screens) ? raw.remoteDisplay.screens : base.remoteDisplay.screens
+      screens: Array.isArray(raw.remoteDisplay?.screens) ? raw.remoteDisplay.screens : base.remoteDisplay.screens,
+      slideControl: raw.remoteDisplay?.slideControl && typeof raw.remoteDisplay.slideControl === "object"
+        ? { ...base.remoteDisplay.slideControl, ...raw.remoteDisplay.slideControl }
+        : { ...base.remoteDisplay.slideControl }
     }
   };
+  normalizeSlideControl(merged);
+  return merged;
 }
 
-// Merge incoming state while protecting newer mode switches & room/booking writes from stale snapshots
-function mergeIncomingState(incomingRaw) {
+// Merge incoming state while protecting newer mode switches, slide commands, service toggles & room/booking writes
+function mergeIncomingState(incomingRaw, options = {}) {
   const next = deepMergeSeed(incomingRaw);
   const localRd = currentState?.remoteDisplay || {};
   const nextRd = next.remoteDisplay || {};
   const localModeTime = Math.max(localRd.modeUpdatedAt || 0, lastLocalModeChangeAt);
   const incomingModeTime = nextRd.modeUpdatedAt || 0;
+  const recentMutation = (Date.now() - lastLocalMutationAt) < 5000;
 
   // Always preserve whichever state has the newer modeUpdatedAt timestamp
   if (localModeTime > incomingModeTime) {
@@ -295,15 +517,64 @@ function mergeIncomingState(incomingRaw) {
     next.remoteDisplay.updatedAt = localRdUpdated;
   }
 
-  // Protect recent room / booking mutations from stale poll snapshots
-  if ((Date.now() - lastLocalMutationAt) < 5000 && currentState) {
-    if (Array.isArray(currentState.rooms) && currentState.rooms.length > 0) {
-      next.rooms = currentState.rooms;
-    }
-    if (Array.isArray(currentState.bookings)) {
-      next.bookings = currentState.bookings;
+  // Reconcile remoteDisplay.slideControl by updatedAt / commandSeq while allowing fresh load after server restart
+  const localSc = localRd.slideControl || {};
+  const incomingSc = nextRd.slideControl || {};
+  const localScUpdated = Number(localSc.updatedAt) || 0;
+  const incomingScUpdated = Number(incomingSc.updatedAt) || 0;
+  const localSeq = Number(localSc.commandSeq) || 0;
+  const incomingSeq = Number(incomingSc.commandSeq) || 0;
+  const recentSlideCommand = (Date.now() - lastLocalSlideCommandAt) < 5000;
+  const allowZeroSlideReset = Boolean(options && options.allowZeroSlideReset === true);
+
+  if (localScUpdated > 0) {
+    const incomingIsOlder =
+      (!allowZeroSlideReset && recentSlideCommand && incomingScUpdated <= localScUpdated) ||
+      (incomingScUpdated > 0 && (localScUpdated > incomingScUpdated || (localScUpdated === incomingScUpdated && localSeq > incomingSeq))) ||
+      (incomingScUpdated === 0 && !allowZeroSlideReset);
+    if (incomingIsOlder) {
+      next.remoteDisplay.slideControl = { ...localSc };
     }
   }
+
+  // Reconcile serviceToggles per key by updatedAt and recent local mutation window
+  const localToggles = normalizeServiceToggles(currentState?.config?.serviceToggles);
+  const incomingToggles = normalizeServiceToggles(next.config?.serviceToggles);
+  const mergedToggles = {};
+  for (const key of SERVICE_KEYS) {
+    const lt = localToggles[key];
+    const it = incomingToggles[key];
+    if ((recentMutation && lt.updatedAt > 0 && it.updatedAt <= lt.updatedAt) || lt.updatedAt > it.updatedAt) {
+      mergedToggles[key] = { ...lt };
+    } else {
+      mergedToggles[key] = { ...it };
+    }
+  }
+  next.config.serviceToggles = mergedToggles;
+
+  // Monotonic room timestamp protection against stale poll/seed snapshots
+  const localRoomsTs = Math.max(
+    Number(currentState?.roomsUpdatedAt) || 0,
+    Number(currentState?.roomsMeta?.updatedAt) || 0,
+    getMaxRoomUpdatedAt(currentState?.rooms)
+  );
+  const incomingRoomsTs = Math.max(
+    Number(next.roomsUpdatedAt) || 0,
+    Number(next.roomsMeta?.updatedAt) || 0,
+    getMaxRoomUpdatedAt(next.rooms)
+  );
+  if ((recentMutation || localRoomsTs > incomingRoomsTs) && Array.isArray(currentState?.rooms) && currentState.rooms.length > 0) {
+    next.rooms = currentState.rooms;
+    next.roomsUpdatedAt = localRoomsTs;
+    next.roomsMeta = currentState.roomsMeta || { updatedAt: localRoomsTs, source: localRoomsTs > 0 ? "persisted" : "seed" };
+  }
+
+  // Protect recent booking mutations from stale poll snapshots
+  if (recentMutation && currentState && Array.isArray(currentState.bookings)) {
+    next.bookings = currentState.bookings;
+  }
+
+  normalizeSlideControl(next);
   return next;
 }
 
@@ -403,13 +674,28 @@ async function fetchApiState() {
   try {
     const res = await fetch("/api/data", { cache: "no-store" });
     if (res.ok) {
-      // Ignore poll responses that started before our latest local mode or room/booking mutation
-      if (fetchStartedAt < lastLocalModeChangeAt || fetchStartedAt < lastLocalMutationAt) {
+      // Ignore poll responses that started before our latest local mode, slide command, or room/booking mutation
+      if (
+        fetchStartedAt < lastLocalModeChangeAt ||
+        fetchStartedAt < lastLocalMutationAt ||
+        fetchStartedAt < lastLocalSlideCommandAt
+      ) {
         return true;
       }
       const apiData = await res.json();
       if (apiData && typeof apiData === "object") {
-        currentState = mergeIncomingState(apiData);
+        const nextBootId = typeof apiData.serverBootId === "string" && apiData.serverBootId
+          ? apiData.serverBootId
+          : null;
+        const bootIdChanged = Boolean(nextBootId && lastKnownServerBootId && nextBootId !== lastKnownServerBootId);
+        const initialServerSyncWithBootId = Boolean(!hasCompletedInitialApiSync && nextBootId);
+        if (nextBootId) {
+          setLastKnownServerBootId(nextBootId);
+        }
+        hasCompletedInitialApiSync = true;
+        currentState = mergeIncomingState(apiData, {
+          allowZeroSlideReset: bootIdChanged || initialServerSyncWithBootId
+        });
         saveLocalState(currentState);
         notifyListeners();
         if (!firebaseConnected) {
@@ -424,47 +710,95 @@ async function fetchApiState() {
   return false;
 }
 
-async function pushApiState(newState) {
+async function pushApiState(newState, { throwOnError = false } = {}) {
   try {
     const res = await fetch("/api/data", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders()
+      },
       body: JSON.stringify(newState)
     });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.state) {
-        currentState = mergeIncomingState(data.state);
-        saveLocalState(currentState);
-        notifyListeners();
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      const err = new Error((data && data.error) || `Request failed (${res.status})`);
+      err.status = res.status;
+      err.code = data && data.code;
+      err.service = data && data.service;
+      err.notice = data && data.notice;
+      if (err.code === "SERVICE_DISABLED") {
+        fetchApiState();
       }
+      if (throwOnError) throw err;
+      return { ok: false, error: err.message, status: res.status, code: err.code, service: err.service, notice: err.notice };
     }
+    if (data && data.state) {
+      if (typeof data.state.serverBootId === "string" && data.state.serverBootId) {
+        setLastKnownServerBootId(data.state.serverBootId);
+      }
+      hasCompletedInitialApiSync = true;
+      currentState = mergeIncomingState(data.state);
+      saveLocalState(currentState);
+      notifyListeners();
+    }
+    return { ok: true, data };
   } catch (e) {
-    // Non-fatal
+    if (e && e.status) {
+      if (throwOnError) throw e;
+      return { ok: false, error: e.message, status: e.status, code: e.code, service: e.service, notice: e.notice };
+    }
+    if (throwOnError) throw e;
+    return { ok: false, offline: true };
   }
 }
 
-async function pushApiAction(action, payload) {
+async function pushApiAction(action, payload, { throwOnError = false } = {}) {
   try {
     const res = await fetch("/api/data", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders()
+      },
       body: JSON.stringify({ __action: action, payload })
     });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.state) {
-        currentState = mergeIncomingState(data.state);
-        saveLocalState(currentState);
-        notifyListeners();
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      const err = new Error((data && data.error) || `Request failed (${res.status})`);
+      err.status = res.status;
+      err.code = data && data.code;
+      err.service = data && data.service;
+      err.notice = data && data.notice;
+      if (err.code === "SERVICE_DISABLED") {
+        fetchApiState();
       }
+      if (throwOnError) throw err;
+      return { ok: false, error: err.message, status: res.status, code: err.code, service: err.service, notice: err.notice };
     }
+    if (data && data.state) {
+      if (typeof data.state.serverBootId === "string" && data.state.serverBootId) {
+        setLastKnownServerBootId(data.state.serverBootId);
+      }
+      hasCompletedInitialApiSync = true;
+      currentState = mergeIncomingState(data.state);
+      saveLocalState(currentState);
+      notifyListeners();
+    }
+    return { ok: true, data };
   } catch (e) {
-    // Non-fatal
+    if (e && e.status) {
+      if (throwOnError) throw e;
+      return { ok: false, error: e.message, status: e.status, code: e.code, service: e.service, notice: e.notice };
+    }
+    if (throwOnError && (action === "UPDATE_SERVICE_TOGGLES" || action === "SLIDE_COMMAND")) {
+      throw e;
+    }
+    return { ok: false, offline: true };
   }
 }
 
-// Push specific node (`rooms` or `bookings`) directly to Firebase Realtime Database FIRST
+// Push specific node (`rooms`, `bookings`, `config`, etc.) directly to Firebase Realtime Database
 async function pushFirebaseNode(nodePath, data) {
   if (!db) return false;
   try {
@@ -517,14 +851,26 @@ async function initRealtimeSync() {
       const val = snapshot.val();
       if (val && typeof val === "object") {
         const normalizedPresenters = normalizeFirebaseArray(val.presenters);
+        const localSc = currentState.remoteDisplay?.slideControl;
+        const incomingSc = val.slideControl && typeof val.slideControl === "object" ? val.slideControl : null;
+        const incomingScUpdated = Number(incomingSc?.updatedAt) || 0;
+        const incomingScSeq = Number(incomingSc?.commandSeq) || 0;
+        const localScUpdated = Number(localSc?.updatedAt) || 0;
+        const preserveLocalSc = Boolean(
+          localSc && localScUpdated > 0 && (!incomingSc || (incomingScUpdated === 0 && incomingScSeq === 0))
+        );
         const incomingRd = {
           ...val,
-          presenters: Array.isArray(normalizedPresenters) ? normalizedPresenters : (currentState.remoteDisplay?.presenters || [])
+          presenters: Array.isArray(normalizedPresenters) ? normalizedPresenters : (currentState.remoteDisplay?.presenters || []),
+          ...(preserveLocalSc ? { slideControl: localSc } : {})
         };
-        currentState = mergeIncomingState({
-          ...currentState,
-          remoteDisplay: incomingRd
-        });
+        currentState = mergeIncomingState(
+          {
+            ...currentState,
+            remoteDisplay: incomingRd
+          },
+          { authoritativeSource: false }
+        );
         saveLocalState(currentState);
         notifyListeners();
       }
@@ -538,7 +884,28 @@ async function initRealtimeSync() {
     (snapshot) => {
       const val = snapshot.val();
       if (val && typeof val === "object") {
-        currentState = { ...currentState, config: { ...currentState.config, ...val } };
+        const recentMutation = (Date.now() - lastLocalMutationAt) < 5000;
+        const localToggles = normalizeServiceToggles(currentState?.config?.serviceToggles);
+        const incomingToggles = normalizeServiceToggles(val.serviceToggles, localToggles);
+        const mergedToggles = {};
+        for (const key of SERVICE_KEYS) {
+          const lt = localToggles[key];
+          const it = incomingToggles[key];
+          if ((recentMutation && lt.updatedAt > 0 && it.updatedAt <= lt.updatedAt) || lt.updatedAt > it.updatedAt) {
+            mergedToggles[key] = { ...lt };
+          } else {
+            mergedToggles[key] = { ...it };
+          }
+        }
+        currentState = {
+          ...currentState,
+          config: {
+            ...currentState.config,
+            ...val,
+            serviceToggles: mergedToggles
+          }
+        };
+        normalizeSlideControl(currentState);
         saveLocalState(currentState);
         notifyListeners();
       }
@@ -553,6 +920,7 @@ async function initRealtimeSync() {
       const val = snapshot.val();
       if (val && typeof val === "object" && Object.keys(val).length > 0) {
         currentState = { ...currentState, departments: val };
+        normalizeSlideControl(currentState);
         saveLocalState(currentState);
         notifyListeners();
       }
@@ -566,11 +934,24 @@ async function initRealtimeSync() {
     async (snapshot) => {
       firebaseConnected = true;
       const val = normalizeFirebaseArray(snapshot.val());
+      const localRoomsTs = Math.max(
+        Number(currentState?.roomsUpdatedAt) || 0,
+        Number(currentState?.roomsMeta?.updatedAt) || 0,
+        getMaxRoomUpdatedAt(currentState?.rooms)
+      );
       if (val && val.length > 0) {
-        currentState = { ...currentState, rooms: val };
-        saveLocalState(currentState);
-        notifyListeners();
-      } else if (Array.isArray(currentState.rooms) && currentState.rooms.length > 0) {
+        const fbRoomsTs = getMaxRoomUpdatedAt(val) || 1;
+        if ((Date.now() - lastLocalMutationAt) >= 5000 && (localRoomsTs === 0 || fbRoomsTs >= localRoomsTs)) {
+          currentState = {
+            ...currentState,
+            rooms: val,
+            roomsUpdatedAt: fbRoomsTs,
+            roomsMeta: { updatedAt: fbRoomsTs, source: "firebase" }
+          };
+          saveLocalState(currentState);
+          notifyListeners();
+        }
+      } else if (localRoomsTs > 0 && Array.isArray(currentState.rooms) && currentState.rooms.length > 0) {
         try {
           await set(roomsRef, currentState.rooms);
         } catch (e) {}
@@ -587,9 +968,11 @@ async function initRealtimeSync() {
       firebaseConnected = true;
       const val = normalizeFirebaseArray(snapshot.val());
       if (val) {
-        currentState = { ...currentState, bookings: val };
-        saveLocalState(currentState);
-        notifyListeners();
+        if ((Date.now() - lastLocalMutationAt) >= 5000) {
+          currentState = { ...currentState, bookings: val };
+          saveLocalState(currentState);
+          notifyListeners();
+        }
       } else if (Array.isArray(currentState.bookings) && currentState.bookings.length > 0) {
         try {
           await set(bookingsRef, currentState.bookings);
@@ -600,29 +983,29 @@ async function initRealtimeSync() {
     () => {}
   );
 
-  // Root state listener
+  // Root state listener (read-only merge when rules allow; never blindly overwrites root with seed)
   onValue(
     rootRef,
     async (snapshot) => {
       firebaseConnected = true;
       const val = snapshot.val();
-      if (!val || (!val.departments && !val.config && !val.rooms && !val.bookings)) {
-        // Seed Firebase automatically with our initial state (including rooms and bookings)
-        try {
-          await set(rootRef, currentState);
-        } catch (seedErr) {
-          console.warn("Auto-seed Firebase warning:", seedErr);
+      if (val && (val.departments || val.config || val.rooms || val.bookings || val.remoteDisplay)) {
+        const nextVal = { ...val };
+        const localSc = currentState.remoteDisplay?.slideControl;
+        const incomingSc = nextVal.remoteDisplay?.slideControl && typeof nextVal.remoteDisplay.slideControl === "object"
+          ? nextVal.remoteDisplay.slideControl
+          : null;
+        const incomingScUpdated = Number(incomingSc?.updatedAt) || 0;
+        const incomingScSeq = Number(incomingSc?.commandSeq) || 0;
+        const localScUpdated = Number(localSc?.updatedAt) || 0;
+        if (localSc && localScUpdated > 0 && (!incomingSc || (incomingScUpdated === 0 && incomingScSeq === 0))) {
+          nextVal.remoteDisplay = {
+            ...(nextVal.remoteDisplay || currentState.remoteDisplay || {}),
+            slideControl: localSc
+          };
         }
-      } else {
-        currentState = mergeIncomingState(val);
+        currentState = mergeIncomingState(nextVal, { authoritativeSource: false });
         saveLocalState(currentState);
-        // Ensure /rooms and /bookings exist in Firebase if missing from root
-        if (!val.rooms && Array.isArray(currentState.rooms)) {
-          try { await set(roomsRef, currentState.rooms); } catch (e) {}
-        }
-        if (!val.bookings && Array.isArray(currentState.bookings)) {
-          try { await set(bookingsRef, currentState.bookings); } catch (e) {}
-        }
       }
       setSyncStatus("firebase", `Firebase RTDB Live (${firebaseConfig.projectId})`);
       notifyListeners();
@@ -665,73 +1048,276 @@ export function getState() {
   return currentState;
 }
 
-export async function saveFullState(nextState) {
-  currentState = deepMergeSeed(nextState);
+export function getServiceStatus(stateOrKey, maybeKey) {
+  const serviceKey = typeof stateOrKey === "string" ? stateOrKey : maybeKey;
+  const targetState = typeof stateOrKey === "string" ? currentState : (stateOrKey || currentState);
+  const toggles = normalizeServiceToggles(targetState?.config?.serviceToggles);
+  const entry = toggles[serviceKey];
+  if (!entry) {
+    return { enabled: true, notice: "", updatedAt: 0 };
+  }
+  return {
+    enabled: entry.enabled !== false,
+    notice: typeof entry.notice === "string" ? entry.notice : "",
+    updatedAt: Number(entry.updatedAt) || 0
+  };
+}
+
+export async function updateServiceToggles(toggles) {
+  const now = Date.now();
+  lastLocalMutationAt = now;
+  const existing = normalizeServiceToggles(currentState?.config?.serviceToggles);
+  const incoming = toggles && typeof toggles === "object" ? toggles : {};
+  const nextToggles = { ...existing };
+  for (const key of SERVICE_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(incoming, key)) {
+      const rawEntry = incoming[key];
+      if (typeof rawEntry === "boolean") {
+        nextToggles[key] = {
+          enabled: rawEntry,
+          notice: existing[key].notice || "",
+          updatedAt: now
+        };
+      } else if (rawEntry && typeof rawEntry === "object") {
+        nextToggles[key] = {
+          enabled: rawEntry.enabled !== false,
+          notice: typeof rawEntry.notice === "string" ? rawEntry.notice : (existing[key].notice || ""),
+          updatedAt: now
+        };
+      }
+    }
+  }
+
+  await pushApiAction("UPDATE_SERVICE_TOGGLES", { serviceToggles: nextToggles }, { throwOnError: true });
+
+  currentState = deepMergeSeed({
+    ...currentState,
+    config: {
+      ...(currentState.config || {}),
+      serviceToggles: nextToggles
+    }
+  });
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  await pushFirebaseNode("config", currentState.config);
+  return currentState.config.serviceToggles;
+}
+
+export async function saveFullState(nextState, options = {}) {
+  const prevState = currentState;
+  lastLocalMutationAt = Date.now();
+  const merged = deepMergeSeed(nextState);
+
+  if (options.includeRooms !== true && Array.isArray(prevState?.rooms) && prevState.rooms.length > 0) {
+    merged.rooms = prevState.rooms;
+    merged.roomsUpdatedAt = prevState.roomsUpdatedAt || 0;
+    merged.roomsMeta = prevState.roomsMeta || { updatedAt: merged.roomsUpdatedAt, source: merged.roomsUpdatedAt > 0 ? "persisted" : "seed" };
+  }
+  if (options.includeBookings !== true && Array.isArray(prevState?.bookings)) {
+    merged.bookings = prevState.bookings;
+  }
+  if (options.preserveServiceToggles !== false && prevState?.config?.serviceToggles) {
+    merged.config.serviceToggles = normalizeServiceToggles(prevState.config.serviceToggles);
+  }
+
+  currentState = merged;
   saveLocalState(currentState);
   if (bc) {
     bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   }
   notifyListeners();
 
-  // Push to Vercel Serverless API
-  pushApiState(currentState);
+  const apiPayload = {
+    config: merged.config,
+    departments: merged.departments,
+    history: merged.history,
+    remoteDisplay: merged.remoteDisplay
+  };
+  if (options.includeRooms === true) {
+    apiPayload.rooms = merged.rooms;
+    apiPayload.roomsUpdatedAt = merged.roomsUpdatedAt;
+    apiPayload.roomsMeta = merged.roomsMeta;
+  }
+  if (options.includeBookings === true) {
+    apiPayload.bookings = merged.bookings;
+    apiPayload.__allowBookingsOverwrite = true;
+  }
 
-  // Push to Firebase if available
-  if (db) {
-    try {
-      await set(ref(db, "/"), currentState);
-      firebaseConnected = true;
-      setSyncStatus("firebase", "Firebase Realtime DB Live");
-    } catch (err) {
-      // Fallback already persisted locally & via API
-      console.info("Saved to API/local store (Firebase write skipped):", err.message);
+  try {
+    const apiRes = await pushApiState(apiPayload, { throwOnError: Boolean(options.throwOnError) });
+    if (!apiRes.ok && !apiRes.offline) {
+      throw new Error(apiRes.error || "Failed to save state");
     }
+  } catch (err) {
+    currentState = prevState;
+    saveLocalState(currentState);
+    if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+    notifyListeners();
+    throw err;
+  }
+
+  // Targeted Firebase RTDB node writes (never overwrite root '/')
+  await pushFirebaseNode("config", currentState.config);
+  await pushFirebaseNode("departments", currentState.departments);
+  await pushFirebaseNode("history", currentState.history);
+  if (options.includeRooms === true) {
+    await pushFirebaseNode("rooms", currentState.rooms);
+  }
+  if (options.includeBookings === true) {
+    await pushFirebaseNode("bookings", currentState.bookings);
   }
   return currentState;
 }
 
 export async function submitDepartmentUpdate({ department, updateText, questionText }) {
+  const prevState = currentState;
+  lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
   if (!state.departments) state.departments = {};
+  const qText = questionText || "N/A";
   state.departments[department] = {
     update: updateText,
-    question: questionText || "N/A"
+    question: qText
   };
 
   if (!Array.isArray(state.history)) state.history = [];
-  state.history.unshift({
+  const entry = {
     timestamp: Date.now(),
     dateString: new Date().toLocaleString("en-MY"),
     department,
     update: updateText,
-    question: questionText || "N/A"
-  });
+    question: qText
+  };
+  state.history.unshift(entry);
 
-  return saveFullState(state);
+  currentState = deepMergeSeed(state);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  try {
+    await pushApiAction("SUBMIT_DEPARTMENT_UPDATE", { department, updateText, questionText: qText, entry }, { throwOnError: true });
+  } catch (err) {
+    currentState = prevState;
+    saveLocalState(currentState);
+    if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+    notifyListeners();
+    throw err;
+  }
+
+  await pushFirebaseNode("departments", currentState.departments);
+  await pushFirebaseNode("history", currentState.history);
+  return currentState;
 }
 
 export async function saveAdminConfig({ config, departments }) {
+  const prevState = currentState;
+  lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
+  const preservedToggles = normalizeServiceToggles(state.config?.serviceToggles);
   if (config) {
-    state.config = { ...state.config, ...config };
+    state.config = {
+      ...state.config,
+      ...config,
+      serviceToggles: config.serviceToggles
+        ? normalizeServiceToggles(config.serviceToggles, preservedToggles)
+        : preservedToggles
+    };
   }
   if (departments) {
     state.departments = departments;
   }
-  return saveFullState(state);
+
+  currentState = deepMergeSeed(state);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  try {
+    await pushApiAction("SAVE_ADMIN_CONFIG", { config: currentState.config, departments: currentState.departments }, { throwOnError: true });
+  } catch (err) {
+    currentState = prevState;
+    saveLocalState(currentState);
+    if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+    notifyListeners();
+    throw err;
+  }
+
+  await pushFirebaseNode("config", currentState.config);
+  await pushFirebaseNode("departments", currentState.departments);
+  return currentState;
 }
 
 export async function resetMeetingSession() {
+  const prevState = currentState;
+  lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
   for (const dept of Object.keys(state.departments || {})) {
     state.departments[dept] = { update: "Pending update...", question: "N/A" };
   }
-  return saveFullState(state);
+
+  currentState = deepMergeSeed(state);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  try {
+    await pushApiAction("RESET_MEETING_SESSION", {}, { throwOnError: true });
+  } catch (err) {
+    currentState = prevState;
+    saveLocalState(currentState);
+    if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+    notifyListeners();
+    throw err;
+  }
+
+  await pushFirebaseNode("departments", currentState.departments);
+  return currentState;
 }
 
-export async function resetToInitialSeed() {
+export async function resetToInitialSeed(options = {}) {
+  const prevState = currentState;
+  lastLocalMutationAt = Date.now();
   const fresh = JSON.parse(JSON.stringify(INITIAL_SEED_DATA));
-  return saveFullState(fresh);
+  const preservedToggles = normalizeServiceToggles(prevState?.config?.serviceToggles);
+  fresh.config.serviceToggles = options.resetServiceToggles === true
+    ? normalizeServiceToggles(DEFAULT_SERVICE_TOGGLES)
+    : preservedToggles;
+
+  if (options.includeRooms !== true && Array.isArray(prevState?.rooms) && prevState.rooms.length > 0) {
+    fresh.rooms = prevState.rooms;
+    fresh.roomsUpdatedAt = prevState.roomsUpdatedAt || 0;
+    fresh.roomsMeta = prevState.roomsMeta || { updatedAt: fresh.roomsUpdatedAt, source: fresh.roomsUpdatedAt > 0 ? "persisted" : "seed" };
+  }
+  if (options.includeBookings !== true && Array.isArray(prevState?.bookings)) {
+    fresh.bookings = prevState.bookings;
+  }
+
+  currentState = deepMergeSeed(fresh);
+  saveLocalState(currentState);
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  notifyListeners();
+
+  try {
+    await pushApiAction("RESET_TO_INITIAL_SEED", {
+      resetServiceToggles: options.resetServiceToggles === true,
+      includeRooms: options.includeRooms === true,
+      includeBookings: options.includeBookings === true
+    }, { throwOnError: true });
+  } catch (err) {
+    currentState = prevState;
+    saveLocalState(currentState);
+    if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+    notifyListeners();
+    throw err;
+  }
+
+  await pushFirebaseNode("config", currentState.config);
+  await pushFirebaseNode("departments", currentState.departments);
+  await pushFirebaseNode("history", currentState.history);
+  return currentState;
 }
 
 export function checkBookingConflict(bookings, { roomId, date, startTime, endTime, excludeId = null }) {
@@ -747,6 +1333,7 @@ export function checkBookingConflict(bookings, { roomId, date, startTime, endTim
 }
 
 export async function addRoomBooking(booking) {
+  const prevState = currentState;
   lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
   if (!Array.isArray(state.bookings)) state.bookings = [];
@@ -786,16 +1373,25 @@ export async function addRoomBooking(booking) {
   if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   notifyListeners();
 
-  // 1. Write directly to Firebase Realtime Database (/bookings) first
-  await pushFirebaseNode("bookings", currentState.bookings);
+  // 1. Persist to HQ Cloud Server (/api/data -> data/runtime-state.json) first; rollback if rejected
+  try {
+    await pushApiAction("ADD_BOOKING", { booking: newBooking }, { throwOnError: true });
+  } catch (err) {
+    currentState = prevState;
+    saveLocalState(currentState);
+    if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+    notifyListeners();
+    throw err;
+  }
 
-  // 2. Persist to HQ Cloud Server (/api/data -> CCHSMeetingDashboard/data.json)
-  await pushApiAction("ADD_BOOKING", { booking: newBooking });
+  // 2. Write directly to Firebase Realtime Database (/bookings)
+  await pushFirebaseNode("bookings", currentState.bookings);
 
   return newBooking;
 }
 
 export async function updateRoomBooking(bookingId, updatedFields) {
+  const prevState = currentState;
   lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
   if (!Array.isArray(state.bookings)) state.bookings = [];
@@ -835,16 +1431,25 @@ export async function updateRoomBooking(bookingId, updatedFields) {
   if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   notifyListeners();
 
-  // 1. Write directly to Firebase Realtime Database (/bookings) first
+  // 1. Persist to HQ Cloud Server (/api/data -> data/runtime-state.json) first; rollback if rejected
+  try {
+    await pushApiAction("UPDATE_BOOKING", { bookingId, updatedFields }, { throwOnError: true });
+  } catch (err) {
+    currentState = prevState;
+    saveLocalState(currentState);
+    if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+    notifyListeners();
+    throw err;
+  }
+
+  // 2. Write directly to Firebase Realtime Database (/bookings)
   await pushFirebaseNode("bookings", currentState.bookings);
 
-  // 2. Persist to HQ Cloud Server (/api/data -> CCHSMeetingDashboard/data.json)
-  await pushApiAction("UPDATE_BOOKING", { bookingId, updatedFields });
-
-  return state.bookings[idx];
+  return currentState.bookings.find((b) => b.id === bookingId) || candidate;
 }
 
 export async function deleteRoomBooking(bookingId) {
+  const prevState = currentState;
   lastLocalMutationAt = Date.now();
   const state = JSON.parse(JSON.stringify(currentState));
   state.bookings = (state.bookings || []).filter((b) => b.id !== bookingId);
@@ -853,11 +1458,19 @@ export async function deleteRoomBooking(bookingId) {
   if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   notifyListeners();
 
-  // 1. Write directly to Firebase Realtime Database (/bookings) first
-  await pushFirebaseNode("bookings", currentState.bookings);
+  // 1. Persist to HQ Cloud Server (/api/data -> data/runtime-state.json) first; rollback if rejected
+  try {
+    await pushApiAction("DELETE_BOOKING", { bookingId }, { throwOnError: true });
+  } catch (err) {
+    currentState = prevState;
+    saveLocalState(currentState);
+    if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+    notifyListeners();
+    throw err;
+  }
 
-  // 2. Persist to HQ Cloud Server (/api/data -> CCHSMeetingDashboard/data.json)
-  await pushApiAction("DELETE_BOOKING", { bookingId });
+  // 2. Write directly to Firebase Realtime Database (/bookings)
+  await pushFirebaseNode("bookings", currentState.bookings);
 
   return currentState;
 }
@@ -883,19 +1496,33 @@ export async function markBookingNotified(bookingId) {
 // ADMIN MEETING ROOM CUSTOMIZATION (Quantity, Name, Floor, Capacity, Details)
 // ============================================================================
 export async function saveMeetingRooms(roomsList) {
-  lastLocalMutationAt = Date.now();
+  const prevState = currentState;
+  const now = Math.max(Date.now(), (currentState?.roomsUpdatedAt || 0) + 1);
+  lastLocalMutationAt = now;
   const state = JSON.parse(JSON.stringify(currentState));
-  state.rooms = Array.isArray(roomsList) ? roomsList : [];
+  const stampedRooms = (Array.isArray(roomsList) ? roomsList : []).map((r) => ({ ...r, updatedAt: now }));
+  state.rooms = stampedRooms;
+  state.roomsUpdatedAt = now;
+  state.roomsMeta = { updatedAt: now, source: "admin" };
+
   currentState = deepMergeSeed(state);
   saveLocalState(currentState);
   if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
   notifyListeners();
 
-  // 1. Write directly to Firebase Realtime Database (/rooms) first
-  await pushFirebaseNode("rooms", state.rooms);
+  // 1. Persist to HQ Cloud Server (/api/data -> data/runtime-state.json) first; rollback if rejected
+  try {
+    await pushApiAction("SAVE_ROOMS", { rooms: stampedRooms, roomsUpdatedAt: now }, { throwOnError: true });
+  } catch (err) {
+    currentState = prevState;
+    saveLocalState(currentState);
+    if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+    notifyListeners();
+    throw err;
+  }
 
-  // 2. Persist to HQ Cloud Server (/api/data -> CCHSMeetingDashboard/data.json)
-  await pushApiAction("SAVE_ROOMS", { rooms: state.rooms });
+  // 2. Write directly to Firebase Realtime Database (/rooms)
+  await pushFirebaseNode("rooms", currentState.rooms);
 
   return currentState.rooms;
 }
@@ -961,34 +1588,40 @@ export function formatWhatsAppPhone(rawPhone) {
   return digits;
 }
 
-export function buildWhatsAppBookingUrl(booking, room, type = "starting") {
-  const phone = formatWhatsAppPhone(booking.phone || "");
-  const roomName = room?.name || booking.roomId || "HQ Meeting Room";
+export function buildWhatsAppBookingMessage(booking, room, type = "starting") {
+  const b = booking || {};
+  const roomName = room?.name || b.roomId || "HQ Meeting Room";
   const roomFloor = room?.floor ? ` (${room.floor})` : "";
   const header = type === "starting"
-    ? "🔔 *CARECLINICS HQ — YOUR ROOM BOOKING IS STARTING NOW*"
-    : "✅ *CARECLINICS HQ — ROOM BOOKING CONFIRMED*";
+    ? "▸ *CARECLINICS HQ — YOUR ROOM BOOKING IS STARTING NOW*"
+    : "✓ *CARECLINICS HQ — ROOM BOOKING CONFIRMED*";
 
   const statusLine = type === "starting"
-    ? `Hi *${booking.organizer || "Staff"}*, your reserved meeting room is ready and your session time has arrived!`
-    : `Hi *${booking.organizer || "Staff"}*, your meeting room reservation at Careclinics HQ has been scheduled.`;
+    ? `Hi *${b.organizer || "Staff"}*, your reserved meeting room is ready and your session time has arrived!`
+    : `Hi *${b.organizer || "Staff"}*, your meeting room reservation at Careclinics HQ has been scheduled.`;
 
+  const bullet = type === "starting" ? "-" : "•";
   const lines = [
     header,
     "",
     statusLine,
     "",
-    `📍 *Room:* ${roomName}${roomFloor}`,
-    `📋 *Meeting:* ${booking.title || "Meeting"}`,
-    `🏢 *Department:* ${booking.department || "HQ"}`,
-    `📅 *Date:* ${booking.date}`,
-    `⏰ *Time:* ${booking.startTime} – ${booking.endTime}`,
-    booking.notes ? `💬 *Notes:* ${booking.notes}` : "",
+    `${bullet} *Room:* ${roomName}${roomFloor}`,
+    `${bullet} *Meeting:* ${b.title || "Meeting"}`,
+    `${bullet} *Department:* ${b.department || "HQ"}`,
+    `${bullet} *Date:* ${b.date || ""}`,
+    `${bullet} *Time:* ${b.startTime || ""} – ${b.endTime || ""}`,
+    b.notes ? `${bullet} *Notes:* ${b.notes}` : "",
     "",
     "_Careclinics Healthcare Services HQ Portal_"
   ].filter(Boolean);
 
-  const text = encodeURIComponent(lines.join("\n"));
+  return lines.join("\n");
+}
+
+export function buildWhatsAppBookingUrl(booking, room, type = "starting") {
+  const phone = formatWhatsAppPhone(booking?.phone || "");
+  const text = encodeURIComponent(buildWhatsAppBookingMessage(booking, room, type));
   return phone
     ? `https://wa.me/${phone}?text=${text}`
     : `https://wa.me/?text=${text}`;
@@ -1066,6 +1699,17 @@ export function downloadOutlookIcs(booking, room) {
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+export async function sendSlideCommand(command, payload = {}) {
+  lastLocalSlideCommandAt = Date.now();
+  const res = await pushApiAction("SLIDE_COMMAND", { command, ...payload }, { throwOnError: true });
+  if (!res || !res.ok) {
+    throw new Error((res && res.error) || "Slide command failed");
+  }
+  if (bc) bc.postMessage({ type: "STATE_UPDATED", state: currentState });
+  await pushFirebaseNode("remoteDisplay/slideControl", currentState.remoteDisplay.slideControl);
+  return currentState.remoteDisplay.slideControl;
 }
 
 export async function updateRemoteDisplay(remoteDisplayPatch) {

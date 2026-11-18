@@ -492,3 +492,175 @@ body, html {
     text-align: center;
     letter-spacing: 0.5px;
 }
+
+/* Strict Read-Only Preview Mode (?preview=1 inside Admin Controller Monitor) */
+body.preview-mode .tv-controls {
+    pointer-events: none;
+    padding: 6px 12px;
+    bottom: 10px;
+    right: 10px;
+}
+
+body.preview-mode .tv-controls button {
+    display: none !important;
+}
+
+body.preview-mode #slide-indicator {
+    font-size: 0.85rem;
+    min-width: 48px;
+}
+
+body.preview-mode .dept-pill,
+body.preview-mode .forza-slot-window,
+body.preview-mode .sidebar-nav-links {
+    pointer-events: none;
+}
+
+body.preview-mode .sidebar {
+    width: 210px;
+    padding: 16px 14px;
+}
+
+body.preview-mode .sidebar-logo {
+    max-width: 145px;
+    padding: 6px 10px;
+}
+
+body.preview-mode .brand-subtitle {
+    font-size: 0.72rem;
+    margin-top: 6px;
+}
+
+body.preview-mode .sidebar-clock-container {
+    padding: 8px 10px;
+    margin-top: 8px;
+}
+
+body.preview-mode .sidebar-time {
+    font-size: 1.05rem;
+}
+
+body.preview-mode .sidebar-date {
+    font-size: 0.7rem;
+}
+
+body.preview-mode .dept-pill-list {
+    max-height: calc(100vh - 210px);
+    gap: 6px;
+    margin-top: 10px;
+}
+
+body.preview-mode .dept-pill {
+    padding: 7px 10px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+}
+
+body.preview-mode .sidebar-footer {
+    font-size: 0.68rem;
+    gap: 4px;
+}
+
+body.preview-mode .sidebar-nav-links {
+    display: none;
+}
+
+body.preview-mode .main-viewport {
+    padding: 16px;
+}
+
+body.preview-mode .cc-card {
+    padding: 24px 28px;
+    border-radius: 16px;
+    overflow-y: auto;
+}
+
+body.preview-mode .cc-card-tag {
+    font-size: 0.78rem;
+    padding: 4px 12px;
+    margin-bottom: 10px;
+}
+
+body.preview-mode .cc-card h1 {
+    font-size: 1.9rem;
+    margin-bottom: 10px;
+}
+
+body.preview-mode .cc-card h2 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+}
+
+body.preview-mode .cc-card .update-text {
+    font-size: 1.15rem;
+    line-height: 1.4;
+}
+
+body.preview-mode .overview-logo {
+    max-width: 160px;
+}
+
+body.preview-mode .overview-clock-box {
+    padding: 10px 16px;
+    border-radius: 12px;
+}
+
+body.preview-mode .overview-time {
+    font-size: 1.4rem;
+}
+
+body.preview-mode .overview-date {
+    font-size: 0.8rem;
+}
+
+body.preview-mode .status-chip {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+}
+
+body.preview-mode .pill-grid {
+    gap: 14px;
+    margin-top: 10px;
+}
+
+body.preview-mode .sub-card {
+    padding: 14px 16px;
+}
+
+body.preview-mode .sub-card h2 {
+    font-size: 1.15rem;
+}
+
+body.preview-mode .sub-card p {
+    font-size: 0.95rem;
+}
+
+body.preview-mode .tagline-display {
+    font-size: 3rem;
+}
+
+body.preview-mode .care-phrases-table td {
+    padding: 8px 12px;
+    font-size: 0.88rem;
+}
+
+body.preview-mode .qna-layout {
+    gap: 20px;
+}
+
+body.preview-mode .forza-slot-window {
+    width: 240px;
+    height: 60px;
+}
+
+body.preview-mode .forza-slot-item {
+    height: 60px;
+    line-height: 60px;
+    font-size: 1rem;
+}
+
+body.preview-mode .winner-text {
+    font-size: 1.15rem;
+    min-height: 28px;
+    margin-top: 8px;
+}

@@ -7,3 +7,5 @@ Thumbs.db
 
 .vercel
 .env*
+data/
+data/runtime-state.json

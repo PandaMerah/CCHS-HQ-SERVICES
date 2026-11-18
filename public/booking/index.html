@@ -150,6 +150,14 @@
       background: var(--cc-blue-hover);
       box-shadow: 0 4px 12px rgba(24, 99, 220, 0.45);
     }
+    .nav-btn.primary-cta:disabled {
+      background: #475569;
+      border-color: #64748b;
+      color: #cbd5e1;
+      opacity: 0.72;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
     .nav-btn.admin-login {
       background: rgba(245, 158, 11, 0.16);
       border-color: rgba(245, 158, 11, 0.4);
@@ -202,9 +210,65 @@
       background: var(--cc-blue-light);
       border-color: #bfdbfe;
     }
+    .tool-grid-item.is-disabled {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #64748b;
+      opacity: 0.85;
+      cursor: not-allowed;
+    }
+    .tool-grid-item.is-disabled:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .tool-grid-item.is-admin-bypass {
+      border-color: #fcd34d;
+      background: #fffbeb;
+    }
     .tool-grid-item .tool-icon { font-size: 1.15rem; margin-bottom: 3px; }
     .tool-grid-item .tool-name { font-size: 0.78rem; font-weight: 700; }
-    .tool-grid-item .tool-desc { font-size: 0.65rem; color: var(--cc-muted); }
+    .tool-grid-item .tool-desc { font-size: 0.65rem; color: var(--cc-muted); line-height: 1.3; }
+    .tool-status-badge {
+      display: inline-block;
+      align-self: flex-start;
+      margin-top: 4px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 0.58rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+    .tool-status-badge.admin-bypass {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fcd34d;
+    }
+
+    /* Service Disabled / Admin Bypass Notice Banner */
+    .service-disabled-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 18px;
+      border: 1px solid #fca5a5;
+      background: #fef2f2;
+      color: #991b1b;
+      box-shadow: var(--shadow-sm);
+      flex-wrap: wrap;
+    }
+    .service-disabled-banner.visible { display: flex; }
+    .service-disabled-banner.admin-bypass {
+      border-color: #fcd34d;
+      background: #fffbeb;
+      color: #78350f;
+    }
 
     /* =========================================================================
        2. LIVE DUE MEETING ALERT STRIP
@@ -354,6 +418,15 @@
     .hero-cta-btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 6px 18px rgba(24, 99, 220, 0.5);
+    }
+    .hero-cta-btn:disabled {
+      background: #475569;
+      border-color: #64748b;
+      color: #cbd5e1;
+      opacity: 0.75;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     /* 4 Live Facility KPI Cards */
@@ -1011,6 +1084,19 @@
       border-color: #86efac;
       color: #15803d;
     }
+    .slot-free-btn:disabled,
+    .slot-free-btn.is-disabled {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+    .slot-free-btn:disabled:hover,
+    .slot-free-btn.is-disabled:hover {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #94a3b8;
+    }
 
     /* Booked Slot Card in Table */
     .slot-booked-card {
@@ -1243,6 +1329,11 @@
       transition: background 0.15s ease;
     }
     .empty-state-cta:hover { background: var(--cc-blue-hover); }
+    .empty-state-cta:disabled {
+      background: #cbd5e1;
+      color: #475569;
+      cursor: not-allowed;
+    }
 
     /* =========================================================================
        8. STREAMLINED RESERVATION MODAL
@@ -1254,7 +1345,7 @@
       background: rgba(12, 25, 54, 0.65);
       backdrop-filter: blur(4px);
       z-index: 120;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       padding: 16px;
       overflow-y: auto;
@@ -1267,6 +1358,7 @@
       box-shadow: 0 24px 60px rgba(12, 25, 54, 0.25);
       width: 100%;
       max-width: 580px;
+      margin: auto;
       padding: 24px 28px;
       position: relative;
       animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1508,6 +1600,12 @@
       z-index: 100;
       cursor: pointer;
     }
+    .mobile-book-fab:disabled {
+      background: #94a3b8;
+      color: #f1f5f9;
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
 
     /* Admin Rooms Manager List */
     .room-admin-item {
@@ -1575,7 +1673,7 @@
         <span id="cloudSyncDot" style="width:7px; height:7px; border-radius:50%; background:#10b981; display:inline-block;"></span>
         <span id="cloudSyncLabel">Firebase Sync</span>
       </button>
-      <button type="button" class="nav-btn primary-cta" onclick="openBookingModal()">
+      <button type="button" id="topbarBookBtn" class="nav-btn primary-cta" onclick="openBookingModal()">
         <span>＋ Book a Room</span>
       </button>
       <!-- Apps / Tools Dropdown -->
@@ -1592,17 +1690,17 @@
               <span class="tool-name">Staff Portal</span>
               <span class="tool-desc">Main Directory</span>
             </a>
-            <a href="/display/?mode=share" class="tool-grid-item">
+            <a href="/display/?mode=share" class="tool-grid-item" data-service-key="screenShare" data-href="/display/?mode=share" data-default-desc="Wireless Cast">
               <span class="tool-icon">🖥️</span>
               <span class="tool-name">Share to TV</span>
               <span class="tool-desc">Wireless Cast</span>
             </a>
-            <a href="/meeting/input.html" class="tool-grid-item">
+            <a href="/meeting/input.html" class="tool-grid-item" data-service-key="departmentUpdate" data-href="/meeting/input.html" data-default-desc="Weekly Input">
               <span class="tool-icon">📝</span>
               <span class="tool-name">Dept Update</span>
               <span class="tool-desc">Weekly Input</span>
             </a>
-            <a href="/pdf/" class="tool-grid-item">
+            <a href="/pdf/" class="tool-grid-item" data-service-key="pdfStudio" data-href="/pdf/" data-default-desc="PDF Toolkit">
               <span class="tool-icon">📄</span>
               <span class="tool-name">BentoPDF</span>
               <span class="tool-desc">PDF Toolkit</span>
@@ -1639,6 +1737,17 @@
   <main class="container">
     <div id="pageToast" class="page-toast"></div>
 
+    <div id="serviceDisabledBanner" class="service-disabled-banner" role="status" aria-live="polite">
+      <div style="display:flex; align-items:flex-start; gap:10px; min-width:0;">
+        <span id="serviceDisabledIcon" style="font-size:1.15rem; flex-shrink:0;">🔒</span>
+        <div>
+          <div id="serviceDisabledHeading" style="font-weight:800; font-size:0.86rem;">Room Booking Currently Unavailable</div>
+          <div id="serviceDisabledText" style="font-size:0.78rem; margin-top:2px;"></div>
+        </div>
+      </div>
+      <a id="serviceDisabledAdminLink" href="/admin/" class="btn-chip" style="display:none; padding:6px 12px; font-size:0.74rem; text-decoration:none; white-space:nowrap;">Manage Service Toggles →</a>
+    </div>
+
     <!-- Executive Hero Dashboard & Real-Time Operational Facility KPIs -->
     <section class="hero-banner">
       <div class="hero-top-row">
@@ -1647,11 +1756,11 @@
             <span>Careclinics HQ Meeting Rooms &amp; Schedule</span>
           </h1>
           <p>
-            Check real-time room availability, equipment specs, and reserve meeting spaces with automated Outlook (.ics) and WhatsApp calendar synchronization.
+            Check real-time room availability, equipment specs, and reserve meeting spaces with Outlook (.ics) calendar invites and 1-click WhatsApp confirmations.
           </p>
         </div>
         <div class="hero-action-group">
-          <button type="button" class="hero-cta-btn" onclick="openBookingModal()">
+          <button type="button" id="heroBookBtn" class="hero-cta-btn" onclick="openBookingModal()">
             <span>＋ Reserve Room Now</span>
           </button>
         </div>
@@ -1758,7 +1867,7 @@
   </main>
 
   <!-- Mobile Floating Action Button -->
-  <button type="button" class="mobile-book-fab" onclick="openBookingModal()">
+  <button type="button" id="mobileBookFab" class="mobile-book-fab" onclick="openBookingModal()">
     <span>＋ Book Room</span>
   </button>
 
@@ -1869,7 +1978,7 @@
           </label>
           <label class="checkbox-row">
             <input type="checkbox" id="chkWhatsappAlert" checked />
-            <span>💬 Send WhatsApp session reminder</span>
+            <span>💬 Enable WhatsApp session reminder alert</span>
           </label>
         </div>
 
@@ -1902,6 +2011,12 @@
         <a id="btnModalWhatsApp" href="#" target="_blank" rel="noopener" class="btn-primary" style="background:var(--cc-whatsapp); text-decoration:none; text-align:center; display:block;">
           💬 Send WhatsApp Confirmation ↗
         </a>
+        <button type="button" id="btnModalCopyWhatsApp" class="btn-chip" style="padding:9px; text-align:center; width:100%;">
+          📋 Copy Confirmation Message
+        </button>
+        <div id="confirmedWhatsAppNote" style="font-size:0.72rem; color:var(--cc-muted); line-height:1.45; padding-top:2px;">
+          1-click WhatsApp opens your pre-filled message for immediate sending (or copy it to paste anywhere). Automatic background sending requires an optional server webhook (<code>WHATSAPP_WEBHOOK_URL</code>) or WhatsApp Business API configured by IT.
+        </div>
       </div>
       <button type="button" class="btn-chip" style="padding:9px 28px;" onclick="closeConfirmedModal()">Done</button>
     </div>
@@ -1977,9 +2092,13 @@
       <div class="modal-header">
         <div>
           <h3 id="roomManagerModalHeading" style="color:var(--cc-navy); font-weight:800; font-size:1.05rem;">🏢 Customize HQ Meeting Rooms (Admin)</h3>
-          <p style="font-size:0.75rem; color:var(--cc-muted);">Manage rooms, floor location, capacity, and equipment specs.</p>
+          <p style="font-size:0.75rem; color:var(--cc-muted);">Manage rooms, floor location, capacity, and equipment specs. Changes persist across git updates and server restarts.</p>
         </div>
         <button type="button" class="modal-close-x" onclick="closeRoomManagerModal()">&times;</button>
+      </div>
+      <div id="roomManagerPersistenceNote" style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:var(--radius-sm); padding:8px 12px; font-size:0.73rem; color:#1e3a8a; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+        <span>💾 Rooms persist in HQ Server runtime storage (<code>data/runtime-state.json</code> via <code>/api/data</code>) &amp; Firebase RTDB across <code>git</code> updates and restarts.</span>
+        <span id="roomManagerSyncMeta" style="font-weight:700; color:#1d4ed8;"></span>
       </div>
       <div id="roomManagerAlert" class="alert"></div>
       <form id="roomConfigForm" style="background:#f8fafc; border:1px solid var(--cc-border); border-radius:var(--radius-md); padding:14px; margin-bottom:14px;">
@@ -2042,9 +2161,9 @@
         <div><strong>Live Connection Status:</strong> <span id="modalSyncStatusText" style="font-weight:700; color:var(--cc-blue);">Checking...</span></div>
       </div>
       <div id="firebaseRulesNoticeBox" style="background:#fffbeb; border:1px solid #fde68a; border-radius:var(--radius-md); padding:12px 14px; font-size:0.75rem; color:#78350f; margin-bottom:12px;">
-        <div style="font-weight:700; margin-bottom:4px;">⚡ Dual-Layer Persistence Active (Firebase RTDB + Server JSON)</div>
+        <div style="font-weight:700; margin-bottom:4px;">⚡ Persistent Dual-Layer Storage (HQ Server + Firebase RTDB)</div>
         <div>
-          Every room and booking change writes directly to Firebase (<code>/rooms</code> and <code>/bookings</code>) <strong>and</strong> persists to the HQ Server database (<code>CCHSMeetingDashboard/data.json</code> via <code>/api/data</code>)—ensuring reliable offline and online operation.
+          Every room and booking change persists to the HQ Server runtime store (<code>data/runtime-state.json</code> via <code>/api/data</code>) <strong>and</strong> syncs with Firebase (<code>/rooms</code> and <code>/bookings</code>) across <code>git</code> updates and server restarts, while <code>CCHSMeetingDashboard/data.json</code> remains a read-only initial template.
         </div>
       </div>
       <div style="display:flex; justify-content:flex-end;">
@@ -2057,6 +2176,7 @@
     import {
       subscribeState,
       subscribeSyncStatus,
+      getServiceStatus,
       checkBookingConflict,
       addRoomBooking,
       updateRoomBooking,
@@ -2066,23 +2186,113 @@
       updateMeetingRoom,
       deleteMeetingRoom,
       buildWhatsAppBookingUrl,
+      buildWhatsAppBookingMessage,
       buildOutlookCalendarUrls,
       downloadOutlookIcs
     } from '/shared/cloud-store.js';
-    import { isAdminLoggedIn, getAdminSession, logoutAdmin } from '/shared/auth.js';
+    import { isAdminLoggedIn, getAdminSession, getAdminToken, logoutAdmin } from '/shared/auth.js';
 
-    const isAdmin = isAdminLoggedIn();
-    const adminSession = getAdminSession();
-    if (isAdmin) {
-      const adminControls = document.getElementById('adminNavControls');
-      adminControls.innerHTML = `
-        <a href="/admin/" class="nav-btn" style="background:rgba(16,185,129,0.2); border-color:#10b981; color:#6ee7b7;">🛡️ Admin</a>
-        <button type="button" class="nav-btn" onclick="openRoomManagerModal()">⚙️ Rooms</button>
-        <button id="bookingLogoutBtn" class="nav-btn" style="background:rgba(244,63,94,0.18); color:#fda4af;">Logout</button>
-      `;
-      document.getElementById('bookingLogoutBtn').addEventListener('click', () => logoutAdmin('/booking/'));
-      document.getElementById('adminRoomConfigActions').style.display = 'inline-block';
+    let rejectedAdminToken = null;
+
+    function parseSignedAdminTokenPayload(token) {
+      if (typeof token !== 'string') return null;
+      const trimmed = token.trim();
+      if (!/^[A-Za-z0-9_-]+\.[0-9a-fA-F]{32,}$/.test(trimmed)) return null;
+      const [payloadB64] = trimmed.split('.');
+      try {
+        const b64 = payloadB64.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4);
+        const bin = atob(padded);
+        let jsonStr;
+        if (typeof TextDecoder === 'function') {
+          const bytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          jsonStr = new TextDecoder().decode(bytes);
+        } else {
+          jsonStr = bin;
+        }
+        return JSON.parse(jsonStr);
+      } catch (e) {
+        return null;
+      }
     }
+
+    function isAdminActive() {
+      if (!isAdminLoggedIn()) return false;
+      const token = getAdminToken();
+      if (!token) return false;
+      if (rejectedAdminToken && token === rejectedAdminToken) return false;
+      const payload = parseSignedAdminTokenPayload(token);
+      if (!payload || payload.role !== 'admin') return false;
+      if (typeof payload.username !== 'string' || payload.username.trim().length === 0) return false;
+      const exp = Number(payload.exp);
+      if (!Number.isFinite(exp) || exp <= Date.now()) return false;
+      return true;
+    }
+
+    function clearRejectedAdminSession() {
+      const token = getAdminToken();
+      if (token) rejectedAdminToken = token;
+      try {
+        localStorage.removeItem('cchs_hq_admin_auth_v1');
+      } catch (e) {
+        // ignore
+      }
+      syncAdminNavControls();
+      if (currentState) {
+        applyServiceToggleEnforcement(currentState);
+        renderRoomsDirectory();
+        renderSchedule();
+      }
+    }
+
+    function escapeHtml(val) {
+      return String(val ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeJsAttr(val) {
+      return escapeHtml(String(val ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+    }
+
+    function safeColor(val, fallback = '#1863dc') {
+      const s = String(val || '').trim();
+      return /^#[0-9a-fA-F]{3,8}$/.test(s) || /^rgba?\([0-9.,\s%]+\)$/i.test(s) ? s : fallback;
+    }
+
+    let renderedAdminNavState = null;
+    function syncAdminNavControls() {
+      const adminNow = isAdminActive();
+      if (renderedAdminNavState === adminNow) return;
+      renderedAdminNavState = adminNow;
+      const adminControls = document.getElementById('adminNavControls');
+      const roomActions = document.getElementById('adminRoomConfigActions');
+      if (adminNow) {
+        if (adminControls) {
+          adminControls.innerHTML = `
+            <a href="/admin/" class="nav-btn" style="background:rgba(16,185,129,0.2); border-color:#10b981; color:#6ee7b7;">🛡️ Admin</a>
+            <button type="button" class="nav-btn" onclick="openRoomManagerModal()">⚙️ Rooms</button>
+            <button id="bookingLogoutBtn" class="nav-btn" style="background:rgba(244,63,94,0.18); color:#fda4af;">Logout</button>
+          `;
+          document.getElementById('bookingLogoutBtn')?.addEventListener('click', () => logoutAdmin('/booking/'));
+        }
+        if (roomActions) roomActions.style.display = 'inline-block';
+      } else {
+        if (adminControls) {
+          adminControls.innerHTML = `<a href="/login.html?redirect=/booking/" class="nav-btn admin-login" id="adminLoginBtn">🔒 Admin</a>`;
+        }
+        if (roomActions) roomActions.style.display = 'none';
+      }
+    }
+    syncAdminNavControls();
+
+    let hasInitialServerSync = false;
+    let bookingSubmitting = false;
+    let roomSaving = false;
 
     // =========================================================================
     // DEPARTMENT COLOR-CODING PALETTE
@@ -2184,6 +2394,13 @@
       const dot = document.getElementById('cloudSyncDot');
       const lbl = document.getElementById('cloudSyncLabel');
       const modalTxt = document.getElementById('modalSyncStatusText');
+      if (
+        (status.mode === 'firebase' && status.firebaseConnected) ||
+        (status.mode === 'cloud-api' && status.detail && status.detail !== 'Using HQ Cloud API Sync')
+      ) {
+        hasInitialServerSync = true;
+        if (currentState) checkDueBookingsForWhatsApp();
+      }
       if (!dot || !lbl) return;
       if (status.mode === 'firebase' && status.firebaseConnected) {
         dot.style.background = '#10b981';
@@ -2206,6 +2423,173 @@
           modalTxt.style.color = '#b45309';
           modalTxt.textContent = status.detail || 'Connecting...';
         }
+      }
+    });
+
+    // =========================================================================
+    // SERVICE TOGGLE ENFORCEMENT (R1) & APPS MENU
+    // =========================================================================
+    function getRoomBookingStatus(state = currentState) {
+      return getServiceStatus(state, 'roomBooking');
+    }
+
+    function isRoomBookingDisabledForStaff(state = currentState) {
+      return !isAdminActive() && getRoomBookingStatus(state).enabled === false;
+    }
+
+    function getRoomBookingDisabledMessage(state = currentState) {
+      const status = getRoomBookingStatus(state);
+      const notice = String(status.notice || '').trim();
+      return notice || 'Room booking is currently disabled by an administrator. You may still view the schedule in read-only mode.';
+    }
+
+    function applyServiceToggleEnforcement(state = currentState) {
+      syncAdminNavControls();
+      const adminNow = isAdminActive();
+      const rbStatus = getRoomBookingStatus(state);
+      const staffDisabled = !adminNow && rbStatus.enabled === false;
+      const disabledMsg = getRoomBookingDisabledMessage(state);
+
+      // 1. Service Disabled / Admin Bypass Banner
+      const banner = document.getElementById('serviceDisabledBanner');
+      const icon = document.getElementById('serviceDisabledIcon');
+      const heading = document.getElementById('serviceDisabledHeading');
+      const text = document.getElementById('serviceDisabledText');
+      const adminLink = document.getElementById('serviceDisabledAdminLink');
+      if (banner && heading && text) {
+        if (rbStatus.enabled === false) {
+          banner.classList.add('visible');
+          if (adminNow) {
+            banner.classList.add('admin-bypass');
+            if (icon) icon.textContent = '🛡️';
+            heading.textContent = 'Admin Bypass Active — Staff Room Booking Disabled';
+            const cleanNotice = String(rbStatus.notice || '').trim();
+            text.textContent = cleanNotice
+              ? `Staff room booking is disabled ("${cleanNotice}"). As an administrator, you can still reserve rooms, manage rooms, and edit service toggles.`
+              : 'Staff room booking is currently disabled. As an administrator, you can still reserve rooms, manage rooms, and edit service toggles.';
+            if (adminLink) adminLink.style.display = 'inline-flex';
+          } else {
+            banner.classList.remove('admin-bypass');
+            if (icon) icon.textContent = '🔒';
+            heading.textContent = 'Room Booking Currently Unavailable';
+            text.textContent = disabledMsg;
+            if (adminLink) adminLink.style.display = 'none';
+          }
+        } else {
+          banner.classList.remove('visible', 'admin-bypass');
+          if (adminLink) adminLink.style.display = 'none';
+        }
+      }
+
+      // 2. Disable static booking triggers for regular staff
+      const triggerSpecs = [
+        { id: 'topbarBookBtn', disabledLabel: '🔒 Booking Disabled' },
+        { id: 'heroBookBtn', disabledLabel: '🔒 Room Booking Disabled' },
+        { id: 'mobileBookFab', disabledLabel: '🔒 Disabled' }
+      ];
+      triggerSpecs.forEach(({ id, disabledLabel }) => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        const labelSpan = btn.querySelector('span');
+        if (labelSpan && !btn.dataset.defaultLabel) {
+          btn.dataset.defaultLabel = labelSpan.textContent;
+        }
+        if (staffDisabled) {
+          btn.disabled = true;
+          btn.setAttribute('aria-disabled', 'true');
+          btn.title = disabledMsg;
+          if (labelSpan) labelSpan.textContent = disabledLabel;
+        } else {
+          btn.disabled = false;
+          btn.removeAttribute('aria-disabled');
+          btn.removeAttribute('title');
+          if (labelSpan && btn.dataset.defaultLabel) {
+            labelSpan.textContent = btn.dataset.defaultLabel;
+          }
+        }
+      });
+
+      // 3. Close booking modal immediately if open when roomBooking becomes disabled for staff
+      const modalBackdrop = document.getElementById('bookingModalBackdrop');
+      if (staffDisabled && modalBackdrop?.classList.contains('open')) {
+        closeBookingModal();
+        showToast(disabledMsg, true);
+      }
+
+      // 4. Enforce #toolsDropdownMenu service links (always visible, disabled with notice for staff)
+      const toolLinks = document.querySelectorAll('#toolsDropdownMenu .tool-grid-item[data-service-key]');
+      toolLinks.forEach((el) => {
+        const key = el.dataset.serviceKey;
+        const status = getServiceStatus(state, key);
+        const descEl = el.querySelector('.tool-desc');
+        if (descEl && !el.dataset.defaultDesc) {
+          el.dataset.defaultDesc = descEl.textContent;
+        }
+        if (!el.dataset.href && el.getAttribute('href')) {
+          el.dataset.href = el.getAttribute('href');
+        }
+        el.querySelector('.tool-status-badge')?.remove();
+
+        if (!status.enabled) {
+          const badge = document.createElement('span');
+          badge.className = adminNow ? 'tool-status-badge admin-bypass' : 'tool-status-badge';
+          badge.textContent = adminNow ? 'Staff Disabled' : 'Disabled';
+          el.appendChild(badge);
+
+          const cleanNotice = String(status.notice || '').trim();
+          if (descEl) {
+            descEl.textContent = adminNow
+              ? (cleanNotice ? `Disabled for staff: ${cleanNotice}` : 'Disabled for staff (Admin access)')
+              : (cleanNotice ? `Unavailable — ${cleanNotice}` : 'Disabled / Unavailable by administrator');
+          }
+
+          if (!adminNow) {
+            el.classList.add('is-disabled');
+            el.classList.remove('is-admin-bypass');
+            el.setAttribute('aria-disabled', 'true');
+            el.setAttribute('tabindex', '0');
+            el.removeAttribute('href');
+          } else {
+            el.classList.remove('is-disabled');
+            el.classList.add('is-admin-bypass');
+            el.removeAttribute('aria-disabled');
+            if (el.dataset.href) el.setAttribute('href', el.dataset.href);
+          }
+        } else {
+          el.classList.remove('is-disabled', 'is-admin-bypass');
+          el.removeAttribute('aria-disabled');
+          if (el.dataset.href) el.setAttribute('href', el.dataset.href);
+          if (descEl && el.dataset.defaultDesc) {
+            descEl.textContent = el.dataset.defaultDesc;
+          }
+        }
+      });
+    }
+
+    document.getElementById('toolsDropdownMenu')?.addEventListener('click', (e) => {
+      const item = e.target.closest('.tool-grid-item[data-service-key]');
+      if (!item) return;
+      const status = getServiceStatus(currentState, item.dataset.serviceKey);
+      if (!isAdminActive() && !status.enabled) {
+        e.preventDefault();
+        e.stopPropagation();
+        const name = item.querySelector('.tool-name')?.textContent || 'This service';
+        const msg = String(status.notice || '').trim() || `${name} is currently disabled by an administrator.`;
+        showToast(msg, true);
+      }
+    });
+
+    document.getElementById('toolsDropdownMenu')?.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const item = e.target.closest('.tool-grid-item[data-service-key]');
+      if (!item) return;
+      const status = getServiceStatus(currentState, item.dataset.serviceKey);
+      if (!isAdminActive() && !status.enabled) {
+        e.preventDefault();
+        e.stopPropagation();
+        const name = item.querySelector('.tool-name')?.textContent || 'This service';
+        const msg = String(status.notice || '').trim() || `${name} is currently disabled by an administrator.`;
+        showToast(msg, true);
       }
     });
 
@@ -2269,6 +2653,10 @@
     // MODAL & FORM CONTROLS
     // =========================================================================
     window.openBookingModal = (prefilledRoomId = null) => {
+      if (isRoomBookingDisabledForStaff(currentState)) {
+        showToast(getRoomBookingDisabledMessage(currentState), true);
+        return;
+      }
       document.getElementById('bookingAlert').style.display = 'none';
       if (prefilledRoomId) {
         document.getElementById('roomId').value = prefilledRoomId;
@@ -2312,9 +2700,10 @@
           if (parsed && parsed.organizer) return parsed;
         }
       } catch (e) {}
-      if (adminSession && adminSession.username) {
+      const activeSession = isAdminActive() ? getAdminSession() : null;
+      if (activeSession && activeSession.username) {
         return {
-          organizer: adminSession.username === 'admin' ? 'HQ Administrator' : adminSession.username,
+          organizer: activeSession.username === 'admin' ? 'HQ Administrator' : activeSession.username,
           department: 'ADMIN',
           phone: '012-3456789',
           email: 'admin@careclinics.my'
@@ -2423,17 +2812,102 @@
 
     const alertEl = document.getElementById('bookingAlert');
     const pageToastEl = document.getElementById('pageToast');
+    let toastTimer = null;
+
+    function showToast(msg, isError = false) {
+      if (!pageToastEl) return;
+      pageToastEl.textContent = isError ? `⚠️ ${msg}` : `✓ ${msg}`;
+      pageToastEl.className = isError ? 'page-toast error' : 'page-toast success';
+      pageToastEl.style.display = 'flex';
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { pageToastEl.style.display = 'none'; }, 4500);
+    }
 
     function showAlert(msg, isError = false) {
       if (isError) {
-        alertEl.textContent = msg;
-        alertEl.className = 'alert error';
-        alertEl.style.display = 'block';
+        const modalOpen = document.getElementById('bookingModalBackdrop')?.classList.contains('open');
+        if (modalOpen && alertEl) {
+          alertEl.textContent = msg;
+          alertEl.className = 'alert error';
+          alertEl.style.display = 'block';
+        } else {
+          showToast(msg, true);
+        }
       } else {
-        pageToastEl.textContent = `✓ ${msg}`;
-        pageToastEl.className = 'page-toast success';
-        pageToastEl.style.display = 'flex';
-        setTimeout(() => { pageToastEl.style.display = 'none'; }, 4500);
+        showToast(msg, false);
+      }
+    }
+
+    function isAdminAuthError(err) {
+      if (!err) return false;
+      if (err.code === 'SERVICE_DISABLED') return false;
+      const status = Number(err.status);
+      const code = String(err.code || '').toUpperCase();
+      const msg = String(err.message || '').toLowerCase();
+      return (
+        status === 401 ||
+        status === 403 ||
+        code === 'UNAUTHORIZED' ||
+        code === 'FORBIDDEN' ||
+        msg.includes('unauthorized') ||
+        msg.includes('invalid or expired admin token') ||
+        msg.includes('admin authentication required')
+      );
+    }
+
+    function renderAdminAuthAlert(alertBox, message) {
+      const text = message || 'Admin session is missing or expired. Please sign in again.';
+      if (alertBox) {
+        alertBox.className = 'alert error';
+        alertBox.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <span>🔒 ${escapeHtml(text)}</span>
+            <a href="/login.html?redirect=/booking/" class="btn-chip" style="padding:4px 10px; font-size:0.74rem; text-decoration:none; background:#fff; border-color:#fca5a5; color:#991b1b; font-weight:700;">Sign In Again →</a>
+          </div>
+        `;
+        alertBox.style.display = 'block';
+      }
+      showToast(text, true);
+    }
+
+    async function verifyRoomsPersistedOnServer(expectedUpdatedAt, checkFn) {
+      try {
+        const res = await fetch('/api/data', { cache: 'no-store' });
+        if (!res.ok) return false;
+        const apiState = await res.json();
+        if (!apiState || !Array.isArray(apiState.rooms)) return false;
+        const serverUpdatedAt = Number(apiState.roomsUpdatedAt || 0);
+        if (expectedUpdatedAt && serverUpdatedAt < expectedUpdatedAt) return false;
+        if (typeof checkFn === 'function' && !checkFn(apiState.rooms)) return false;
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (e) {
+          // fallback below
+        }
+      }
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return Boolean(ok);
+      } catch (e) {
+        return false;
       }
     }
 
@@ -2455,11 +2929,15 @@
       if (!state) return;
       currentState = state;
       renderAll();
-      checkDueBookingsForWhatsApp();
+      if (hasInitialServerSync) {
+        checkDueBookingsForWhatsApp();
+      }
     });
 
     setInterval(() => {
-      checkDueBookingsForWhatsApp();
+      if (hasInitialServerSync) {
+        checkDueBookingsForWhatsApp();
+      }
       updateHeroKPIs();
     }, 15000);
 
@@ -2475,6 +2953,14 @@
       const box = document.getElementById('liveSlotStatus');
       const txt = document.getElementById('liveSlotText');
       const btn = document.getElementById('btnSubmitBooking');
+
+      if (isRoomBookingDisabledForStaff(currentState)) {
+        box.className = 'slot-status-box conflict';
+        box.firstElementChild.textContent = '🔒';
+        txt.textContent = getRoomBookingDisabledMessage(currentState);
+        btn.disabled = true;
+        return false;
+      }
 
       const roomObj = (currentState.rooms || []).find(r => r.id === roomId);
       if (roomObj && roomObj.status === 'maintenance') {
@@ -2511,7 +2997,7 @@
       box.className = 'slot-status-box ok';
       box.firstElementChild.textContent = '🟢';
       txt.textContent = `Available: ${startTime}–${endTime} on ${date}`;
-      btn.disabled = false;
+      btn.disabled = bookingSubmitting;
       return true;
     }
 
@@ -2556,21 +3042,21 @@
       const prevFilterRoom = filterRoom.value || 'ALL';
 
       roomSelect.innerHTML = rooms.map(r =>
-        `<option value="${r.id}" ${r.status === 'maintenance' ? 'disabled' : ''}>${r.name} (${r.capacity} pax)${r.status === 'maintenance' ? ' [Maintenance]' : ''}</option>`
+        `<option value="${escapeHtml(r.id)}" ${r.status === 'maintenance' ? 'disabled' : ''}>${escapeHtml(r.name)} (${Number(r.capacity) || 0} pax)${r.status === 'maintenance' ? ' [Maintenance]' : ''}</option>`
       ).join('');
 
-      editRoomSelect.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name} (${r.capacity} pax)</option>`).join('');
+      editRoomSelect.innerHTML = rooms.map(r => `<option value="${escapeHtml(r.id)}">${escapeHtml(r.name)} (${Number(r.capacity) || 0} pax)</option>`).join('');
       if (prevRoom && rooms.some(r => r.id === prevRoom)) roomSelect.value = prevRoom;
 
       filterRoom.innerHTML = `<option value="ALL">All HQ Rooms (${rooms.length})</option>` +
-        rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        rooms.map(r => `<option value="${escapeHtml(r.id)}">${escapeHtml(r.name)}</option>`).join('');
       filterRoom.value = prevFilterRoom && (prevFilterRoom === 'ALL' || rooms.some(r => r.id === prevFilterRoom)) ? prevFilterRoom : 'ALL';
 
       // Sync Departments
       const deptSelect = document.getElementById('department');
       const editDeptSelect = document.getElementById('editDepartment');
       const prevDept = deptSelect.value;
-      const deptOpts = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+      const deptOpts = depts.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
       deptSelect.innerHTML = deptOpts;
       editDeptSelect.innerHTML = deptOpts;
       if (prevDept && depts.includes(prevDept)) deptSelect.value = prevDept;
@@ -2597,10 +3083,10 @@
           const busy = isRoomBusyNow(room.id, bookings);
           const isSelected = activeFilter === room.id;
           return `
-            <button type="button" class="room-pill-btn ${isSelected ? 'active' : ''}" onclick="selectRoomFilter('${room.id}')" title="${room.floor || 'HQ'} • ${room.capacity} pax">
-              <span class="room-pill-dot" style="background:${isMaint ? '#f59e0b' : busy ? '#ef4444' : (room.color || '#1863dc')};"></span>
-              <span>${room.name}</span>
-              <span style="opacity:0.65; font-weight:500;">${room.capacity}p</span>
+            <button type="button" class="room-pill-btn ${isSelected ? 'active' : ''}" onclick="selectRoomFilter('${escapeJsAttr(room.id)}')" title="${escapeHtml(room.floor || 'HQ')} • ${Number(room.capacity) || 0} pax">
+              <span class="room-pill-dot" style="background:${isMaint ? '#f59e0b' : busy ? '#ef4444' : safeColor(room.color)};"></span>
+              <span>${escapeHtml(room.name)}</span>
+              <span style="opacity:0.65; font-weight:500;">${Number(room.capacity) || 0}p</span>
               ${busy ? `<span class="live-room-badge">Live</span>` : ''}
             </button>
           `;
@@ -2611,8 +3097,9 @@
       renderRoomsDirectory();
       syncEndTimeFromStartAndDuration();
       renderSchedule();
+      applyServiceToggleEnforcement(currentState);
 
-      if (isAdmin) {
+      if (isAdminActive()) {
         renderRoomManagerList();
       }
     }
@@ -2668,10 +3155,12 @@
       const filterRoomVal = document.getElementById('filterRoom').value;
       const filterDateVal = document.getElementById('filterDate').value || todayStr;
       const isViewingToday = filterDateVal === todayStr;
+      const staffDisabled = isRoomBookingDisabledForStaff(currentState);
 
       document.getElementById('activeDateLabel').textContent = formatReadableDate(filterDateVal);
-      document.getElementById('scheduleSubtitle').textContent =
-        `🏢 ${rooms.length} HQ meeting room${rooms.length === 1 ? '' : 's'} • Select a room to reserve`;
+      document.getElementById('scheduleSubtitle').textContent = staffDisabled
+        ? `🔒 Room booking disabled (read-only schedule) • ${rooms.length} HQ meeting room${rooms.length === 1 ? '' : 's'}`
+        : `🏢 ${rooms.length} HQ meeting room${rooms.length === 1 ? '' : 's'} • Select a room to reserve`;
 
       const visibleRooms = (filterRoomVal && filterRoomVal !== 'ALL')
         ? rooms.filter(r => r.id === filterRoomVal)
@@ -2696,9 +3185,9 @@
           .filter(b => b.roomId === room.id && b.date === filterDateVal)
           .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-        const accentColor = room.color || '#1863dc';
+        const accentColor = safeColor(room.color);
         const amenitiesList = room.amenities || ['TV Display', 'Whiteboard', 'Wireless HDMI'];
-        const scheduleTitle = isViewingToday ? "Today's Schedule" : `Schedule (${filterDateVal})`;
+        const scheduleTitle = isViewingToday ? "Today's Schedule" : `Schedule (${escapeHtml(filterDateVal)})`;
 
         return `
           <div class="room-card-item">
@@ -2706,10 +3195,10 @@
             <div class="room-card-body">
               <div class="room-card-header">
                 <div>
-                  <div class="room-card-name">${room.name}</div>
-                  <div class="room-card-location">📍 ${room.floor || 'Level 1'}</div>
+                  <div class="room-card-name">${escapeHtml(room.name)}</div>
+                  <div class="room-card-location">📍 ${escapeHtml(room.floor || 'Level 1')}</div>
                 </div>
-                <div class="room-capacity-pill">👥 ${room.capacity} Pax</div>
+                <div class="room-capacity-pill">👥 ${Number(room.capacity) || 0} Pax</div>
               </div>
 
               <div>
@@ -2720,7 +3209,7 @@
                 ` : currentMeeting ? `
                   <div class="room-status-indicator busy">
                     <span class="live-pulse-dot" style="background:#ef4444; box-shadow:0 0 6px #ef4444;"></span>
-                    <span>In Use until ${currentMeeting.endTime}</span>
+                    <span>In Use until ${escapeHtml(currentMeeting.endTime)}</span>
                   </div>
                 ` : isViewingToday ? `
                   <div class="room-status-indicator available">
@@ -2736,7 +3225,7 @@
 
               <!-- Amenities -->
               <div class="room-amenities-wrap">
-                ${amenitiesList.map(a => `<span class="room-amenity-chip">✓ ${a}</span>`).join('')}
+                ${amenitiesList.map(a => `<span class="room-amenity-chip">✓ ${escapeHtml(a)}</span>`).join('')}
               </div>
 
               <!-- Today's / Selected Date's Mini Schedule -->
@@ -2749,8 +3238,8 @@
                   <div style="color:var(--cc-muted); font-size:0.72rem; padding:4px 0;">✨ Free all day on this date</div>
                 ` : targetDateBookings.slice(0, 3).map(b => `
                   <div class="room-mini-booking-item">
-                    <span class="room-mini-time">${b.startTime}–${b.endTime}</span>
-                    <span class="room-mini-topic" title="${b.title}">${b.title}</span>
+                    <span class="room-mini-time">${escapeHtml(b.startTime)}–${escapeHtml(b.endTime)}</span>
+                    <span class="room-mini-topic" title="${escapeHtml(b.title)}">${escapeHtml(b.title)}</span>
                   </div>
                 `).join('')}
                 ${targetDateBookings.length > 3 ? `
@@ -2761,11 +3250,12 @@
               <!-- Actions -->
               <div class="room-card-actions">
                 <button type="button" class="btn-card-book"
-                  ${isMaint ? 'disabled' : ''}
-                  onclick="openBookingModal('${room.id}')">
-                  <span>＋ Book This Room</span>
+                  ${(isMaint || staffDisabled) ? 'disabled aria-disabled="true"' : ''}
+                  ${staffDisabled ? `title="${escapeHtml(getRoomBookingDisabledMessage(currentState))}"` : ''}
+                  onclick="openBookingModal('${escapeJsAttr(room.id)}')">
+                  <span>${staffDisabled && !isMaint ? '🔒 Booking Disabled' : '＋ Book This Room'}</span>
                 </button>
-                <button type="button" class="btn-card-schedule" onclick="selectRoomFilter('${room.id}', true); switchMainView('timetable');">
+                <button type="button" class="btn-card-schedule" onclick="selectRoomFilter('${escapeJsAttr(room.id)}', true); switchMainView('timetable');">
                   <span>📅 Timetable</span>
                 </button>
               </div>
@@ -2834,6 +3324,8 @@
       const roomMap = Object.fromEntries(allRooms.map(r => [r.id, r]));
       const filterDateVal = document.getElementById('filterDate').value || todayStr;
       const filterRoomVal = document.getElementById('filterRoom').value;
+      const staffDisabled = isRoomBookingDisabledForStaff(currentState);
+      const adminNow = isAdminActive();
 
       if (showAllDates) {
         document.getElementById('activeDateLabel').textContent = 'All Upcoming Dates';
@@ -2880,9 +3372,9 @@
                 return `
                   <th>
                     <div class="th-header-row">
-                      <div class="th-room-name" onclick="selectRoomFilter('${r.id}')" title="Click to filter schedule to ${r.name}">
-                        <span style="width:8px; height:8px; border-radius:50%; background:${r.color || '#1863dc'}; display:inline-block; flex-shrink:0;"></span>
-                        <span>${r.name}</span>
+                      <div class="th-room-name" onclick="selectRoomFilter('${escapeJsAttr(r.id)}')" title="Click to filter schedule to ${escapeHtml(r.name)}">
+                        <span style="width:8px; height:8px; border-radius:50%; background:${safeColor(r.color)}; display:inline-block; flex-shrink:0;"></span>
+                        <span>${escapeHtml(r.name)}</span>
                       </div>
                       <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
                         ${isMaint
@@ -2891,19 +3383,19 @@
                             ? `<span class="live-room-badge">● Live</span>`
                             : ''
                         }
-                        <span class="room-info-trigger" tabindex="0" aria-label="Room specifications for ${r.name}">
+                        <span class="room-info-trigger" tabindex="0" aria-label="Room specifications for ${escapeHtml(r.name)}">
                           ⓘ
                           <div class="room-info-tooltip">
-                            <div style="font-weight:700; font-size:0.75rem; margin-bottom:2px; color:#fff;">${r.name}</div>
-                            <div style="color:#94a3b8; margin-bottom:6px;">📍 ${r.floor || 'HQ'} • 👥 ${r.capacity} pax</div>
-                            <div style="color:#e2e8f0; margin-bottom:6px;">🛠️ ${(r.amenities || []).join(' • ')}</div>
-                            <div style="color:#38bdf8; font-weight:600;">📅 ${todayCount} booking${todayCount === 1 ? '' : 's'} on ${filterDateVal}</div>
+                            <div style="font-weight:700; font-size:0.75rem; margin-bottom:2px; color:#fff;">${escapeHtml(r.name)}</div>
+                            <div style="color:#94a3b8; margin-bottom:6px;">📍 ${escapeHtml(r.floor || 'HQ')} • 👥 ${Number(r.capacity) || 0} pax</div>
+                            <div style="color:#e2e8f0; margin-bottom:6px;">🛠️ ${escapeHtml((r.amenities || []).join(' • '))}</div>
+                            <div style="color:#38bdf8; font-weight:600;">📅 ${todayCount} booking${todayCount === 1 ? '' : 's'} on ${escapeHtml(filterDateVal)}</div>
                           </div>
                         </span>
                       </div>
                     </div>
                     <div class="th-room-sub">
-                      ${shortFloor} • ${r.capacity} pax${topEquip ? ` • ${topEquip}` : ''}
+                      ${escapeHtml(shortFloor)} • ${Number(r.capacity) || 0} pax${topEquip ? ` • ${escapeHtml(topEquip)}` : ''}
                     </div>
                   </th>
                 `;
@@ -2934,24 +3426,33 @@
                         return `
                           <button type="button" class="slot-booked-card"
                             style="background:${theme.bg}; border-left-color:${theme.border}; color:${theme.text};"
-                            onclick="openBookingPopover('${b.id}')"
-                            title="${b.title} (${b.startTime}–${b.endTime}) • Click for details">
-                            <div class="slot-booked-title">${b.title}</div>
+                            onclick="openBookingPopover('${escapeJsAttr(b.id)}')"
+                            title="${escapeHtml(b.title)} (${escapeHtml(b.startTime)}–${escapeHtml(b.endTime)}) • Click for details">
+                            <div class="slot-booked-title">${escapeHtml(b.title)}</div>
                             <div class="slot-booked-footer">
-                              <span class="slot-time-badge">${b.startTime}–${b.endTime}</span>
+                              <span class="slot-time-badge">${escapeHtml(b.startTime)}–${escapeHtml(b.endTime)}</span>
                               <span class="slot-dept-chip" style="background:${theme.pillBg}; color:${theme.pillText};">
-                                <span class="slot-dept-avatar" style="background:${theme.avatarBg};">${initials}</span>
-                                <span>${theme.label}</span>
+                                <span class="slot-dept-avatar" style="background:${theme.avatarBg};">${escapeHtml(initials)}</span>
+                                <span>${escapeHtml(theme.label)}</span>
                               </span>
                             </div>
                           </button>
                         `;
                       }).join('')}</td>`;
                     }
+                    if (staffDisabled) {
+                      return `
+                        <td>
+                          <button type="button" class="slot-free-btn is-disabled" disabled aria-disabled="true" title="${escapeHtml(getRoomBookingDisabledMessage(currentState))}" aria-label="Unavailable: ${escapeHtml(room.name)} at ${escapeHtml(slotStart)}">
+                            <span>Unavailable</span>
+                          </button>
+                        </td>
+                      `;
+                    }
                     return `
                       <td>
-                        <button type="button" class="slot-free-btn" onclick="quickPickSlot('${room.id}', '${filterDateVal}', '${slotStart}', '${nextHour}')" aria-label="Book ${room.name} at ${slotStart}">
-                          <span>＋ Book ${slotStart}</span>
+                        <button type="button" class="slot-free-btn" onclick="quickPickSlot('${escapeJsAttr(room.id)}', '${escapeJsAttr(filterDateVal)}', '${escapeJsAttr(slotStart)}', '${escapeJsAttr(nextHour)}')" aria-label="Book ${escapeHtml(room.name)} at ${escapeHtml(slotStart)}">
+                          <span>＋ Book ${escapeHtml(slotStart)}</span>
                         </button>
                       </td>
                     `;
@@ -2978,8 +3479,9 @@
       });
 
       if (currentMainView === 'timetable') {
-        document.getElementById('scheduleSubtitle').textContent =
-          `${dayBookings.length} reservation${dayBookings.length === 1 ? '' : 's'} • Click any open slot to reserve`;
+        document.getElementById('scheduleSubtitle').textContent = staffDisabled
+          ? `${dayBookings.length} reservation${dayBookings.length === 1 ? '' : 's'} • Read-only schedule (booking disabled)`
+          : `${dayBookings.length} reservation${dayBookings.length === 1 ? '' : 's'} • Click any open slot to reserve`;
       } else if (currentMainView === 'agenda') {
         document.getElementById('scheduleSubtitle').textContent = showAllDates
           ? `${filtered.length} upcoming reservation${filtered.length === 1 ? '' : 's'} across all dates`
@@ -2993,10 +3495,10 @@
             <div class="empty-state-icon">📅</div>
             <div class="empty-state-title">No Meetings Scheduled</div>
             <div class="empty-state-desc">
-              ${showAllDates ? 'There are currently no upcoming reservations recorded in the system.' : `All ${visibleRooms.length} HQ meeting rooms are open and ready for reservation on ${formatReadableDate(filterDateVal)}.`}
+              ${showAllDates ? 'There are currently no upcoming reservations recorded in the system.' : `All ${visibleRooms.length} HQ meeting rooms are open and ready for reservation on ${escapeHtml(formatReadableDate(filterDateVal))}.`}
             </div>
-            <button type="button" class="empty-state-cta" onclick="openBookingModal()">
-              <span>＋ Reserve a Meeting Room</span>
+            <button type="button" class="empty-state-cta" ${staffDisabled ? 'disabled aria-disabled="true"' : ''} onclick="openBookingModal()">
+              <span>${staffDisabled ? '🔒 Room Booking Disabled' : '＋ Reserve a Meeting Room'}</span>
             </button>
           </div>
         `;
@@ -3011,26 +3513,26 @@
         return `
           <div class="booking-item" style="border-left-color: ${theme.border}; background:${theme.bg};">
             <div class="booking-time-box">
-              <div class="booking-time">${b.startTime} – ${b.endTime}</div>
-              <div class="booking-date">${b.date}</div>
+              <div class="booking-time">${escapeHtml(b.startTime)} – ${escapeHtml(b.endTime)}</div>
+              <div class="booking-date">${escapeHtml(b.date)}</div>
             </div>
             <div class="booking-details">
-              <div class="booking-title" style="color:${theme.text};">${b.title}</div>
+              <div class="booking-title" style="color:${theme.text};">${escapeHtml(b.title)}</div>
               <div class="booking-meta">
-                <strong style="color:var(--cc-navy);">📍 ${room.name}</strong>
-                <span class="dept-pill" style="background:${theme.pillBg}; color:${theme.pillText};">${b.department}</span>
-                <span>👤 ${b.organizer || 'HQ Staff'}</span>
-                ${b.phone ? `<span>📱 ${b.phone}</span>` : ''}
+                <strong style="color:var(--cc-navy);">📍 ${escapeHtml(room.name)}</strong>
+                <span class="dept-pill" style="background:${theme.pillBg}; color:${theme.pillText};">${escapeHtml(b.department)}</span>
+                <span>👤 ${escapeHtml(b.organizer || 'HQ Staff')}</span>
+                ${b.phone ? `<span>📱 ${escapeHtml(b.phone)}</span>` : ''}
               </div>
-              ${b.notes ? `<div style="font-size: 0.75rem; color: #475569; margin-top: 4px;">💬 ${b.notes}</div>` : ''}
+              ${b.notes ? `<div style="font-size: 0.75rem; color: #475569; margin-top: 4px;">💬 ${escapeHtml(b.notes)}</div>` : ''}
             </div>
             <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-              <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="mini-action-btn outlook">📅 Outlook 365</a>
-              <button type="button" class="mini-action-btn outlook" onclick="triggerIcsDownload('${b.id}')">📥 .ics</button>
-              <a href="${waUrl}" target="_blank" rel="noopener" class="mini-action-btn wa">💬 WhatsApp</a>
-              ${isAdmin
-                ? `<button type="button" class="btn-edit" onclick="openEditBooking('${b.id}')">✎ Edit</button>
-                   <button type="button" class="btn-delete" onclick="cancelBooking('${b.id}')">🗑 Delete</button>`
+              <a href="${escapeHtml(outlookUrls.office365Url)}" target="_blank" rel="noopener" class="mini-action-btn outlook">📅 Outlook 365</a>
+              <button type="button" class="mini-action-btn outlook" onclick="triggerIcsDownload('${escapeJsAttr(b.id)}')">📥 .ics</button>
+              <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="mini-action-btn wa">💬 WhatsApp</a>
+              ${adminNow
+                ? `<button type="button" class="btn-edit" onclick="openEditBooking('${escapeJsAttr(b.id)}')">✎ Edit</button>
+                   <button type="button" class="btn-delete" onclick="cancelBooking('${escapeJsAttr(b.id)}')">🗑 Delete</button>`
                 : ''
               }
             </div>
@@ -3050,40 +3552,41 @@
       const waUrl = buildWhatsAppBookingUrl(b, room, 'confirmed');
       const outlookUrls = buildOutlookCalendarUrls(b, room);
       const content = document.getElementById('bookingPopoverContent');
+      const adminNow = isAdminActive();
 
       content.innerHTML = `
         <div class="modal-header" style="margin-bottom:12px;">
           <div>
             <span class="dept-pill" style="background:${theme.pillBg}; color:${theme.pillText}; display:inline-block; margin-bottom:6px;">
-              ${b.department}
+              ${escapeHtml(b.department)}
             </span>
-            <h3 style="font-size:1.05rem; font-weight:800; color:var(--cc-navy); line-height:1.3;">${b.title}</h3>
+            <h3 style="font-size:1.05rem; font-weight:800; color:var(--cc-navy); line-height:1.3;">${escapeHtml(b.title)}</h3>
           </div>
           <button type="button" class="modal-close-x" onclick="closeBookingPopover()">&times;</button>
         </div>
         <div style="background:#f8fafc; border:1px solid var(--cc-border); border-radius:var(--radius-md); padding:12px 14px; font-size:0.78rem; display:flex; flex-direction:column; gap:6px; margin-bottom:16px;">
-          <div><strong>📍 Room:</strong> ${room.name} <span style="color:var(--cc-muted);">(${room.floor || 'Level 1'})</span></div>
-          <div><strong>⏰ Time:</strong> ${b.date} • ${b.startTime} – ${b.endTime}</div>
-          <div><strong>👤 Booked By:</strong> ${b.organizer || 'HQ Staff'}${b.phone ? ` • 📱 ${b.phone}` : ''}</div>
-          ${(room.amenities && room.amenities.length) ? `<div><strong>🛠️ Equipment:</strong> ${room.amenities.join(', ')}</div>` : ''}
-          ${b.notes ? `<div style="padding-top:6px; border-top:1px dashed #cbd5e1; color:#334155;"><strong>💬 Notes:</strong> ${b.notes}</div>` : ''}
+          <div><strong>📍 Room:</strong> ${escapeHtml(room.name)} <span style="color:var(--cc-muted);">(${escapeHtml(room.floor || 'Level 1')})</span></div>
+          <div><strong>⏰ Time:</strong> ${escapeHtml(b.date)} • ${escapeHtml(b.startTime)} – ${escapeHtml(b.endTime)}</div>
+          <div><strong>👤 Booked By:</strong> ${escapeHtml(b.organizer || 'HQ Staff')}${b.phone ? ` • 📱 ${escapeHtml(b.phone)}` : ''}</div>
+          ${(room.amenities && room.amenities.length) ? `<div><strong>🛠️ Equipment:</strong> ${escapeHtml(room.amenities.join(', '))}</div>` : ''}
+          ${b.notes ? `<div style="padding-top:6px; border-top:1px dashed #cbd5e1; color:#334155;"><strong>💬 Notes:</strong> ${escapeHtml(b.notes)}</div>` : ''}
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <a href="${waUrl}" target="_blank" rel="noopener" class="mini-action-btn wa" style="justify-content:center; padding:9px;">
+            <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="mini-action-btn wa" style="justify-content:center; padding:9px;">
               💬 WhatsApp Alert
             </a>
-            <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="mini-action-btn outlook" style="justify-content:center; padding:9px;">
+            <a href="${escapeHtml(outlookUrls.office365Url)}" target="_blank" rel="noopener" class="mini-action-btn outlook" style="justify-content:center; padding:9px;">
               📅 Outlook 365
             </a>
           </div>
-          <button type="button" class="btn-chip" style="width:100%; padding:9px;" onclick="triggerIcsDownload('${b.id}')">
+          <button type="button" class="btn-chip" style="width:100%; padding:9px;" onclick="triggerIcsDownload('${escapeJsAttr(b.id)}')">
             📥 Download Outlook Invite (.ics)
           </button>
-          ${isAdmin ? `
+          ${adminNow ? `
             <div style="display:flex; gap:8px; margin-top:6px; padding-top:10px; border-top:1px solid var(--cc-border);">
-              <button type="button" class="btn-edit" style="flex:1; padding:8px;" onclick="closeBookingPopover(); openEditBooking('${b.id}')">✎ Edit Reservation</button>
-              <button type="button" class="btn-delete" style="flex:1; padding:8px;" onclick="closeBookingPopover(); cancelBooking('${b.id}')">🗑 Delete Reservation</button>
+              <button type="button" class="btn-edit" style="flex:1; padding:8px;" onclick="closeBookingPopover(); openEditBooking('${escapeJsAttr(b.id)}')">✎ Edit Reservation</button>
+              <button type="button" class="btn-delete" style="flex:1; padding:8px;" onclick="closeBookingPopover(); cancelBooking('${escapeJsAttr(b.id)}')">🗑 Delete Reservation</button>
             </div>
           ` : ''}
         </div>
@@ -3097,6 +3600,10 @@
 
     // Quick pick slot from timetable
     window.quickPickSlot = (roomId, dateStr, startTime, endTime) => {
+      if (isRoomBookingDisabledForStaff(currentState)) {
+        showToast(getRoomBookingDisabledMessage(currentState), true);
+        return;
+      }
       document.getElementById('roomId').value = roomId;
       document.getElementById('date').value = dateStr;
       document.getElementById('startTime').value = startTime;
@@ -3127,6 +3634,14 @@
     // =========================================================================
     document.getElementById('bookingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (isRoomBookingDisabledForStaff(currentState)) {
+        const disabledMsg = getRoomBookingDisabledMessage(currentState);
+        showAlert(disabledMsg, true);
+        showToast(disabledMsg, true);
+        applyServiceToggleEnforcement(currentState);
+        return;
+      }
+      if (bookingSubmitting) return;
       if (!validateLiveSlot()) return;
 
       const roomId = document.getElementById('roomId').value;
@@ -3142,7 +3657,31 @@
       const autoOutlook = document.getElementById('chkAutoOutlook').checked;
       const notifyWhatsapp = document.getElementById('chkWhatsappAlert').checked;
 
+      if (!title) {
+        showAlert('Please enter a meeting title or purpose.', true);
+        document.getElementById('title')?.focus();
+        return;
+      }
+      if (!organizer) {
+        showAlert('Please enter the organizer full name.', true);
+        document.getElementById('organizer')?.focus();
+        return;
+      }
+      if (!phone) {
+        showAlert('Please enter a WhatsApp phone number.', true);
+        document.getElementById('phone')?.focus();
+        return;
+      }
+
       saveStaffSessionProfile({ organizer, department, phone, email });
+
+      const submitBtn = document.getElementById('btnSubmitBooking');
+      const prevBtnText = submitBtn ? submitBtn.textContent : 'Confirm Reservation';
+      bookingSubmitting = true;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Reserving...';
+      }
 
       try {
         const created = await addRoomBooking({
@@ -3171,19 +3710,60 @@
 
         const outlookUrls = buildOutlookCalendarUrls(created, room);
         const waUrl = buildWhatsAppBookingUrl(created, room, 'confirmed');
+        const waMessage = buildWhatsAppBookingMessage(created, room, 'confirmed');
 
         document.getElementById('confirmedModalSummary').textContent =
           `${room.name} • ${date} (${startTime} – ${endTime}) • Booked by ${organizer}`;
         document.getElementById('btnModalOutlook365').href = outlookUrls.office365Url;
         document.getElementById('btnModalWhatsApp').href = waUrl;
         document.getElementById('btnModalOutlookIcs').onclick = () => downloadOutlookIcs(created, room);
+        const copyBtn = document.getElementById('btnModalCopyWhatsApp');
+        if (copyBtn) {
+          copyBtn.textContent = '📋 Copy Confirmation Message';
+          copyBtn.onclick = async () => {
+            const copied = await copyTextToClipboard(waMessage);
+            if (copied) {
+              copyBtn.textContent = '✓ Copied Confirmation Message!';
+              showToast('WhatsApp confirmation message copied to clipboard!');
+              setTimeout(() => {
+                copyBtn.textContent = '📋 Copy Confirmation Message';
+              }, 2500);
+            } else {
+              showToast('Unable to copy automatically. Please use "Send WhatsApp Confirmation" instead.', true);
+            }
+          };
+        }
         document.getElementById('confirmedModal').classList.add('open');
 
         if (autoOutlook) {
           downloadOutlookIcs(created, room);
         }
       } catch (err) {
-        showAlert(err.message || 'Unable to reserve room due to schedule conflict.', true);
+        const wasAdmin = isAdminActive();
+        if (err?.code === 'SERVICE_DISABLED' || (err?.status === 403 && !wasAdmin)) {
+          if (err?.code === 'SERVICE_DISABLED' && wasAdmin) {
+            clearRejectedAdminSession();
+            closeBookingModal();
+          }
+          const msg = (err.notice && String(err.notice).trim()) || err.message || getRoomBookingDisabledMessage(currentState);
+          showAlert(msg, true);
+          showToast(msg, true);
+          if (currentState) applyServiceToggleEnforcement(currentState);
+        } else if (isAdminAuthError(err)) {
+          if (wasAdmin) {
+            clearRejectedAdminSession();
+            closeBookingModal();
+          }
+          showToast(err.message || 'Admin session expired or invalid. Please sign in again.', true);
+        } else {
+          showAlert(err.message || 'Unable to reserve room due to schedule conflict.', true);
+        }
+      } finally {
+        bookingSubmitting = false;
+        if (submitBtn) {
+          submitBtn.textContent = prevBtnText;
+        }
+        validateLiveSlot();
       }
     });
 
@@ -3191,7 +3771,7 @@
     // ADMIN EDIT & DELETE ACTIONS
     // =========================================================================
     window.openEditBooking = (id) => {
-      if (!isAdmin) return;
+      if (!isAdminActive()) return;
       const b = (currentState?.bookings || []).find(item => item.id === id);
       if (!b) return;
       document.getElementById('editModalAlert').style.display = 'none';
@@ -3215,7 +3795,12 @@
 
     document.getElementById('editBookingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!isAdmin) return;
+      const errEl = document.getElementById('editModalAlert');
+      if (!isAdminActive() || !getAdminToken()) {
+        clearRejectedAdminSession();
+        renderAdminAuthAlert(errEl, 'Admin authentication token is missing or expired. Please sign in again.');
+        return;
+      }
       const id = document.getElementById('editId').value;
       const roomId = document.getElementById('editRoomId').value;
       const title = document.getElementById('editTitle').value.trim();
@@ -3228,25 +3813,62 @@
       const endTime = document.getElementById('editEndTime').value;
       const notes = document.getElementById('editNotes').value.trim();
 
+      if (!title) {
+        errEl.className = 'alert error';
+        errEl.textContent = 'Please enter a meeting title.';
+        errEl.style.display = 'block';
+        document.getElementById('editTitle')?.focus();
+        return;
+      }
+      if (!organizer) {
+        errEl.className = 'alert error';
+        errEl.textContent = 'Please enter the organizer name.';
+        errEl.style.display = 'block';
+        document.getElementById('editOrganizer')?.focus();
+        return;
+      }
+      if (!phone) {
+        errEl.className = 'alert error';
+        errEl.textContent = 'Please enter a WhatsApp phone number.';
+        errEl.style.display = 'block';
+        document.getElementById('editPhone')?.focus();
+        return;
+      }
+      errEl.style.display = 'none';
+
       try {
         await updateRoomBooking(id, { roomId, title, department, organizer, phone, email, date, startTime, endTime, notes });
         window.closeEditBooking();
         showAlert('Reservation updated by Administrator!');
       } catch (err) {
-        const errEl = document.getElementById('editModalAlert');
-        errEl.textContent = err.message;
-        errEl.style.display = 'block';
+        if (isAdminAuthError(err)) {
+          clearRejectedAdminSession();
+          renderAdminAuthAlert(errEl, err.message || 'Admin session expired. Please sign in again.');
+        } else {
+          errEl.className = 'alert error';
+          errEl.textContent = err.message || 'Unable to update reservation.';
+          errEl.style.display = 'block';
+        }
       }
     });
 
     window.cancelBooking = async (id) => {
-      if (!isAdmin) return;
+      if (!isAdminActive() || !getAdminToken()) {
+        clearRejectedAdminSession();
+        showToast('Admin session expired or token missing. Please sign in again at /login.html?redirect=/booking/.', true);
+        return;
+      }
       if (confirm('Cancel and delete this room reservation?')) {
         try {
           await deleteRoomBooking(id);
           showAlert('Reservation deleted.');
         } catch (err) {
-          showAlert(err.message || 'Failed to cancel reservation.', true);
+          if (isAdminAuthError(err)) {
+            clearRejectedAdminSession();
+            showToast('Admin session expired or invalid (401/403). Please sign in again.', true);
+          } else {
+            showAlert(err.message || 'Failed to cancel reservation.', true);
+          }
         }
       }
     };
@@ -3255,9 +3877,17 @@
     // ADMIN MEETING ROOM MANAGEMENT
     // =========================================================================
     window.openRoomManagerModal = () => {
-      if (!isAdmin) return;
+      if (!isAdminActive()) return;
+      const alertBox = document.getElementById('roomManagerAlert');
+      if (alertBox) {
+        alertBox.style.display = 'none';
+        alertBox.textContent = '';
+      }
       resetRoomConfigForm();
       renderRoomManagerList();
+      if (!getAdminToken()) {
+        renderAdminAuthAlert(alertBox, 'Admin authentication token is missing or expired. Please sign in again before saving room changes.');
+      }
       document.getElementById('roomManagerModal').classList.add('open');
     };
 
@@ -3279,6 +3909,7 @@
     };
 
     window.startEditRoomConfig = (roomId) => {
+      if (!isAdminActive()) return;
       const room = (currentState?.rooms || []).find(r => r.id === roomId);
       if (!room) return;
       document.getElementById('cfgRoomId').value = room.id;
@@ -3294,15 +3925,47 @@
     };
 
     window.removeRoomConfig = async (roomId) => {
-      if (!isAdmin) return;
+      const alertBox = document.getElementById('roomManagerAlert');
+      if (!isAdminActive() || !getAdminToken()) {
+        clearRejectedAdminSession();
+        renderAdminAuthAlert(alertBox, 'Admin authentication token is missing or expired. Please sign in again.');
+        return;
+      }
       const room = (currentState?.rooms || []).find(r => r.id === roomId);
       if (!confirm(`Remove meeting room "${room?.name || roomId}" from HQ availability?`)) return;
       try {
+        const prevRoomsUpdatedAt = Number(currentState?.roomsUpdatedAt || 0);
         await deleteMeetingRoom(roomId);
-      } catch (err) {
-        const alertBox = document.getElementById('roomManagerAlert');
+        const expectedUpdatedAt = Math.max(Number(currentState?.roomsUpdatedAt || 0), prevRoomsUpdatedAt + 1);
+        const persisted = await verifyRoomsPersistedOnServer(
+          expectedUpdatedAt,
+          (rooms) => Array.isArray(rooms) && !rooms.some(r => r.id === roomId)
+        );
+        if (!persisted) {
+          if (alertBox) {
+            alertBox.textContent = '⚠️ HQ Server (/api/data) did not confirm saving this room change. Removal was cached in this browser only and could not be persisted to the server.';
+            alertBox.className = 'alert error';
+            alertBox.style.display = 'block';
+          }
+          showToast('HQ Server did not confirm room removal — change not persisted on server.', true);
+          return;
+        }
+        if (document.getElementById('cfgRoomId').value === roomId) {
+          resetRoomConfigForm();
+        }
         if (alertBox) {
-          alertBox.textContent = err.message;
+          alertBox.textContent = `✓ Meeting room "${room?.name || roomId}" removed and synced to HQ Server!`;
+          alertBox.className = 'alert success';
+          alertBox.style.display = 'block';
+          setTimeout(() => { alertBox.style.display = 'none'; }, 3500);
+        }
+        showToast(`Meeting room "${room?.name || roomId}" removed.`);
+      } catch (err) {
+        if (isAdminAuthError(err)) {
+          clearRejectedAdminSession();
+          renderAdminAuthAlert(alertBox, err.message || 'Admin session expired or invalid. Please sign in again.');
+        } else if (alertBox) {
+          alertBox.textContent = err.message || 'Unable to remove meeting room.';
           alertBox.className = 'alert error';
           alertBox.style.display = 'block';
         }
@@ -3312,23 +3975,32 @@
     function renderRoomManagerList() {
       const rooms = currentState?.rooms || [];
       document.getElementById('modalRoomCount').textContent = rooms.length;
+      const syncMetaEl = document.getElementById('roomManagerSyncMeta');
+      if (syncMetaEl) {
+        const meta = currentState?.roomsMeta;
+        const ts = Number(meta?.updatedAt || currentState?.roomsUpdatedAt) || 0;
+        const source = meta?.source || (ts > 0 ? 'persisted' : 'seed');
+        syncMetaEl.textContent = ts > 0
+          ? `Synced (${source}) • ${new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+          : `Source: ${source}`;
+      }
       const listEl = document.getElementById('roomManagerList');
       listEl.innerHTML = rooms.map(r => `
-        <div class="room-admin-item" style="border-left-color:${r.color || '#1863dc'};">
+        <div class="room-admin-item" style="border-left-color:${safeColor(r.color)};">
           <div>
             <div style="font-weight:700; font-size:0.86rem; color:var(--cc-navy);">
-              ${r.name}
+              ${escapeHtml(r.name)}
               <span class="${r.status === 'maintenance' ? 'maint-room-badge' : ''}" style="margin-left:6px;">
                 ${r.status === 'maintenance' ? 'Maintenance' : ''}
               </span>
             </div>
             <div style="font-size:0.74rem; color:var(--cc-muted); margin-top:2px;">
-              📍 ${r.floor || 'HQ'} • 👥 ${r.capacity} pax • 🛠️ ${(r.amenities || []).join(', ')}
+              📍 ${escapeHtml(r.floor || 'HQ')} • 👥 ${Number(r.capacity) || 0} pax • 🛠️ ${escapeHtml((r.amenities || []).join(', '))}
             </div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button type="button" class="btn-edit" onclick="startEditRoomConfig('${r.id}')">✎ Edit</button>
-            <button type="button" class="btn-delete" onclick="removeRoomConfig('${r.id}')">🗑 Remove</button>
+            <button type="button" class="btn-edit" onclick="startEditRoomConfig('${escapeJsAttr(r.id)}')">✎ Edit</button>
+            <button type="button" class="btn-delete" onclick="removeRoomConfig('${escapeJsAttr(r.id)}')">🗑 Remove</button>
           </div>
         </div>
       `).join('');
@@ -3336,7 +4008,14 @@
 
     document.getElementById('roomConfigForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!isAdmin) return;
+      if (roomSaving) return;
+      const alertBox = document.getElementById('roomManagerAlert');
+      if (!isAdminActive() || !getAdminToken()) {
+        clearRejectedAdminSession();
+        renderAdminAuthAlert(alertBox, 'Admin authentication token is missing or expired. Please sign in again.');
+        return;
+      }
+
       const id = document.getElementById('cfgRoomId').value;
       const name = document.getElementById('cfgRoomName').value.trim();
       const floor = document.getElementById('cfgRoomFloor').value.trim();
@@ -3345,24 +4024,93 @@
       const color = document.getElementById('cfgRoomColor').value;
       const amenities = document.getElementById('cfgRoomAmenities').value.split(',').map(s => s.trim()).filter(Boolean);
 
+      if (!name) {
+        if (alertBox) {
+          alertBox.textContent = 'Please enter a valid meeting room name.';
+          alertBox.className = 'alert error';
+          alertBox.style.display = 'block';
+        }
+        document.getElementById('cfgRoomName')?.focus();
+        return;
+      }
+
+      if (!floor) {
+        if (alertBox) {
+          alertBox.textContent = 'Please enter the floor / wing location.';
+          alertBox.className = 'alert error';
+          alertBox.style.display = 'block';
+        }
+        document.getElementById('cfgRoomFloor')?.focus();
+        return;
+      }
+
+      if (amenities.length === 0) {
+        if (alertBox) {
+          alertBox.textContent = 'Please enter at least one equipment item or amenity (comma-separated).';
+          alertBox.className = 'alert error';
+          alertBox.style.display = 'block';
+        }
+        document.getElementById('cfgRoomAmenities')?.focus();
+        return;
+      }
+
+      const saveBtn = document.getElementById('btnSaveRoomConfig');
+      const prevLabel = saveBtn ? saveBtn.textContent : 'Save Meeting Room';
+      roomSaving = true;
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+      }
+
       try {
+        const prevRoomsUpdatedAt = Number(currentState?.roomsUpdatedAt || 0);
+        let targetRoomId = id;
         if (id) {
           await updateMeetingRoom(id, { name, floor, capacity, status, color, amenities });
         } else {
-          await addMeetingRoom({ name, floor, capacity, status, color, amenities });
+          const createdRoom = await addMeetingRoom({ name, floor, capacity, status, color, amenities });
+          targetRoomId = createdRoom?.id || '';
+        }
+        const expectedUpdatedAt = Math.max(Number(currentState?.roomsUpdatedAt || 0), prevRoomsUpdatedAt + 1);
+        const persisted = await verifyRoomsPersistedOnServer(
+          expectedUpdatedAt,
+          (rooms) => Array.isArray(rooms) && rooms.some(
+            r => (targetRoomId ? r.id === targetRoomId : true) && r.name === name && r.floor === floor
+          )
+        );
+        if (!persisted) {
+          if (alertBox) {
+            alertBox.textContent = '⚠️ HQ Server (/api/data) did not confirm saving this room change. Changes are cached locally in this browser only and will not persist across restarts or devices until connection returns.';
+            alertBox.className = 'alert error';
+            alertBox.style.display = 'block';
+          }
+          showToast('HQ Server did not confirm saving room change — not persisted on server.', true);
+          return;
         }
         resetRoomConfigForm();
-        const alertBox = document.getElementById('roomManagerAlert');
-        alertBox.textContent = '✓ HQ Meeting Room configuration saved!';
-        alertBox.className = 'alert success';
-        alertBox.style.display = 'block';
-        setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
-      } catch (err) {
-        const alertBox = document.getElementById('roomManagerAlert');
         if (alertBox) {
-          alertBox.textContent = err.message;
+          alertBox.textContent = '✓ HQ Meeting Room configuration saved and synced to HQ Server!';
+          alertBox.className = 'alert success';
+          alertBox.style.display = 'block';
+          setTimeout(() => { alertBox.style.display = 'none'; }, 3500);
+        }
+        showToast('HQ Meeting Room configuration saved!');
+      } catch (err) {
+        if (isAdminAuthError(err)) {
+          clearRejectedAdminSession();
+          renderAdminAuthAlert(alertBox, err.message || 'Admin session expired or invalid. Please sign in again.');
+        } else if (alertBox) {
+          alertBox.textContent = err.message || 'Unable to save meeting room configuration.';
           alertBox.className = 'alert error';
           alertBox.style.display = 'block';
+        }
+      } finally {
+        roomSaving = false;
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          if (saveBtn.textContent === 'Saving...') {
+            saveBtn.textContent = document.getElementById('cfgRoomId').value ? 'Save Room Changes' : prevLabel;
+          }
         }
       }
     });
@@ -3376,7 +4124,7 @@
     };
 
     function checkDueBookingsForWhatsApp() {
-      if (!currentState) return;
+      if (!currentState || !hasInitialServerSync) return;
       const now = new Date();
       const dStr = getLocalDateString(now);
       const hhmm = now.toTimeString().slice(0, 5);
@@ -3402,12 +4150,12 @@
       document.getElementById('dueBannerDesc').textContent =
         `"${b.title}" in ${room.name} • ${b.organizer || 'Staff'} (${b.department})`;
       document.getElementById('dueBannerActions').innerHTML = `
-        <a href="${waUrl}" target="_blank" rel="noopener" class="strip-btn">📲 WhatsApp</a>
-        <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="strip-btn secondary">📅 Outlook</a>
-        <button type="button" class="strip-dismiss" onclick="dismissDueBanner('${b.id}')" title="Dismiss alert">&times;</button>
+        <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="strip-btn">📲 WhatsApp</a>
+        <a href="${escapeHtml(outlookUrls.office365Url)}" target="_blank" rel="noopener" class="strip-btn secondary">📅 Outlook</a>
+        <button type="button" class="strip-dismiss" onclick="dismissDueBanner('${escapeJsAttr(b.id)}')" title="Dismiss alert">&times;</button>
       `;
       banner.style.display = 'flex';
-      if (!b.whatsappNotified && b.notifyWhatsapp !== false) {
+      if (hasInitialServerSync && !b.whatsappNotified && b.notifyWhatsapp !== false) {
         markBookingNotified(b.id);
       }
     }

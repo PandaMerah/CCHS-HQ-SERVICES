@@ -1,11 +1,25 @@
-import { subscribeState, subscribeSyncStatus } from '/shared/cloud-store.js';
+import { subscribeState, subscribeSyncStatus, computeMeetingSlides } from '/shared/cloud-store.js';
+
+const isPreviewMode = new URLSearchParams(window.location.search).get('preview') === '1';
+if (isPreviewMode && document.body) {
+    document.body.classList.add('preview-mode');
+}
+
+const REFRESH_NONCE_STORAGE_KEY = 'cchs_meeting_refresh_nonce_v1';
+const pageLoadedAt = Date.now();
 
 let currentSlideIndex = 0;
 let totalSlides = 0;
 let departmentNames = [];
 let slideMeta = [];
 let autoPlayInterval = null;
+let activeAutoPlayIntervalMs = 8000;
 let currentSyncMode = 'connecting';
+let lastSlidesRenderKey = null;
+let lastAppliedCommandSeq = null;
+let syncBaselineNonce = 0;
+let isInitialSyncCallback = true;
+let hasHydratedServerControl = false;
 
 subscribeSyncStatus(({ mode }) => {
     currentSyncMode = mode;
@@ -16,9 +30,11 @@ subscribeSyncStatus(({ mode }) => {
 });
 
 subscribeState((data) => {
-    if (data) {
-        buildSlides(data);
-    }
+    const isSyncCall = isInitialSyncCallback;
+    isInitialSyncCallback = false;
+    if (!data) return;
+    buildSlides(data);
+    syncRemoteSlideControl(data, isSyncCall);
 });
 
 function escapeHtml(str) {
@@ -27,16 +43,41 @@ function escapeHtml(str) {
     return d.innerHTML;
 }
 
+function computeSlidesRenderKey(data) {
+    const departments = data?.departments && typeof data.departments === 'object' ? data.departments : {};
+    const orderedDepts = Object.keys(departments).map((dept) => {
+        const entry = departments[dept] || {};
+        return [dept, String(entry.update ?? ''), String(entry.question ?? '')];
+    });
+    const cfg = data?.config && typeof data.config === 'object' ? data.config : {};
+    return JSON.stringify({
+        departments: orderedDepts,
+        showQnA: cfg.showQnA !== false,
+        showVisionMission: cfg.showVisionMission !== false,
+        visionText: String(cfg.visionText ?? ''),
+        missionText: String(cfg.missionText ?? ''),
+        showDailyPhrases: cfg.showDailyPhrases !== false,
+        showLastMinuteSpeech: cfg.showLastMinuteSpeech === true,
+        lastMinuteSpeechText: String(cfg.lastMinuteSpeechText ?? '')
+    });
+}
+
 function buildSlides(data) {
     const container = document.getElementById('slides-container');
-    if (!container) return;
-    container.innerHTML = '';
+    if (!container) return false;
+
+    const renderKey = computeSlidesRenderKey(data);
+    if (renderKey === lastSlidesRenderKey && container.children.length > 0) {
+        return false;
+    }
+
     departmentNames = Object.keys(data.departments || {});
-    slideMeta = [];
+    slideMeta = computeMeetingSlides(data);
     const config = data.config || {};
+    const htmlChunks = [];
 
     // 1. Overview Main Page
-    container.innerHTML += `
+    htmlChunks.push(`
         <div class="slide">
             <div class="cc-card overview-card">
                 <div class="overview-header">
@@ -61,27 +102,25 @@ function buildSlides(data) {
                     </div>
                 </div>
             </div>
-        </div>`;
-    slideMeta.push({ label: 'Overview', icon: '❯' });
+        </div>`);
 
     // 2. Department Updates & Conditional Q&A Loop (Forza Slot Reel)
     for (const dept of departmentNames) {
         const deptData = data.departments[dept] || {};
 
         // Update Slide
-        container.innerHTML += `
+        htmlChunks.push(`
             <div class="slide">
                 <div class="cc-card">
                     <div class="cc-card-tag">${escapeHtml(dept)}</div>
                     <h2>Weekly Department Update</h2>
                     <p class="update-text">${escapeHtml(deptData.update || "No update provided.")}</p>
                 </div>
-            </div>`;
-        slideMeta.push({ label: `${dept} Update`, icon: '❯' });
+            </div>`);
 
         // Conditional Q&A Slide (Forza Style Vertical Reel)
         if (config.showQnA !== false) {
-            container.innerHTML += `
+            htmlChunks.push(`
                 <div class="slide qna-slide">
                     <div class="cc-card">
                         <div class="qna-layout">
@@ -104,14 +143,13 @@ function buildSlides(data) {
                             </div>
                         </div>
                     </div>
-                </div>`;
-            slideMeta.push({ label: `${dept} Q&A`, icon: '🎲' });
+                </div>`);
         }
     }
 
     // 3. Vision & Mission Slide
     if (config.showVisionMission !== false) {
-        container.innerHTML += `
+        htmlChunks.push(`
             <div class="slide">
                 <div class="cc-card">
                     <div class="cc-card-tag">Core Values</div>
@@ -127,23 +165,21 @@ function buildSlides(data) {
                         </div>
                     </div>
                 </div>
-            </div>`;
-        slideMeta.push({ label: 'Vision & Mission', icon: '❯' });
+            </div>`);
     }
 
     // 4. Tagline Slide ("Humanising Care")
-    container.innerHTML += `
+    htmlChunks.push(`
         <div class="slide">
             <div class="cc-card" style="align-items: center; text-align: center; justify-content: center;">
                 <div class="cc-card-tag">Our Tagline</div>
                 <h1 class="tagline-display">Humanising Care</h1>
             </div>
-        </div>`;
-    slideMeta.push({ label: 'Tagline', icon: '❯' });
+        </div>`);
 
     // 5. Care Quality Phrases Slide
     if (config.showDailyPhrases !== false) {
-        container.innerHTML += `
+        htmlChunks.push(`
             <div class="slide">
                 <div class="cc-card" style="padding: 48px;">
                     <div class="cc-card-tag">Culture</div>
@@ -184,30 +220,33 @@ function buildSlides(data) {
                         </table>
                     </div>
                 </div>
-            </div>`;
-        slideMeta.push({ label: 'Care Quality Phrases', icon: '❯' });
+            </div>`);
     }
 
     // 6. C-Suite Closing Remarks Slide
     if (config.showLastMinuteSpeech === true) {
-        container.innerHTML += `
+        htmlChunks.push(`
             <div class="slide">
                 <div class="cc-card">
                     <div class="cc-card-tag" style="background: rgba(17, 35, 73, 0.1); color: var(--cc-navy);">Closing</div>
                     <h2>C-Suite Closing Remarks</h2>
                     <p class="update-text">${escapeHtml(config.lastMinuteSpeechText || "")}</p>
                 </div>
-            </div>`;
-        slideMeta.push({ label: 'C-Suite Closing Remarks', icon: '❯' });
+            </div>`);
     }
 
+    container.innerHTML = htmlChunks.join('');
     totalSlides = slideMeta.length;
-    if (currentSlideIndex >= totalSlides) currentSlideIndex = 0;
+    currentSlideIndex = totalSlides > 0
+        ? Math.max(0, Math.min(totalSlides - 1, currentSlideIndex))
+        : 0;
+    lastSlidesRenderKey = renderKey;
 
     renderSidebarMenu();
     updateSlidePosition();
     updateClocks();
     initReels();
+    return true;
 }
 
 function initReels() {
@@ -232,11 +271,14 @@ function renderSidebarMenu() {
 }
 
 function goToSlide(index) {
-    currentSlideIndex = index;
+    if (isPreviewMode || totalSlides <= 0) return;
+    const parsed = Math.trunc(Number(index) || 0);
+    currentSlideIndex = Math.max(0, Math.min(totalSlides - 1, parsed));
     updateSlidePosition();
 }
 
 function changeSlide(direction) {
+    if (isPreviewMode || totalSlides <= 0) return;
     currentSlideIndex = Math.max(0, Math.min(totalSlides - 1, currentSlideIndex + direction));
     updateSlidePosition();
 }
@@ -246,10 +288,18 @@ function updateSlidePosition() {
     if (!container) return;
     container.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
     const indicator = document.getElementById('slide-indicator');
-    if (indicator) indicator.innerText = `${currentSlideIndex + 1} / ${totalSlides}`;
-    renderSidebarMenu();
+    if (indicator) {
+        indicator.textContent = totalSlides > 0 ? `${currentSlideIndex + 1} / ${totalSlides}` : '0 / 0';
+    }
 
-    const activePill = document.querySelector('.dept-pill.active');
+    const pills = document.querySelectorAll('#sidebar-menu .dept-pill');
+    let activePill = null;
+    pills.forEach((pill, idx) => {
+        const isActive = idx === currentSlideIndex;
+        pill.classList.toggle('active', isActive);
+        if (isActive) activePill = pill;
+    });
+
     if (activePill) {
         activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -294,11 +344,13 @@ function spinForzaReel(slideElement) {
 }
 
 function spinCurrentSlideReel(el) {
+    if (isPreviewMode) return;
     const slideEl = el.closest('.slide');
     if (slideEl) spinForzaReel(slideEl);
 }
 
 function toggleFullScreen() {
+    if (isPreviewMode) return;
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
     } else {
@@ -306,24 +358,164 @@ function toggleFullScreen() {
     }
 }
 
-function toggleAutoPlay() {
+function startAutoPlay(intervalMs = 8000) {
+    if (isPreviewMode) return;
+    const rawMs = Number(intervalMs);
+    const ms = Number.isFinite(rawMs) && rawMs >= 1000 ? Math.trunc(rawMs) : 8000;
     const btn = document.getElementById('btn-autoplay');
+
+    if (autoPlayInterval && activeAutoPlayIntervalMs === ms) {
+        if (btn) {
+            btn.textContent = "⏸ Auto";
+            btn.style.background = "#1863dc";
+        }
+        return;
+    }
+
     if (autoPlayInterval) {
         clearInterval(autoPlayInterval);
         autoPlayInterval = null;
-        if (btn) {
-            btn.innerText = "▶ Auto";
-            btn.style.background = "";
-        }
-    } else {
-        autoPlayInterval = setInterval(() => {
+    }
+
+    activeAutoPlayIntervalMs = ms;
+    autoPlayInterval = setInterval(() => {
+        if (totalSlides > 0) {
             currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
             updateSlidePosition();
-        }, 8000);
-        if (btn) {
-            btn.innerText = "⏸ Auto";
-            btn.style.background = "#1863dc";
         }
+    }, ms);
+
+    if (btn) {
+        btn.textContent = "⏸ Auto";
+        btn.style.background = "#1863dc";
+    }
+}
+
+function stopAutoPlay() {
+    if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+    }
+    const btn = document.getElementById('btn-autoplay');
+    if (btn) {
+        btn.textContent = "▶ Auto";
+        btn.style.background = "";
+    }
+}
+
+function toggleAutoPlay() {
+    if (isPreviewMode) return;
+    if (autoPlayInterval) {
+        stopAutoPlay();
+    } else {
+        startAutoPlay(activeAutoPlayIntervalMs);
+    }
+}
+
+function handleRemoteRefresh(sc, isSyncCall) {
+    if (isPreviewMode || window.self !== window.top) return false;
+    const incomingNonce = Number(sc?.refreshNonce) || 0;
+
+    if (isSyncCall) {
+        syncBaselineNonce = incomingNonce;
+        return false;
+    }
+
+    let storedRaw = null;
+    try {
+        storedRaw = sessionStorage.getItem(REFRESH_NONCE_STORAGE_KEY);
+    } catch (_) {
+        return false;
+    }
+
+    if (storedRaw === null) {
+        const updatedAt = Number(sc?.updatedAt) || 0;
+        if (incomingNonce > syncBaselineNonce && updatedAt >= pageLoadedAt) {
+            try {
+                sessionStorage.setItem(REFRESH_NONCE_STORAGE_KEY, String(incomingNonce));
+            } catch (_) {}
+            window.location.reload();
+            return true;
+        }
+        try {
+            sessionStorage.setItem(REFRESH_NONCE_STORAGE_KEY, String(incomingNonce));
+        } catch (_) {}
+        return false;
+    }
+
+    const handledNonce = Number(storedRaw) || 0;
+    if (incomingNonce > handledNonce) {
+        try {
+            sessionStorage.setItem(REFRESH_NONCE_STORAGE_KEY, String(incomingNonce));
+        } catch (_) {}
+        window.location.reload();
+        return true;
+    }
+    if (incomingNonce < handledNonce) {
+        try {
+            sessionStorage.setItem(REFRESH_NONCE_STORAGE_KEY, String(incomingNonce));
+        } catch (_) {}
+    }
+    return false;
+}
+
+function syncRemoteSlideControl(data, isSyncCall) {
+    const sc = data?.remoteDisplay?.slideControl;
+    if (!sc || typeof sc !== 'object') return;
+
+    if (handleRemoteRefresh(sc, isSyncCall)) return;
+
+    const incomingSeq = Number(sc.commandSeq) || 0;
+    const maxIdx = Math.max(0, totalSlides - 1);
+    const remoteIdx = Math.max(0, Math.min(maxIdx, Math.trunc(Number(sc.currentSlideIndex) || 0)));
+    const hasActiveControlState = (Number(sc.updatedAt) || 0) > 0 || incomingSeq > 0 || remoteIdx > 0 || Boolean(sc.autoPlay);
+
+    if (lastAppliedCommandSeq === null || (!isSyncCall && !hasHydratedServerControl)) {
+        if (hasActiveControlState) {
+            if (currentSlideIndex !== remoteIdx) {
+                currentSlideIndex = remoteIdx;
+                updateSlidePosition();
+            }
+            if (!isPreviewMode) {
+                if (sc.autoPlay) {
+                    startAutoPlay(sc.autoPlayIntervalMs);
+                } else {
+                    stopAutoPlay();
+                }
+            }
+            if (!isSyncCall) {
+                hasHydratedServerControl = true;
+            }
+        }
+        lastAppliedCommandSeq = incomingSeq;
+        return;
+    }
+
+    if (incomingSeq !== lastAppliedCommandSeq) {
+        const cmd = sc.lastCommand;
+        if (isPreviewMode) {
+            if (currentSlideIndex !== remoteIdx) {
+                currentSlideIndex = remoteIdx;
+                updateSlidePosition();
+            }
+        } else if (cmd === 'pause') {
+            stopAutoPlay();
+        } else if (cmd === 'resume') {
+            startAutoPlay(sc.autoPlayIntervalMs);
+        } else if (cmd === 'refresh') {
+            // Handled above without snapping back currentSlideIndex
+        } else {
+            if (currentSlideIndex !== remoteIdx) {
+                currentSlideIndex = remoteIdx;
+                updateSlidePosition();
+            }
+            if (sc.autoPlay) {
+                startAutoPlay(sc.autoPlayIntervalMs);
+            } else {
+                stopAutoPlay();
+            }
+        }
+        lastAppliedCommandSeq = incomingSeq;
     }
 }
 
@@ -344,6 +536,7 @@ function updateClocks() {
 }
 
 document.addEventListener('keydown', (e) => {
+    if (isPreviewMode) return;
     if (e.key === 'ArrowRight') changeSlide(1);
     if (e.key === 'ArrowLeft') changeSlide(-1);
     if (e.key === 'Enter') {

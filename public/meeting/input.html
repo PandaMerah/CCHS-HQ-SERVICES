@@ -171,6 +171,82 @@
             border-radius: 8px;
             display: none;
         }
+
+        #serviceDisabledBanner {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            color: #991b1b;
+            box-shadow: 0 8px 20px rgba(153, 27, 27, 0.08);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        #serviceDisabledBanner.admin-mode {
+            border-color: #fcd34d;
+            background: #fffbeb;
+            color: #92400e;
+            box-shadow: 0 8px 20px rgba(146, 64, 14, 0.08);
+        }
+
+        .service-banner-title {
+            font-weight: 800;
+            font-size: 1.02rem;
+            margin-bottom: 4px;
+        }
+
+        .service-banner-notice {
+            font-size: 0.94rem;
+            line-height: 1.45;
+        }
+
+        .service-banner-link {
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.88rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: #991b1b;
+            color: #ffffff;
+            white-space: nowrap;
+        }
+
+        #serviceDisabledBanner.admin-mode .service-banner-link {
+            background: #b45309;
+            color: #ffffff;
+        }
+
+        .card-panel.panel-disabled {
+            opacity: 0.78;
+        }
+
+        .card-panel.panel-disabled input:disabled,
+        .card-panel.panel-disabled select:disabled,
+        .card-panel.panel-disabled textarea:disabled,
+        .card-panel.panel-disabled button:disabled {
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .nav-pill.is-disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            background: #e5e7eb;
+            color: #6b7280;
+            border-color: #d1d5db;
+        }
+
+        .nav-pill.is-disabled:hover {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
     </style>
 </head>
 <body>
@@ -181,15 +257,17 @@
         </div>
         <div class="top-nav-links" id="inputNavLinks">
             <a href="/" class="nav-pill">← Staff Portal</a>
-            <a href="/booking/" class="nav-pill">📅 Book Room</a>
-            <a href="/pdf/" class="nav-pill">📄 BentoPDF</a>
+            <a href="/booking/" class="nav-pill" data-service-link="roomBooking" data-default-text="📅 Book Room">📅 Book Room</a>
+            <a href="/pdf/" class="nav-pill" data-service-link="pdfStudio" data-default-text="📄 BentoPDF">📄 BentoPDF</a>
             <a href="/login.html?redirect=/meeting/admin.html" class="nav-pill">🔒 Admin Login</a>
         </div>
     </div>
 
+    <div id="serviceDisabledBanner" role="alert" style="display:none;"></div>
+
     <div class="container-layout">
         <!-- Input Form Panel -->
-        <div class="card-panel">
+        <div class="card-panel" id="inputFormPanel">
             <div class="header">
                 <div>
                     <h2>Submit Department Update</h2>
@@ -214,7 +292,7 @@
             <input type="text" id="questionText" placeholder="Enter question for other departments..." oninput="updatePreview()">
 
             <div class="btn-group">
-                <button type="button" class="btn-clear" onclick="clearInputFields()">Clear Text</button>
+                <button type="button" id="clearBtn" class="btn-clear" onclick="clearInputFields()">Clear Text</button>
                 <button type="button" id="submitBtn" style="flex: 1;" onclick="submitUpdate()">Save & Broadcast Live to TV</button>
             </div>
         </div>
@@ -242,7 +320,7 @@
     </div>
 
     <script type="module">
-        import { subscribeState, submitDepartmentUpdate } from '/shared/cloud-store.js';
+        import { subscribeState, submitDepartmentUpdate, getServiceStatus } from '/shared/cloud-store.js';
         import { isAdminLoggedIn } from '/shared/auth.js';
 
         if (isAdminLoggedIn()) {
@@ -254,12 +332,202 @@
             `;
         }
 
+        const DEFAULT_DEPT_NOTICE = 'Administrators have temporarily disabled Department Update submissions.';
+        const DEFAULT_GENERIC_NOTICE = 'Currently unavailable — temporarily disabled by administrator.';
+
         let fullHistory = [];
         let departmentData = {};
         let initialized = false;
+        let latestState = null;
+        let isSubmitting = false;
+        let hydratedFromServer = isAdminLoggedIn();
+        let serverBootToggles = null;
+
+        const hydrationPromise = isAdminLoggedIn()
+            ? Promise.resolve()
+            : fetch('/api/data', { cache: 'no-store' })
+                .then(res => (res.ok ? res.json() : null))
+                .then(data => {
+                    if (data?.config?.serviceToggles) {
+                        serverBootToggles = data.config.serviceToggles;
+                    }
+                })
+                .catch(() => {})
+                .finally(() => {
+                    hydratedFromServer = true;
+                    if (latestState) applyInputPageToggles(latestState);
+                });
+
+        function resolveStatus(state, key) {
+            const storeStatus = getServiceStatus(state, key);
+            const bootToggle = serverBootToggles?.[key];
+            if (bootToggle) {
+                const bootTs = Number(bootToggle.updatedAt || 0);
+                const storeTs = Number(storeStatus.updatedAt || 0);
+                if (bootTs > storeTs || (storeTs === 0 && bootToggle.enabled === false)) {
+                    return {
+                        enabled: bootToggle.enabled !== false,
+                        notice: typeof bootToggle.notice === 'string' ? bootToggle.notice : '',
+                        updatedAt: bootTs
+                    };
+                }
+            }
+            return storeStatus;
+        }
+
+        function isDeptInputBlocked(state = latestState) {
+            if (isAdminLoggedIn()) return false;
+            if (!hydratedFromServer) return true;
+            return !resolveStatus(state, 'departmentUpdate').enabled;
+        }
+
+        function renderServiceDisabledBanner(deptStatus, admin) {
+            const banner = document.getElementById('serviceDisabledBanner');
+            if (!banner) return;
+
+            if (deptStatus.enabled) {
+                banner.style.display = 'none';
+                banner.classList.remove('admin-mode');
+                banner.replaceChildren();
+                return;
+            }
+
+            const noticeText = (deptStatus.notice || '').trim() || DEFAULT_DEPT_NOTICE;
+            banner.style.display = 'flex';
+            banner.classList.toggle('admin-mode', admin);
+
+            const contentDiv = document.createElement('div');
+            const titleEl = document.createElement('div');
+            titleEl.className = 'service-banner-title';
+            const noticeEl = document.createElement('div');
+            noticeEl.className = 'service-banner-notice';
+
+            const actionLink = document.createElement('a');
+            actionLink.className = 'service-banner-link';
+
+            if (admin) {
+                titleEl.textContent = 'Admin Awareness: Department Update is currently DISABLED for regular staff.';
+                noticeEl.textContent = `Staff notice: ${noticeText} — As an Administrator, you may still submit updates.`;
+                actionLink.href = '/admin/#serviceTogglesSection';
+                actionLink.textContent = 'Manage Service Toggles →';
+            } else {
+                titleEl.textContent = '⛔ Department Update Unavailable';
+                noticeEl.textContent = noticeText;
+                actionLink.href = '/';
+                actionLink.textContent = '← Return to Staff Portal';
+            }
+
+            contentDiv.append(titleEl, noticeEl);
+            banner.replaceChildren(contentDiv, actionLink);
+        }
+
+        function applyCrossNavToggles(state) {
+            const admin = isAdminLoggedIn();
+            document.querySelectorAll('#inputNavLinks [data-service-link]').forEach((link) => {
+                const key = link.dataset.serviceLink;
+                if (!key) return;
+                if (!link.dataset.href && link.getAttribute('href')) {
+                    link.dataset.href = link.getAttribute('href');
+                }
+                if (!link.dataset.defaultText) {
+                    link.dataset.defaultText = link.textContent.trim();
+                }
+
+                const status = resolveStatus(state, key);
+                const disabledForStaff = !admin && !status.enabled;
+                const noticeText = (status.notice || '').trim() || DEFAULT_GENERIC_NOTICE;
+
+                if (disabledForStaff) {
+                    link.removeAttribute('href');
+                    link.setAttribute('aria-disabled', 'true');
+                    link.setAttribute('data-service-disabled', 'true');
+                    link.setAttribute('tabindex', '-1');
+                    link.setAttribute('title', noticeText);
+                    link.classList.add('is-disabled');
+                    link.textContent = `${link.dataset.defaultText} (Unavailable)`;
+                } else {
+                    if (link.dataset.href) link.setAttribute('href', link.dataset.href);
+                    link.removeAttribute('aria-disabled');
+                    link.removeAttribute('data-service-disabled');
+                    link.removeAttribute('tabindex');
+                    link.removeAttribute('title');
+                    link.classList.remove('is-disabled');
+                    link.textContent = link.dataset.defaultText;
+                }
+            });
+        }
+
+        function applyInputPageToggles(state) {
+            const admin = isAdminLoggedIn();
+            const deptStatus = resolveStatus(state, 'departmentUpdate');
+            const blockedForStaff = !admin && (!hydratedFromServer || !deptStatus.enabled);
+
+            renderServiceDisabledBanner(deptStatus, admin);
+            applyCrossNavToggles(state);
+
+            const panel = document.getElementById('inputFormPanel');
+            const deptSelect = document.getElementById('department');
+            const historyDropdown = document.getElementById('historyDropdown');
+            const updateTextEl = document.getElementById('updateText');
+            const questionTextEl = document.getElementById('questionText');
+            const clearBtn = document.getElementById('clearBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (panel) panel.classList.toggle('panel-disabled', blockedForStaff);
+            if (deptSelect) deptSelect.disabled = blockedForStaff;
+            if (historyDropdown) historyDropdown.disabled = blockedForStaff;
+            if (updateTextEl) {
+                updateTextEl.disabled = blockedForStaff;
+                updateTextEl.readOnly = blockedForStaff;
+            }
+            if (questionTextEl) {
+                questionTextEl.disabled = blockedForStaff;
+                questionTextEl.readOnly = blockedForStaff;
+            }
+            if (clearBtn) clearBtn.disabled = blockedForStaff;
+
+            if (submitBtn && !isSubmitting) {
+                submitBtn.disabled = blockedForStaff;
+                if (blockedForStaff) {
+                    submitBtn.textContent = hydratedFromServer ? 'Service Disabled by Admin' : 'Checking availability...';
+                } else {
+                    submitBtn.textContent = 'Save & Broadcast Live to TV';
+                }
+            }
+        }
+
+        function handleBlockedCrossNav(e) {
+            const link = e.target?.closest?.('#inputNavLinks [data-service-link]');
+            if (!link) return;
+            if (link.getAttribute('data-service-disabled') === 'true' || link.getAttribute('aria-disabled') === 'true') {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            if (!isAdminLoggedIn() && !hydratedFromServer) {
+                const key = link.dataset.serviceLink;
+                const href = link.getAttribute('href') || link.dataset.href;
+                if (!key || !href) return;
+                e.preventDefault();
+                e.stopPropagation();
+                hydrationPromise.then(() => {
+                    if (resolveStatus(latestState, key).enabled) {
+                        window.location.href = href;
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('click', handleBlockedCrossNav, true);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                handleBlockedCrossNav(e);
+            }
+        }, true);
 
         subscribeState((data) => {
             if (!data) return;
+            latestState = data;
             fullHistory = data.history || [];
             departmentData = data.departments || {};
 
@@ -278,6 +546,8 @@
                 updatePreview();
                 initialized = true;
             }
+
+            applyInputPageToggles(data);
         });
 
         function onDeptChange() {
@@ -306,6 +576,7 @@
         }
 
         function populateFromHistory() {
+            if (isDeptInputBlocked()) return;
             const dropdown = document.getElementById('historyDropdown');
             const dept = document.getElementById('department').value;
             const deptHistory = fullHistory.filter(h => h.department === dept);
@@ -321,6 +592,7 @@
         }
 
         function clearInputFields() {
+            if (isDeptInputBlocked()) return;
             document.getElementById('updateText').value = "";
             document.getElementById('questionText').value = "";
             document.getElementById('historyDropdown').value = "";
@@ -335,21 +607,55 @@
         }
 
         async function submitUpdate() {
+            await hydrationPromise;
+            if (isDeptInputBlocked()) {
+                applyInputPageToggles(latestState);
+                const status = resolveStatus(latestState, 'departmentUpdate');
+                showStatus((status.notice || '').trim() || DEFAULT_DEPT_NOTICE, true);
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
             const department = document.getElementById('department').value;
             const updateText = document.getElementById('updateText').value;
             const questionText = document.getElementById('questionText').value;
 
+            isSubmitting = true;
             btn.disabled = true;
             btn.textContent = "Broadcasting...";
             try {
                 await submitDepartmentUpdate({ department, updateText, questionText });
                 showStatus("Update successfully broadcasted to TV!", false);
             } catch (err) {
-                showStatus("Error submitting update: " + err.message, true);
+                if (err && err.code === 'SERVICE_DISABLED') {
+                    const notice = err.notice || err.message || DEFAULT_DEPT_NOTICE;
+                    const disabledEntry = {
+                        enabled: false,
+                        notice,
+                        updatedAt: Date.now()
+                    };
+                    serverBootToggles = {
+                        ...(serverBootToggles || {}),
+                        departmentUpdate: disabledEntry
+                    };
+                    latestState = {
+                        ...(latestState || {}),
+                        config: {
+                            ...(latestState?.config || {}),
+                            serviceToggles: {
+                                ...(latestState?.config?.serviceToggles || {}),
+                                departmentUpdate: disabledEntry
+                            }
+                        }
+                    };
+                    applyInputPageToggles(latestState);
+                    showStatus(notice, true);
+                } else {
+                    showStatus("Error submitting update: " + (err?.message || err), true);
+                }
             } finally {
-                btn.disabled = false;
-                btn.textContent = "Save & Broadcast Live to TV";
+                isSubmitting = false;
+                applyInputPageToggles(latestState);
             }
         }
 

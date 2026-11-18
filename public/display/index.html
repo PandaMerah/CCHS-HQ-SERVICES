@@ -104,6 +104,19 @@
       align-items: start;
     }
 
+    .controller-container > div {
+      min-width: 0;
+    }
+
+    body.mode-remote .controller-container {
+      max-width: 640px;
+      grid-template-columns: 1fr;
+    }
+
+    body.mode-remote .controller-right-col {
+      order: -1;
+    }
+
     @media (max-width: 1120px) {
       .controller-container {
         grid-template-columns: 1fr;
@@ -116,6 +129,7 @@
       border-radius: 18px;
       padding: 24px;
       margin-bottom: 20px;
+      min-width: 0;
     }
 
     .card-title {
@@ -517,6 +531,224 @@
       align-items: center;
       gap: 8px;
     }
+
+    /* F4: Screen-Share Service Toggle Disabled / Admin Notice */
+    .share-service-notice {
+      padding: 16px 20px;
+      border-radius: 14px;
+      background: rgba(239, 68, 68, 0.16);
+      border: 1px solid rgba(248, 113, 113, 0.55);
+      color: #fecaca;
+      margin-bottom: 18px;
+    }
+
+    .share-service-notice.is-admin-info {
+      background: rgba(24, 99, 220, 0.22);
+      border-color: rgba(142, 209, 252, 0.5);
+      color: #dbeafe;
+    }
+
+    .share-service-notice-title {
+      font-weight: 800;
+      font-size: 0.98rem;
+      margin-bottom: 4px;
+    }
+
+    .share-service-notice-body {
+      font-size: 0.87rem;
+      line-height: 1.45;
+      opacity: 0.95;
+    }
+
+    .share-hero-card.is-service-disabled #shareSetupForm,
+    .share-hero-card.is-service-disabled #meetStage {
+      opacity: 0.58;
+    }
+
+    .share-hero-card.is-service-disabled input:disabled,
+    .share-hero-card.is-service-disabled select:disabled,
+    .share-hero-card.is-service-disabled button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* F11: Remote Slide Control Card & Mobile Layout */
+    .remote-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--cc-border);
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      white-space: nowrap;
+    }
+
+    .remote-badge.is-playing {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.55);
+      color: #6ee7b7;
+    }
+
+    .remote-badge.is-paused {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: #fcd34d;
+    }
+
+    .remote-readout-box {
+      background: rgba(12, 25, 54, 0.78);
+      border: 1px solid rgba(142, 209, 252, 0.28);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+
+    .remote-readout-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--cc-sky);
+      margin-bottom: 4px;
+    }
+
+    .remote-readout-value {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #ffffff;
+      word-break: break-word;
+    }
+
+    .remote-inactive-note {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: #fcd34d;
+    }
+
+    .remote-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .remote-btn {
+      min-height: 48px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(142, 209, 252, 0.3);
+      background: rgba(24, 99, 220, 0.25);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.94rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .remote-btn:hover {
+      background: rgba(24, 99, 220, 0.45);
+      border-color: var(--cc-sky);
+    }
+
+    .remote-btn.primary {
+      background: var(--cc-blue);
+      border-color: rgba(142, 209, 252, 0.55);
+    }
+
+    .remote-btn.primary:hover {
+      background: #2563eb;
+    }
+
+    .remote-btn.playing {
+      background: rgba(16, 185, 129, 0.24);
+      border-color: rgba(16, 185, 129, 0.65);
+      color: #a7f3d0;
+    }
+
+    .remote-btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--cc-border);
+      color: #e2e8f0;
+    }
+
+    .remote-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .remote-select {
+      min-height: 46px;
+      font-size: 16px;
+      max-width: 100%;
+    }
+
+    .remote-feedback {
+      margin-top: 8px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .remote-feedback.ok {
+      display: block;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+    }
+
+    .remote-feedback.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      color: #fecaca;
+    }
+
+    .card.monitor-card {
+      padding: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 12px 16px;
+      }
+      .controller-container {
+        padding: 16px 14px 48px;
+        gap: 16px;
+      }
+      .controller-right-col {
+        order: -1;
+      }
+      .card,
+      .card.monitor-card {
+        padding: 16px;
+      }
+      .monitor-frame {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        min-height: 0;
+      }
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -542,6 +774,11 @@
 
     <main class="share-container">
       <div class="share-hero-card">
+        <div id="shareServiceNotice" class="share-service-notice" role="alert" style="display: none;">
+          <div id="shareServiceNoticeTitle" class="share-service-notice-title"></div>
+          <div id="shareServiceNoticeBody" class="share-service-notice-body"></div>
+        </div>
+
         <!-- Live Banner when sharing -->
         <div id="shareLiveBanner" class="share-status-banner waiting" style="display: none;">
           <div style="display:flex; align-items:center; gap:10px;">
@@ -623,6 +860,7 @@
       </a>
       <div class="nav-links">
         <a href="/admin/" class="nav-btn">🛡️ Admin Portal</a>
+        <a href="/display/?mode=remote" class="nav-btn" id="btnMobileRemoteLink">📱 Mobile Remote</a>
         <a href="/display/?mode=share" target="_blank" class="nav-btn">🖥️ Open Staff Share Page ↗</a>
         <a href="/display/?mode=receiver" target="_blank" class="nav-btn primary">⛶ Launch TV Receiver ↗</a>
       </div>
@@ -730,9 +968,46 @@
         </div>
       </div>
 
-      <!-- Right Column: Live 16:9 Screen Monitor Preview -->
-      <div>
-        <div class="card" style="padding: 20px;">
+      <!-- Right Column: TV Remote Slide Control + Live 16:9 Screen Monitor Preview -->
+      <div class="controller-right-col">
+        <!-- TV Remote Slide Control Card (F11) -->
+        <div class="card" id="remoteSlideControlCard" style="border-color: rgba(142, 209, 252, 0.35);">
+          <div class="card-title">
+            <span>🎛️ TV Remote Slide Control</span>
+            <span id="slideAutoPlayBadge" class="remote-badge is-paused">⏸ Auto-Advance: Paused</span>
+          </div>
+          <div class="card-sub">
+            Control the Weekly Alignment Meeting deck on the HQ TV without a keyboard or mouse connected.
+          </div>
+
+          <div class="remote-readout-box">
+            <div class="remote-readout-label">Current TV Slide</div>
+            <div class="remote-readout-value" id="slideReadoutText">Slide 1 / 1 — Overview</div>
+            <div class="remote-inactive-note" id="slideDeckInactiveNote">
+              <span>TV is currently showing another channel.</span>
+              <button type="button" id="btnSwitchToMeetingTv" class="nav-btn primary" style="padding: 5px 10px; font-size: 0.75rem;">Switch TV to Meeting Deck</button>
+            </div>
+          </div>
+
+          <div class="remote-btn-grid">
+            <button type="button" id="btnSlidePrev" class="remote-btn">❮ Previous Slide</button>
+            <button type="button" id="btnSlideNext" class="remote-btn primary">Next Slide ❯</button>
+          </div>
+
+          <div class="form-group">
+            <label for="slideJumpSelect">Select Slide</label>
+            <select id="slideJumpSelect" class="remote-select"></select>
+          </div>
+
+          <div class="remote-btn-grid" style="margin-bottom: 0;">
+            <button type="button" id="btnSlideAutoPlay" class="remote-btn">▶ Resume Auto-Advance</button>
+            <button type="button" id="btnSlideRefresh" class="remote-btn secondary">🔄 Refresh TV</button>
+          </div>
+
+          <div id="slideRemoteFeedback" class="remote-feedback" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="card monitor-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
             <div>
               <div class="card-title" style="margin-bottom: 2px;">Live TV Output Monitor</div>
@@ -773,32 +1048,28 @@
       registerPresenter,
       updatePresenterStreamData,
       removePresenter,
-      selectActivePresenter
+      selectActivePresenter,
+      getServiceStatus,
+      computeMeetingSlides,
+      sendSlideCommand
     } from '/shared/cloud-store.js';
     import { requireAdminAuth, isAdminLoggedIn } from '/shared/auth.js';
 
     const params = new URLSearchParams(window.location.search);
-    const modeParam = params.get('mode'); // 'share' | 'receiver' | null (controller)
+    const modeParam = params.get('mode'); // 'share' | 'receiver' | 'remote' | null (controller)
     const forcedView = params.get('view');
 
     const isShareMode = modeParam === 'share';
     const isReceiverMode = modeParam === 'receiver';
+    const isRemoteMode = modeParam === 'remote';
     const isControllerMode = !isShareMode && !isReceiverMode;
 
-    if (isShareMode) {
-      document.body.classList.add('mode-share');
-      if (isAdminLoggedIn()) {
-        document.getElementById('shareNavLinks').innerHTML += `<a href="/display/" class="nav-btn primary">🛡️ Admin TV Switcher</a>`;
-      }
-    } else if (isReceiverMode) {
-      document.body.classList.add('mode-receiver');
-    } else {
-      // Controller mode requires Admin Authentication
-      if (!requireAdminAuth()) {
-        throw new Error('Redirecting to Admin Login');
-      }
-      document.body.classList.add('mode-controller');
-    }
+    const RECEIVER_REFRESH_KEY = 'cchs_display_receiver_refresh_nonce_v1';
+    const receiverBootAt = Date.now();
+    let isInitialReceiverSync = true;
+    let syncReceiverBaselineNonce = 0;
+    let lastSlideSelectSignature = '';
+    let slideFeedbackTimer = null;
 
     const ICE_SERVERS = [
       { urls: 'stun:stun.l.google.com:19302' },
@@ -810,6 +1081,23 @@
     let currentState = null;
     let selectedMode = 'meeting-tv';
     let formInitialized = false;
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getSafePreviewFrameUrl(url) {
+      if (typeof url !== 'string') return '';
+      const trimmed = url.trim();
+      return /^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=]+$/i.test(trimmed)
+        ? trimmed
+        : '';
+    }
 
     // Boost WebRTC video (8 Mbps 1080p) & audio (128 kbps fullband stereo/voice) senders
     async function boostWebRTCHighQuality(call) {
@@ -1027,7 +1315,90 @@
       }
     }
 
+    function isShareBlockedByToggle(state = currentState) {
+      if (isAdminLoggedIn()) return false;
+      const status = getServiceStatus(state, 'screenShare');
+      return !status.enabled;
+    }
+
+    function applyShareServiceAvailability(state) {
+      const status = getServiceStatus(state, 'screenShare');
+      const isAdmin = isAdminLoggedIn();
+      const blocked = !status.enabled && !isAdmin;
+
+      const heroCard = document.querySelector('#shareRoot .share-hero-card');
+      const noticeBox = document.getElementById('shareServiceNotice');
+      const noticeTitle = document.getElementById('shareServiceNoticeTitle');
+      const noticeBody = document.getElementById('shareServiceNoticeBody');
+
+      const controlIds = [
+        'presName',
+        'presDept',
+        'presTitle',
+        'btnStartShare',
+        'btnSwitchSource',
+        'btnToggleMicAudio',
+        'btnToggleVoiceMic'
+      ];
+
+      if (blocked) {
+        if (heroCard) heroCard.classList.add('is-service-disabled');
+        if (noticeBox && noticeTitle && noticeBody) {
+          noticeBox.classList.remove('is-admin-info');
+          noticeTitle.textContent = '🚫 Screen Share Service Disabled (Unavailable)';
+          noticeBody.textContent = status.notice && status.notice.trim()
+            ? status.notice.trim()
+            : 'Screen sharing to HQ TV has been temporarily disabled by an administrator. Please check back later or contact IT/Admin.';
+          noticeBox.style.display = 'block';
+        }
+        controlIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.disabled = true;
+            el.setAttribute('aria-disabled', 'true');
+          }
+        });
+        if (localStream || myPresenterId) {
+          stopStaffScreenShare();
+        }
+      } else if (!status.enabled && isAdmin) {
+        if (heroCard) heroCard.classList.remove('is-service-disabled');
+        if (noticeBox && noticeTitle && noticeBody) {
+          noticeBox.classList.add('is-admin-info');
+          noticeTitle.textContent = 'ℹ️ Staff Screen Share is Currently Disabled';
+          const customNote = status.notice && status.notice.trim() ? ` (Staff notice: ${status.notice.trim()})` : '';
+          noticeBody.textContent = `Regular staff cannot share right now, but your Administrator access remains active.${customNote}`;
+          noticeBox.style.display = 'block';
+        }
+        controlIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.disabled = false;
+            el.removeAttribute('aria-disabled');
+          }
+        });
+      } else {
+        if (heroCard) heroCard.classList.remove('is-service-disabled');
+        if (noticeBox) {
+          noticeBox.style.display = 'none';
+          noticeBox.classList.remove('is-admin-info');
+        }
+        controlIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.disabled = false;
+            el.removeAttribute('aria-disabled');
+          }
+        });
+      }
+    }
+
     async function startStaffScreenShare() {
+      if (isShareBlockedByToggle()) {
+        applyShareServiceAvailability(currentState);
+        return;
+      }
+
       const nameInput = document.getElementById('presName');
       const deptInput = document.getElementById('presDept');
       const titleInput = document.getElementById('presTitle');
@@ -1176,6 +1547,13 @@
         await new Promise(r => setTimeout(r, 250));
       }
 
+      if (!localStream || !myPresenterId || isShareBlockedByToggle()) {
+        if (localStream || myPresenterId) {
+          await stopStaffScreenShare(true);
+        }
+        return;
+      }
+
       const hasAudio = (outboundStream ? outboundStream.getAudioTracks().length : 0) > 0;
       const initialFrame = captureVideoThumbnail(videoEl, true);
       await registerPresenter({
@@ -1192,7 +1570,10 @@
       // Periodically send heartbeat + HD preview frame every 2.5s
       if (frameCaptureTimer) clearInterval(frameCaptureTimer);
       frameCaptureTimer = setInterval(() => {
-        if (!localStream || !myPresenterId) return;
+        if (!localStream || !myPresenterId || isShareBlockedByToggle()) {
+          stopStaffScreenShare(true);
+          return;
+        }
         const rd = currentState?.remoteDisplay || {};
         const stillInList = (rd.presenters || []).some(p => p.id === myPresenterId);
 
@@ -1241,6 +1622,10 @@
     }
 
     async function switchSharedScreen() {
+      if (isShareBlockedByToggle()) {
+        applyShareServiceAvailability(currentState);
+        return;
+      }
       const name = document.getElementById('presName').value.trim() || 'HQ Staff';
       const department = document.getElementById('presDept').value || 'IT';
       const title = document.getElementById('presTitle').value.trim() || 'Screen Presentation';
@@ -1253,6 +1638,10 @@
     }
 
     async function toggleSharedAudioTrack() {
+      if (isShareBlockedByToggle()) {
+        applyShareServiceAvailability(currentState);
+        return;
+      }
       if (!localStream) return;
       const tracks = localStream.getAudioTracks();
       if (!tracks.length) {
@@ -1266,6 +1655,10 @@
     }
 
     async function togglePresenterMicVoice() {
+      if (isShareBlockedByToggle()) {
+        applyShareServiceAvailability(currentState);
+        return;
+      }
       if (micStream && micStream.getAudioTracks().length > 0) {
         const track = micStream.getAudioTracks()[0];
         if (track.enabled) {
@@ -1340,18 +1733,6 @@
       }
     }
 
-    window.addEventListener('beforeunload', () => {
-      if (myPresenterId) {
-        removePresenter(myPresenterId);
-      }
-    });
-
-    window.startStaffScreenShare = startStaffScreenShare;
-    window.switchSharedScreen = switchSharedScreen;
-    window.toggleSharedAudioTrack = toggleSharedAudioTrack;
-    window.togglePresenterMicVoice = togglePresenterMicVoice;
-    window.stopStaffScreenShare = stopStaffScreenShare;
-
     // =========================================================================
     // B. TV RECEIVER WEBRTC CLIENT LOGIC (?mode=receiver & Admin Monitor)
     // =========================================================================
@@ -1380,23 +1761,25 @@
       } catch (e) {}
     }
 
-    // Unlock TV audio on any click, touch, or keypress anywhere on the Receiver page
-    ['click', 'touchstart', 'keydown'].forEach(evtName => {
-      document.addEventListener(evtName, () => {
-        if (isReceiverMode || adminMonitorAudioEnabled) {
-          unlockReceiverAudioContext();
-          const audioEl = document.getElementById('tvLiveStreamAudio');
-          if (audioEl && audioEl.srcObject) {
-            audioEl.muted = false;
-            audioEl.volume = 1.0;
-            audioEl.play().then(() => {
-              const btn = document.getElementById('tvUnmuteBtn');
-              if (btn) btn.style.display = 'none';
-            }).catch(() => {});
+    function registerReceiverAudioUnlock() {
+      // Unlock TV audio on any click, touch, or keypress anywhere on the Receiver page
+      ['click', 'touchstart', 'keydown'].forEach(evtName => {
+        document.addEventListener(evtName, () => {
+          if (isReceiverMode || adminMonitorAudioEnabled) {
+            unlockReceiverAudioContext();
+            const audioEl = document.getElementById('tvLiveStreamAudio');
+            if (audioEl && audioEl.srcObject) {
+              audioEl.muted = false;
+              audioEl.volume = 1.0;
+              audioEl.play().then(() => {
+                const btn = document.getElementById('tvUnmuteBtn');
+                if (btn) btn.style.display = 'none';
+              }).catch(() => {});
+            }
           }
-        }
-      }, { passive: true });
-    });
+        }, { passive: true });
+      });
+    }
 
     function ensureReceiverPeer() {
       if (receiverPeer && !receiverPeer.destroyed) {
@@ -1545,7 +1928,7 @@
       }
     }
 
-    window.enableTvAudio = () => {
+    function enableTvAudio() {
       unlockReceiverAudioContext();
       const audioEl = document.getElementById('tvLiveStreamAudio');
       if (audioEl) {
@@ -1558,9 +1941,9 @@
       }
       const btn = document.getElementById('tvUnmuteBtn');
       if (btn) btn.style.display = 'none';
-    };
+    }
 
-    window.toggleAdminMonitorAudio = () => {
+    function toggleAdminMonitorAudio() {
       adminMonitorAudioEnabled = !adminMonitorAudioEnabled;
       unlockReceiverAudioContext();
       const btn = document.getElementById('adminMonitorAudioBtn');
@@ -1574,12 +1957,166 @@
         const audioEl = document.getElementById('tvLiveStreamAudio');
         if (audioEl) audioEl.muted = !adminMonitorAudioEnabled;
       }
-    };
+    }
+
+    function showSlideRemoteFeedback(message, isError = false) {
+      const el = document.getElementById('slideRemoteFeedback');
+      if (!el) return;
+      el.textContent = message;
+      el.className = `remote-feedback ${isError ? 'error' : 'ok'}`;
+      if (slideFeedbackTimer) clearTimeout(slideFeedbackTimer);
+      slideFeedbackTimer = setTimeout(() => {
+        el.className = 'remote-feedback';
+        el.textContent = '';
+      }, isError ? 5000 : 2500);
+    }
+
+    function renderSlideRemoteControl(state) {
+      const slides = computeMeetingSlides(state);
+      const sc = state?.remoteDisplay?.slideControl || {};
+      const total = slides.length;
+      const idx = total > 0
+        ? Math.max(0, Math.min(total - 1, Math.trunc(Number(sc.currentSlideIndex) || 0)))
+        : 0;
+
+      const readoutEl = document.getElementById('slideReadoutText');
+      if (readoutEl) {
+        readoutEl.textContent = total > 0
+          ? `Slide ${idx + 1} / ${total} — ${slides[idx].label}`
+          : 'No slides available';
+      }
+
+      const inactiveNote = document.getElementById('slideDeckInactiveNote');
+      if (inactiveNote) {
+        const activeMode = state?.remoteDisplay?.activeMode || 'meeting-tv';
+        inactiveNote.style.display = activeMode !== 'meeting-tv' ? 'flex' : 'none';
+      }
+
+      const intervalSec = Math.max(1, Math.round((Number(sc.autoPlayIntervalMs) || 8000) / 1000));
+      const isPlaying = Boolean(sc.autoPlay);
+      const badgeEl = document.getElementById('slideAutoPlayBadge');
+      if (badgeEl) {
+        badgeEl.textContent = isPlaying
+          ? `▶ Auto-Advance: Playing (${intervalSec}s)`
+          : '⏸ Auto-Advance: Paused';
+        badgeEl.className = `remote-badge ${isPlaying ? 'is-playing' : 'is-paused'}`;
+      }
+
+      const autoBtn = document.getElementById('btnSlideAutoPlay');
+      if (autoBtn) {
+        autoBtn.textContent = isPlaying ? '⏸ Pause Auto-Advance' : '▶ Resume Auto-Advance';
+        autoBtn.classList.toggle('playing', isPlaying);
+      }
+
+      const selectEl = document.getElementById('slideJumpSelect');
+      if (selectEl) {
+        const signature = slides.map(s => `${s.index}:${s.label}`).join('|');
+        if (signature !== lastSlideSelectSignature) {
+          selectEl.textContent = '';
+          for (const s of slides) {
+            const opt = document.createElement('option');
+            opt.value = String(s.index);
+            opt.textContent = `${s.index + 1}. ${s.label}`;
+            selectEl.appendChild(opt);
+          }
+          lastSlideSelectSignature = signature;
+        }
+        if (total > 0) {
+          selectEl.value = String(idx);
+        }
+      }
+    }
+
+    async function runSlideCommand(command, payload = {}) {
+      const cleanPayload = {};
+      if (command === 'goto') {
+        const idx = Number.parseInt(payload.slideIndex, 10);
+        if (!Number.isInteger(idx) || idx < 0) {
+          showSlideRemoteFeedback('Invalid slide selected.', true);
+          return;
+        }
+        cleanPayload.slideIndex = idx;
+      } else if (payload.autoPlayIntervalMs !== undefined) {
+        const ms = Number.parseInt(payload.autoPlayIntervalMs, 10);
+        if (Number.isInteger(ms) && ms >= 1000) {
+          cleanPayload.autoPlayIntervalMs = ms;
+        }
+      }
+
+      try {
+        await sendSlideCommand(command, cleanPayload);
+        if (currentState) {
+          renderSlideRemoteControl(currentState);
+        }
+        const labels = {
+          prev: 'Moved TV to previous slide.',
+          next: 'Moved TV to next slide.',
+          goto: 'Jumped TV to selected slide.',
+          pause: 'Paused TV auto-advance.',
+          resume: 'Resumed TV auto-advance.',
+          refresh: 'Sent refresh signal to TV display.'
+        };
+        showSlideRemoteFeedback(labels[command] || 'Updated TV slide state.');
+      } catch (err) {
+        const msg = err?.status === 401 || err?.status === 403
+          ? 'Admin session expired or unauthorized. Please log in again.'
+          : (err?.message || 'Unable to send TV remote command.');
+        showSlideRemoteFeedback(msg, true);
+      }
+    }
+
+    function handleReceiverRefreshNonce(state, isSyncCall) {
+      const sc = state?.remoteDisplay?.slideControl;
+      if (!sc || typeof sc !== 'object') return false;
+      const incomingNonce = Number(sc.refreshNonce) || 0;
+
+      if (isSyncCall) {
+        syncReceiverBaselineNonce = incomingNonce;
+        return false;
+      }
+
+      let storedRaw = null;
+      try {
+        storedRaw = sessionStorage.getItem(RECEIVER_REFRESH_KEY);
+      } catch (_) {
+        return false;
+      }
+
+      if (storedRaw === null) {
+        const updatedAt = Number(sc.updatedAt) || 0;
+        if (incomingNonce > syncReceiverBaselineNonce && updatedAt >= receiverBootAt) {
+          try {
+            sessionStorage.setItem(RECEIVER_REFRESH_KEY, String(incomingNonce));
+          } catch (_) {}
+          window.location.reload();
+          return true;
+        }
+        try {
+          sessionStorage.setItem(RECEIVER_REFRESH_KEY, String(incomingNonce));
+        } catch (_) {}
+        return false;
+      }
+
+      const handledNonce = Number(storedRaw) || 0;
+      if (incomingNonce > handledNonce) {
+        try {
+          sessionStorage.setItem(RECEIVER_REFRESH_KEY, String(incomingNonce));
+        } catch (_) {}
+        window.location.reload();
+        return true;
+      }
+      if (incomingNonce < handledNonce) {
+        try {
+          sessionStorage.setItem(RECEIVER_REFRESH_KEY, String(incomingNonce));
+        } catch (_) {}
+      }
+      return false;
+    }
 
     // =========================================================================
     // C. STATE SUBSCRIPTION & UI RENDERING
     // =========================================================================
-    subscribeState((state) => {
+    function handleStateUpdate(state, isSyncCall) {
       if (!state) return;
       currentState = state;
       const rd = state.remoteDisplay || {};
@@ -1588,7 +2125,16 @@
       // Populate Department dropdown on Share page
       const presDept = document.getElementById('presDept');
       if (presDept && presDept.options.length === 0) {
-        presDept.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+        depts.forEach((d) => {
+          const opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = d;
+          presDept.appendChild(opt);
+        });
+      }
+
+      if (isShareMode) {
+        applyShareServiceAvailability(state);
       }
 
       // Update Share Banner if we are currently sharing
@@ -1618,17 +2164,19 @@
         }
         updateModeButtons();
         renderPresenterQueue(state);
+        renderSlideRemoteControl(state);
         renderDisplaySurface(document.getElementById('previewMonitor'), selectedMode, state);
       }
 
       if (isReceiverMode) {
+        if (handleReceiverRefreshNonce(state, isSyncCall)) return;
         renderDisplaySurface(
           document.getElementById('receiverViewport'),
           forcedView || rd.activeMode || 'meeting-tv',
           state
         );
       }
-    });
+    }
 
     function renderPresenterQueue(state) {
       const rd = state.remoteDisplay || {};
@@ -1652,61 +2200,87 @@
 
       container.innerHTML = presenters.map(p => {
         const isLive = activeId === p.id;
+        const safePreview = getSafePreviewFrameUrl(p.previewFrame);
+        const safeId = escapeHtml(p.id || '');
         return `
           <div class="presenter-item ${isLive ? 'live-on-tv' : ''}">
             <div class="presenter-top">
-              ${p.previewFrame
-                ? `<img src="${p.previewFrame}" class="presenter-thumb" alt="Screen Preview" />`
+              ${safePreview
+                ? `<img src="${escapeHtml(safePreview)}" class="presenter-thumb" alt="Screen Preview" />`
                 : `<div class="presenter-thumb" style="display:flex; align-items:center; justify-content:center; font-size:1.4rem;">🖥️</div>`
               }
               <div class="presenter-meta">
                 <div class="presenter-name">
-                  <span>👤 ${p.name}</span>
+                  <span>👤 ${escapeHtml(p.name || 'HQ Staff')}</span>
                   ${isLive ? `<span class="mini-badge" style="background:#10b981; color:#052e16;">● LIVE ON TV</span>` : `<span class="mini-badge" style="background:rgba(245,158,11,0.2); color:#fbbf24;">Waiting in Queue</span>`}
                 </div>
-                <div class="presenter-title">📑 ${p.title || 'Screen Presentation'}</div>
+                <div class="presenter-title">📑 ${escapeHtml(p.title || 'Screen Presentation')}</div>
                 <div class="presenter-badges">
-                  <span class="mini-badge" style="background:rgba(24,99,220,0.3); color:var(--cc-sky);">${p.department}</span>
+                  <span class="mini-badge" style="background:rgba(24,99,220,0.3); color:var(--cc-sky);">${escapeHtml(p.department || 'Staff')}</span>
                   <span class="mini-badge" style="background:rgba(255,255,255,0.08); color:#cbd5e1;">${p.hasAudio ? '🔊 Audio Shared' : '🔇 Video Only'}</span>
                 </div>
               </div>
             </div>
             <div class="presenter-actions">
               ${isLive
-                ? `<button type="button" class="btn-stop-cast" onclick="adminSelectPresenter(null)">⏹ Stop TV Output</button>`
-                : `<button type="button" class="btn-cast" onclick="adminSelectPresenter('${p.id}')">📺 Output This Screen to TV</button>`
+                ? `<button type="button" class="btn-stop-cast" data-action="stop-cast">⏹ Stop TV Output</button>`
+                : `<button type="button" class="btn-cast" data-action="cast" data-presenter-id="${safeId}">📺 Output This Screen to TV</button>`
               }
-              <button type="button" class="btn-kick" onclick="adminKickPresenter('${p.id}')" title="Disconnect this presenter">✕ Disconnect</button>
+              <button type="button" class="btn-kick" data-action="kick" data-presenter-id="${safeId}" title="Disconnect this presenter">✕ Disconnect</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    window.adminSelectPresenter = async (presenterId) => {
+    function showControllerStatusToast(message, isError = false, durationMs = 3500) {
+      const toast = document.getElementById('statusToast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.style.background = isError ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)';
+      toast.style.borderColor = isError ? '#ef4444' : '#10b981';
+      toast.style.color = isError ? '#fecaca' : '#6ee7b7';
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, durationMs);
+    }
+
+    async function adminSelectPresenter(presenterId) {
       selectedMode = presenterId ? 'screen-share' : 'meeting-tv';
       updateModeButtons();
-      await selectActivePresenter(presenterId);
-      const toast = document.getElementById('statusToast');
-      toast.textContent = presenterId
-        ? '✓ Switched HQ TV output to selected staff presenter!'
-        : '✓ Stopped screen share on TV and returned to standby.';
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3500);
-    };
-
-    window.adminKickPresenter = async (presenterId) => {
-      if (confirm('Disconnect this user from screen sharing?')) {
-        await removePresenter(presenterId);
+      try {
+        await selectActivePresenter(presenterId);
+        showControllerStatusToast(presenterId
+          ? '✓ Switched HQ TV output to selected staff presenter!'
+          : '✓ Stopped screen share on TV and returned to standby.');
+      } catch (err) {
+        showControllerStatusToast(err?.message || 'Unable to update active presenter.', true);
       }
-    };
+    }
+
+    async function adminKickPresenter(presenterId) {
+      if (confirm('Disconnect this user from screen sharing?')) {
+        try {
+          await removePresenter(presenterId);
+        } catch (err) {
+          showControllerStatusToast(err?.message || 'Unable to disconnect presenter.', true);
+        }
+      }
+    }
 
     function populateEditorFields(state) {
       const rd = state.remoteDisplay || {};
       const rooms = state.rooms || [];
       const roomSel = document.getElementById('targetRoomSelect');
-      roomSel.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-      if (rd.targetRoomId) roomSel.value = rd.targetRoomId;
+      if (roomSel) {
+        roomSel.textContent = '';
+        rooms.forEach((r) => {
+          const opt = document.createElement('option');
+          opt.value = String(r.id ?? '');
+          opt.textContent = String(r.name ?? '');
+          roomSel.appendChild(opt);
+        });
+        if (rd.targetRoomId) roomSel.value = rd.targetRoomId;
+      }
 
       document.getElementById('annBadge').value = rd.announcement?.badge || 'HQ NOTICE';
       document.getElementById('annTitle').value = rd.announcement?.title || '';
@@ -1728,7 +2302,7 @@
     }
 
     // Persist channel selection immediately on click so it never reverts back to Weekly Meeting Deck
-    window.selectMode = async (mode) => {
+    async function selectMode(mode) {
       selectedMode = mode;
       updateModeButtons();
       const rd = currentState?.remoteDisplay || {};
@@ -1736,14 +2310,15 @@
       if (mode === 'screen-share' && !rd.activePresenterId && rd.presenters?.length > 0) {
         patch.activePresenterId = rd.presenters[0].id;
       }
-      await updateRemoteDisplay(patch);
-      const toast = document.getElementById('statusToast');
-      toast.textContent = `✓ Switched TV channel to ${mode === 'screen-share' ? 'Live Screen Share' : mode}!`;
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 2800);
-    };
+      try {
+        await updateRemoteDisplay(patch);
+        showControllerStatusToast(`✓ Switched TV channel to ${mode === 'screen-share' ? 'Live Screen Share' : mode}!`, false, 2800);
+      } catch (err) {
+        showControllerStatusToast(err?.message || 'Unable to switch TV channel.', true);
+      }
+    }
 
-    window.pushBroadcastSettings = async () => {
+    async function pushBroadcastSettings() {
       const patch = {
         activeMode: selectedMode,
         targetRoomId: document.getElementById('targetRoomSelect').value,
@@ -1760,12 +2335,13 @@
         }
       };
 
-      await updateRemoteDisplay(patch);
-      const toast = document.getElementById('statusToast');
-      toast.textContent = '✓ Live broadcast updated across all HQ screens!';
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3500);
-    };
+      try {
+        await updateRemoteDisplay(patch);
+        showControllerStatusToast('✓ Live broadcast updated across all HQ screens!');
+      } catch (err) {
+        showControllerStatusToast(err?.message || 'Unable to save broadcast settings.', true);
+      }
+    }
 
     function renderDisplaySurface(targetEl, mode, state) {
       if (!targetEl) return;
@@ -1792,22 +2368,27 @@
         }
 
         const isWebRTCLive = connectedPresenterPeerId === activePres.peerId && currentMediaStream && currentMediaStream.active;
+        const safeFallbackFrame = getSafePreviewFrameUrl(activePres.previewFrame);
 
         // Keep WebRTC video element persistent if already rendered for this presenter
-        const existingWrap = targetEl.querySelector(`[data-presenter-id="${activePres.id}"]`);
+        const firstChild = targetEl.firstElementChild;
+        const existingWrap = firstChild && firstChild.dataset && firstChild.dataset.presenterId === String(activePres.id || '')
+          ? firstChild
+          : null;
         if (!existingWrap) {
           targetEl.innerHTML = `
-            <div data-presenter-id="${activePres.id}" style="width:100%; height:100%; background:#000; position:relative; display:flex; align-items:center; justify-content:center;">
+            <div data-presenter-id="${escapeHtml(activePres.id || '')}" style="width:100%; height:100%; background:#000; position:relative; display:flex; align-items:center; justify-content:center;">
               <video id="tvLiveStreamVideo" autoplay muted playsinline style="width:100%; height:100%; object-fit:contain; display:${isWebRTCLive ? 'block' : 'none'};"></video>
-              <img id="tvFallbackFrame" src="${activePres.previewFrame || ''}" style="width:100%; height:100%; object-fit:contain; display:${isWebRTCLive ? 'none' : 'block'};" alt="Live Screen Share" />
+              <img id="tvFallbackFrame" ${safeFallbackFrame ? `src="${escapeHtml(safeFallbackFrame)}"` : ''} style="width:100%; height:100%; object-fit:contain; display:${(!isWebRTCLive && safeFallbackFrame) ? 'block' : 'none'};" alt="Live Screen Share" />
             </div>
           `;
           connectReceiverToPresenter(activePres);
         } else {
           // Update fallback frame seamlessly only if WebRTC video isn't active yet
           const fbImg = document.getElementById('tvFallbackFrame');
-          if (fbImg && activePres.previewFrame && !isWebRTCLive) {
-            fbImg.src = activePres.previewFrame;
+          if (fbImg && safeFallbackFrame && !isWebRTCLive) {
+            fbImg.src = safeFallbackFrame;
+            fbImg.style.display = 'block';
           }
           connectReceiverToPresenter(activePres);
         }
@@ -1827,8 +2408,9 @@
       if (unmuteBtn) unmuteBtn.style.display = 'none';
 
       if (mode === 'meeting-tv') {
-        if (!targetEl.querySelector('iframe[src="/meeting/index.html"]')) {
-          targetEl.innerHTML = `<iframe src="/meeting/index.html" style="width:100%; height:100%; border:none;"></iframe>`;
+        const iframeSrc = targetEl.id === 'previewMonitor' ? '/meeting/index.html?preview=1' : '/meeting/index.html';
+        if (!targetEl.querySelector(`iframe[src="${iframeSrc}"]`)) {
+          targetEl.innerHTML = `<iframe src="${iframeSrc}" style="width:100%; height:100%; border:none;"></iframe>`;
         }
         return;
       }
@@ -1836,8 +2418,9 @@
       if (mode === 'room-signage') {
         const roomId = rd.targetRoomId || 'boardroom-main';
         const room = (state.rooms || []).find(r => r.id === roomId) || (state.rooms || [])[0] || { name: 'HQ Boardroom', floor: 'Level 1', capacity: 20 };
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const hhmm = new Date().toTimeString().slice(0, 5);
+        const localNow = new Date();
+        const todayStr = `${localNow.getFullYear()}-${String(localNow.getMonth() + 1).padStart(2, '0')}-${String(localNow.getDate()).padStart(2, '0')}`;
+        const hhmm = localNow.toTimeString().slice(0, 5);
         const roomBookings = (state.bookings || [])
           .filter(b => b.roomId === room.id && b.date === todayStr)
           .sort((a, b) => a.startTime.localeCompare(b.startTime));
@@ -1849,13 +2432,13 @@
               <div style="display:flex; align-items:center; gap:14px;">
                 <img src="/careclinic-logo.webp" style="height:48px; background:rgba(0,0,0,0.3); padding:6px 12px; border-radius:10px;" onerror="this.src='/images/acme-logo.svg'"/>
                 <div>
-                  <div style="font-size:1.3rem; font-weight:800;">${room.name}</div>
-                  <div style="font-size:0.9rem; opacity:0.8;">${room.floor} • Capacity ${room.capacity} pax</div>
+                  <div style="font-size:1.3rem; font-weight:800;">${escapeHtml(room.name)}</div>
+                  <div style="font-size:0.9rem; opacity:0.8;">${escapeHtml(room.floor)} • Capacity ${escapeHtml(room.capacity)} pax</div>
                 </div>
               </div>
               <div style="text-align:right;">
-                <div style="font-size:2rem; font-weight:900;">${nowStr}</div>
-                <div style="font-size:0.85rem; opacity:0.8;">${dateStr}</div>
+                <div style="font-size:2rem; font-weight:900;">${escapeHtml(nowStr)}</div>
+                <div style="font-size:0.85rem; opacity:0.8;">${escapeHtml(dateStr)}</div>
               </div>
             </div>
 
@@ -1864,10 +2447,10 @@
                 ${activeBooking ? '● ROOM IN SESSION' : '● AVAILABLE FOR USE'}
               </div>
               <h1 style="font-size:2.8rem; font-weight:900; line-height:1.15; margin-bottom:10px;">
-                ${activeBooking ? activeBooking.title : 'Room is Currently Free'}
+                ${activeBooking ? escapeHtml(activeBooking.title) : 'Room is Currently Free'}
               </h1>
               <p style="font-size:1.25rem; opacity:0.9;">
-                ${activeBooking ? `${activeBooking.startTime} – ${activeBooking.endTime} • ${activeBooking.department} (${activeBooking.organizer})` : 'Scan or open /booking to reserve this space.'}
+                ${activeBooking ? `${escapeHtml(activeBooking.startTime)} – ${escapeHtml(activeBooking.endTime)} • ${escapeHtml(activeBooking.department)} (${escapeHtml(activeBooking.organizer)})` : 'Scan or open /booking to reserve this space.'}
               </p>
             </div>
 
@@ -1876,9 +2459,9 @@
               <div style="display:flex; gap:14px; overflow-x:auto;">
                 ${roomBookings.length ? roomBookings.map(b => `
                   <div style="background:rgba(255,255,255,0.1); padding:10px 14px; border-radius:10px; min-width:210px;">
-                    <div style="font-weight:800; font-size:0.9rem;">${b.startTime} – ${b.endTime}</div>
-                    <div style="font-weight:600; font-size:0.85rem; margin-top:2px;">${b.title}</div>
-                    <div style="font-size:0.75rem; opacity:0.75;">${b.department}</div>
+                    <div style="font-weight:800; font-size:0.9rem;">${escapeHtml(b.startTime)} – ${escapeHtml(b.endTime)}</div>
+                    <div style="font-weight:600; font-size:0.85rem; margin-top:2px;">${escapeHtml(b.title)}</div>
+                    <div style="font-size:0.75rem; opacity:0.75;">${escapeHtml(b.department)}</div>
                   </div>
                 `).join('') : '<div style="font-size:0.9rem; opacity:0.8;">No further bookings scheduled for today.</div>'}
               </div>
@@ -1895,23 +2478,23 @@
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <img src="/careclinic-logo.webp" style="height:52px;" onerror="this.src='/images/acme-logo.svg'"/>
               <div style="text-align:right;">
-                <div style="font-size:1.8rem; font-weight:800;">${nowStr}</div>
-                <div style="font-size:0.9rem; color:#8ed1fc;">${dateStr}</div>
+                <div style="font-size:1.8rem; font-weight:800;">${escapeHtml(nowStr)}</div>
+                <div style="font-size:0.9rem; color:#8ed1fc;">${escapeHtml(dateStr)}</div>
               </div>
             </div>
             <div style="max-width:900px; margin:auto 0;">
               <span style="display:inline-block; background:#f59e0b; color:#0f172a; font-weight:900; padding:6px 18px; border-radius:999px; font-size:0.95rem; letter-spacing:0.08em; margin-bottom:20px;">
-                ${ann.badge || 'HQ NOTICE'}
+                ${escapeHtml(ann.badge || 'HQ NOTICE')}
               </span>
               <h1 style="font-size:3.2rem; font-weight:900; line-height:1.15; margin-bottom:20px;">
-                ${ann.title || 'Careclinics HQ Announcement'}
+                ${escapeHtml(ann.title || 'Careclinics HQ Announcement')}
               </h1>
               <p style="font-size:1.5rem; line-height:1.55; color:#e2e8f0;">
-                ${ann.message || ''}
+                ${escapeHtml(ann.message || '')}
               </p>
             </div>
             <div style="border-top:1px solid rgba(255,255,255,0.15); padding-top:18px; font-size:1rem; color:#8ed1fc; font-weight:600;">
-              ${ann.footer || 'Careclinics Healthcare Services HQ'}
+              ${escapeHtml(ann.footer || 'Careclinics Healthcare Services HQ')}
             </div>
           </div>
         `;
@@ -1925,8 +2508,8 @@
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <img src="/careclinic-logo.webp" style="height:56px;" onerror="this.src='/images/acme-logo.svg'"/>
             <div style="text-align:right;">
-              <div style="font-size:2rem; font-weight:800;">${nowStr}</div>
-              <div style="font-size:0.95rem; opacity:0.85;">${dateStr}</div>
+              <div style="font-size:2rem; font-weight:800;">${escapeHtml(nowStr)}</div>
+              <div style="font-size:0.95rem; opacity:0.85;">${escapeHtml(dateStr)}</div>
             </div>
           </div>
           <div style="margin:auto 0;">
@@ -1934,20 +2517,123 @@
               SALAM CARECLINICS • WELCOME TO HQ
             </div>
             <h1 style="font-size:3.1rem; font-weight:900; line-height:1.15; margin-bottom:12px;">
-              ${wel.headline || 'Welcome to Careclinics Healthcare Services HQ'}
+              ${escapeHtml(wel.headline || 'Welcome to Careclinics Healthcare Services HQ')}
             </h1>
             <p style="font-size:1.35rem; color:#dbeafe; margin-bottom:28px;">
-              ${wel.subheadline || 'Humanising Care — Merging Best Medical Practices with Modern Technology'}
+              ${escapeHtml(wel.subheadline || 'Humanising Care — Merging Best Medical Practices with Modern Technology')}
             </p>
             <div style="background:rgba(12, 25, 54, 0.55); border:1px solid rgba(255,255,255,0.2); border-radius:16px; padding:22px;">
               <div style="font-size:0.85rem; font-weight:700; text-transform:uppercase; color:#8ed1fc; margin-bottom:12px;">Today's HQ Highlights & Sessions</div>
-              ${(wel.guestList || []).map(g => `<div style="font-size:1.15rem; font-weight:600; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08);">• ${g}</div>`).join('')}
+              ${(wel.guestList || []).map(g => `<div style="font-size:1.15rem; font-weight:600; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08);">• ${escapeHtml(g)}</div>`).join('')}
             </div>
           </div>
           <div style="font-size:0.9rem; opacity:0.8;">© 2026 Careclinics Healthcare Services • Humanising Care</div>
         </div>
       `;
     }
+
+    function initDisplayPortal() {
+      if (isControllerMode && !requireAdminAuth()) {
+        return;
+      }
+
+      if (isShareMode) {
+        document.body.classList.add('mode-share');
+        if (isAdminLoggedIn()) {
+          const shareNav = document.getElementById('shareNavLinks');
+          if (shareNav) {
+            const adminLink = document.createElement('a');
+            adminLink.href = '/display/';
+            adminLink.className = 'nav-btn primary';
+            adminLink.textContent = '🛡️ Admin TV Switcher';
+            shareNav.appendChild(adminLink);
+          }
+        }
+      } else if (isReceiverMode) {
+        document.body.classList.add('mode-receiver');
+      } else {
+        document.body.classList.add('mode-controller');
+        if (isRemoteMode) {
+          document.body.classList.add('mode-remote');
+          const remoteLink = document.getElementById('btnMobileRemoteLink');
+          if (remoteLink) {
+            remoteLink.href = '/display/';
+            remoteLink.textContent = '🖥️ Full Switcher';
+          }
+        }
+      }
+
+      window.startStaffScreenShare = startStaffScreenShare;
+      window.switchSharedScreen = switchSharedScreen;
+      window.toggleSharedAudioTrack = toggleSharedAudioTrack;
+      window.togglePresenterMicVoice = togglePresenterMicVoice;
+      window.stopStaffScreenShare = stopStaffScreenShare;
+      window.enableTvAudio = enableTvAudio;
+      window.toggleAdminMonitorAudio = toggleAdminMonitorAudio;
+      window.adminSelectPresenter = adminSelectPresenter;
+      window.adminKickPresenter = adminKickPresenter;
+      window.selectMode = selectMode;
+      window.pushBroadcastSettings = pushBroadcastSettings;
+
+      window.addEventListener('beforeunload', () => {
+        if (myPresenterId) {
+          removePresenter(myPresenterId);
+        }
+      });
+
+      registerReceiverAudioUnlock();
+
+      const btnPrev = document.getElementById('btnSlidePrev');
+      const btnNext = document.getElementById('btnSlideNext');
+      const selectJump = document.getElementById('slideJumpSelect');
+      const btnAuto = document.getElementById('btnSlideAutoPlay');
+      const btnRefresh = document.getElementById('btnSlideRefresh');
+      const btnSwitchDeck = document.getElementById('btnSwitchToMeetingTv');
+
+      if (btnPrev) btnPrev.addEventListener('click', () => runSlideCommand('prev'));
+      if (btnNext) btnNext.addEventListener('click', () => runSlideCommand('next'));
+      if (selectJump) {
+        selectJump.addEventListener('change', (e) => {
+          const idx = Number.parseInt(e.target.value, 10);
+          if (Number.isInteger(idx) && idx >= 0) {
+            runSlideCommand('goto', { slideIndex: idx });
+          }
+        });
+      }
+      if (btnAuto) {
+        btnAuto.addEventListener('click', () => {
+          const isPlaying = Boolean(currentState?.remoteDisplay?.slideControl?.autoPlay);
+          runSlideCommand(isPlaying ? 'pause' : 'resume');
+        });
+      }
+      if (btnRefresh) btnRefresh.addEventListener('click', () => runSlideCommand('refresh'));
+      if (btnSwitchDeck) btnSwitchDeck.addEventListener('click', () => selectMode('meeting-tv'));
+
+      const queueListEl = document.getElementById('presenterQueueList');
+      if (queueListEl) {
+        queueListEl.addEventListener('click', (e) => {
+          const btn = e.target.closest('button[data-action]');
+          if (!btn) return;
+          const action = btn.dataset.action;
+          if (action === 'stop-cast') {
+            adminSelectPresenter(null);
+          } else if (action === 'cast') {
+            adminSelectPresenter(btn.dataset.presenterId || null);
+          } else if (action === 'kick') {
+            const targetId = btn.dataset.presenterId;
+            if (targetId) adminKickPresenter(targetId);
+          }
+        });
+      }
+
+      subscribeState((state) => {
+        const isSyncCall = isInitialReceiverSync;
+        isInitialReceiverSync = false;
+        handleStateUpdate(state, isSyncCall);
+      });
+    }
+
+    initDisplayPortal();
   </script>
 </body>
 </html>

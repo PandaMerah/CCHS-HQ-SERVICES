@@ -373,6 +373,179 @@
       font-size: 0.88rem;
       font-weight: 600;
     }
+
+    /* Admin Service & Tool Availability Toggles */
+    .service-toggles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 16px;
+    }
+
+    .toggle-control-card {
+      background: rgba(12, 25, 54, 0.75);
+      border: 1px solid var(--cc-border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .toggle-control-card.is-disabled {
+      border-color: rgba(244, 63, 94, 0.45);
+      background: rgba(65, 16, 35, 0.28);
+    }
+
+    .toggle-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .toggle-card-meta {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .toggle-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(24, 99, 220, 0.22);
+      border: 1px solid rgba(142, 209, 252, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .toggle-card-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .toggle-card-route {
+      font-size: 0.74rem;
+      color: var(--cc-sky);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-top: 2px;
+    }
+
+    .toggle-card-desc {
+      font-size: 0.81rem;
+      color: var(--cc-muted);
+      line-height: 1.4;
+    }
+
+    .toggle-card-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toggle-status-badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .toggle-control-card.is-disabled .toggle-status-badge {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fda4af;
+      border-color: rgba(244, 63, 94, 0.45);
+    }
+
+    .switch-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch-input {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 48px;
+      height: 26px;
+      padding: 0;
+      border-radius: 999px;
+      background: rgba(244, 63, 94, 0.42);
+      border: 1px solid rgba(244, 63, 94, 0.65);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch-input::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: transform 0.2s ease;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .toggle-switch-input:checked {
+      background: rgba(16, 185, 129, 0.8);
+      border-color: #10b981;
+    }
+
+    .toggle-switch-input:checked::before {
+      transform: translateX(22px);
+    }
+
+    .toggle-switch-input:focus-visible {
+      outline: 2px solid var(--cc-sky);
+      outline-offset: 2px;
+    }
+
+    .toggle-switch-input:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .switch-state-label {
+      font-size: 0.76rem;
+      font-weight: 800;
+      min-width: 28px;
+      color: #fda4af;
+    }
+
+    .toggle-switch-input:checked ~ .switch-state-label {
+      color: #6ee7b7;
+    }
+
+    .notice-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .notice-row input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.82rem;
+      padding: 8px 10px;
+    }
   </style>
 </head>
 <body>
@@ -492,6 +665,22 @@
         <div class="chip-row">
           <a href="/pdf/" class="chip-btn">Open PDF Studio →</a>
         </div>
+      </div>
+    </section>
+
+    <!-- Section 1.2: Staff Service & Tool Availability Toggles -->
+    <section id="serviceTogglesSection">
+      <div class="section-header">
+        <div class="section-title">🎛️ Staff Service & Tool Availability Toggles</div>
+        <span id="adminServiceToggleSummary" class="btn-top">4 / 4 Enabled for Staff</span>
+      </div>
+
+      <div class="admin-panel" id="serviceTogglesPanel">
+        <div id="adminTogglesToast" class="toast-msg"></div>
+        <div style="margin-bottom: 16px; font-size: 0.86rem; color: var(--cc-muted);">
+          Enable or disable main staff services and tools on the Staff Portal. When disabled, regular staff see the item clearly displayed as unavailable with your notice and cannot use it, while administrators always retain full access and toggle control.
+        </div>
+        <div id="adminServiceTogglesGrid" class="service-toggles-grid"></div>
       </div>
     </section>
 
@@ -680,6 +869,8 @@
     import { requireAdminAuth, getAdminSession, logoutAdmin, updateAdminCredentials } from '/shared/auth.js';
     import {
       subscribeState,
+      getServiceStatus,
+      updateServiceToggles,
       updateRoomBooking,
       deleteRoomBooking,
       selectActivePresenter,
@@ -692,357 +883,651 @@
       downloadOutlookIcs
     } from '/shared/cloud-store.js';
 
-    // Guard route immediately
-    if (!requireAdminAuth()) {
-      throw new Error('Redirecting to Admin Login');
-    }
-
-    const session = getAdminSession();
-    if (session?.username) {
-      document.getElementById('adminUserLabel').textContent = session.username;
-      document.getElementById('newAdminUser').value = session.username;
-    }
-
-    document.getElementById('logoutBtn').addEventListener('click', () => logoutAdmin('/'));
-
-    let currentState = null;
-    const todayStr = new Date().toISOString().slice(0, 10);
-
-    function showToast(elId, msg, isError = false) {
-      const el = document.getElementById(elId);
-      el.textContent = msg;
-      el.style.display = 'block';
-      el.style.background = isError ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)';
-      el.style.border = `1px solid ${isError ? '#ef4444' : '#10b981'}`;
-      el.style.color = isError ? '#fca5a5' : '#6ee7b7';
-      setTimeout(() => { el.style.display = 'none'; }, 4000);
-    }
-
-    subscribeState((state) => {
-      if (!state) return;
-      currentState = state;
-      populateFiltersAndModal(state);
-      renderAdminPresenters(state);
-      renderAdminBookings();
-      renderAdminRoomsList(state);
-    });
-
-    function renderAdminPresenters(state) {
-      const rd = state.remoteDisplay || {};
-      const now = Date.now();
-      const presenters = (rd.presenters || []).filter(p => !p.lastHeartbeat || (now - p.lastHeartbeat) < 60000);
-      const activeId = rd.activeMode === 'screen-share' ? rd.activePresenterId : null;
-      const container = document.getElementById('adminPresenterQueue');
-      if (!container) return;
-
-      if (presenters.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--cc-muted); border:1px dashed var(--cc-border); border-radius:12px;">No staff members are currently sharing their screen. Staff can click <strong>Share Screen & Audio to TV</strong> on the Staff Portal to join the queue.</div>`;
+    function initAdminPortal() {
+      if (!requireAdminAuth()) {
         return;
       }
 
-      container.innerHTML = presenters.map(p => {
-        const isLive = activeId === p.id;
-        return `
-          <div class="booking-row" style="border-left-color: ${isLive ? '#10b981' : '#f59e0b'}; ${isLive ? 'background:rgba(16,185,129,0.12);' : ''}">
-            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
-              ${p.previewFrame
-                ? `<img src="${p.previewFrame}" style="width:120px; height:68px; object-fit:cover; border-radius:8px; border:1px solid var(--cc-border);" />`
-                : `<div style="width:120px; height:68px; border-radius:8px; background:#040914; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🖥️</div>`
+      let bootToggles = null;
+      fetch('/api/data', { cache: 'no-store' })
+        .then(res => (res.ok ? res.json() : null))
+        .then(bootData => {
+          if (bootData?.config?.serviceToggles) {
+            bootToggles = bootData.config.serviceToggles;
+            if (currentState) renderServiceToggles(currentState);
+          }
+        })
+        .catch(() => {});
+
+      const session = getAdminSession();
+      if (session?.username) {
+        document.getElementById('adminUserLabel').textContent = session.username;
+        document.getElementById('newAdminUser').value = session.username;
+      }
+
+      document.getElementById('logoutBtn').addEventListener('click', () => logoutAdmin('/'));
+
+      let currentState = null;
+      function getLocalDateStr(d = new Date()) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      }
+      const todayStr = getLocalDateStr();
+
+      function showToast(elId, msg, isError = false) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.textContent = msg;
+        el.style.display = 'block';
+        el.style.background = isError ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)';
+        el.style.border = `1px solid ${isError ? '#ef4444' : '#10b981'}`;
+        el.style.color = isError ? '#fca5a5' : '#6ee7b7';
+        setTimeout(() => { el.style.display = 'none'; }, 4000);
+      }
+
+      const SERVICE_TOGGLE_DEFS = [
+        {
+          key: 'departmentUpdate',
+          label: 'Submit Department Update',
+          route: '/meeting/input.html',
+          icon: '📝',
+          desc: 'Staff weekly/monthly department alignment update & Q&A submission form.'
+        },
+        {
+          key: 'roomBooking',
+          label: 'Book HQ Meeting Room',
+          route: '/booking/',
+          icon: '📅',
+          desc: 'HQ room availability schedule, reservations, and WhatsApp/Outlook confirmations.'
+        },
+        {
+          key: 'screenShare',
+          label: 'Share Screen & Audio to TV',
+          route: '/display/?mode=share',
+          icon: '🖥️',
+          desc: 'Staff presenter queue for sharing slides, video, and audio to HQ TV.'
+        },
+        {
+          key: 'pdfStudio',
+          label: 'BentoPDF Studio (12 PDF Tools)',
+          route: '/pdf/',
+          icon: '📄',
+          desc: 'All 12 browser-based PDF tools and Staff Portal Quick BentoPDF shortcuts.'
+        }
+      ];
+
+      const dirtyNotices = new Set();
+      const savingToggleKeys = new Set();
+      const toggleDomRefs = new Map();
+
+      function buildServiceToggleCards() {
+        const grid = document.getElementById('adminServiceTogglesGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        SERVICE_TOGGLE_DEFS.forEach((def) => {
+          const card = document.createElement('div');
+          card.className = 'toggle-control-card';
+          card.dataset.serviceToggleCard = def.key;
+          card.dataset.serviceKey = def.key;
+
+          const top = document.createElement('div');
+          top.className = 'toggle-card-top';
+
+          const meta = document.createElement('div');
+          meta.className = 'toggle-card-meta';
+
+          const icon = document.createElement('div');
+          icon.className = 'toggle-card-icon';
+          icon.textContent = def.icon;
+
+          const info = document.createElement('div');
+          const title = document.createElement('div');
+          title.className = 'toggle-card-title';
+          title.textContent = def.label;
+          const route = document.createElement('div');
+          route.className = 'toggle-card-route';
+          route.textContent = def.route;
+          info.append(title, route);
+          meta.append(icon, info);
+
+          const switchWrap = document.createElement('label');
+          switchWrap.className = 'switch-wrap';
+          switchWrap.htmlFor = `toggleSwitch-${def.key}`;
+          switchWrap.setAttribute('aria-label', `Toggle ${def.label}`);
+
+          const switchInput = document.createElement('input');
+          switchInput.type = 'checkbox';
+          switchInput.className = 'toggle-switch-input';
+          switchInput.setAttribute('role', 'switch');
+          switchInput.setAttribute('aria-label', `Enable ${def.label}`);
+          switchInput.id = `toggleSwitch-${def.key}`;
+          switchInput.dataset.serviceToggle = def.key;
+          switchInput.checked = true;
+
+          const stateLabel = document.createElement('span');
+          stateLabel.className = 'switch-state-label';
+          stateLabel.textContent = 'ON';
+
+          switchWrap.append(switchInput, stateLabel);
+          top.append(meta, switchWrap);
+
+          const desc = document.createElement('div');
+          desc.className = 'toggle-card-desc';
+          desc.textContent = def.desc;
+
+          const statusRow = document.createElement('div');
+          statusRow.className = 'toggle-card-status-row';
+          const badge = document.createElement('span');
+          badge.className = 'toggle-status-badge';
+          badge.id = `toggleBadge-${def.key}`;
+          badge.dataset.serviceBadge = def.key;
+          badge.textContent = '● Enabled for Staff';
+          statusRow.appendChild(badge);
+
+          const noticeRow = document.createElement('div');
+          noticeRow.className = 'notice-row';
+
+          const noticeInput = document.createElement('input');
+          noticeInput.type = 'text';
+          noticeInput.id = `toggleNotice-${def.key}`;
+          noticeInput.dataset.serviceNoticeInput = def.key;
+          noticeInput.placeholder = 'Optional unavailable notice shown to staff...';
+          noticeInput.maxLength = 240;
+
+          const saveBtn = document.createElement('button');
+          saveBtn.type = 'button';
+          saveBtn.className = 'btn-edit';
+          saveBtn.id = `saveNoticeBtn-${def.key}`;
+          saveBtn.dataset.saveNotice = def.key;
+          saveBtn.textContent = 'Save Notice';
+
+          noticeRow.append(noticeInput, saveBtn);
+          card.append(top, desc, statusRow, noticeRow);
+          grid.appendChild(card);
+
+          toggleDomRefs.set(def.key, {
+            card,
+            switchInput,
+            stateLabel,
+            badge,
+            noticeInput,
+            saveBtn
+          });
+
+          noticeInput.addEventListener('input', () => {
+            dirtyNotices.add(def.key);
+          });
+
+          noticeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              saveServiceNotice(def.key);
+            }
+          });
+
+          switchInput.addEventListener('change', async () => {
+            const nextEnabled = switchInput.checked;
+            const notice = noticeInput.value.trim();
+            savingToggleKeys.add(def.key);
+            stateLabel.textContent = nextEnabled ? 'ON' : 'OFF';
+            card.classList.toggle('is-disabled', !nextEnabled);
+            badge.textContent = nextEnabled ? '● Enabled for Staff' : '⛔ Disabled for Staff';
+            try {
+              const nextToggles = await updateServiceToggles({
+                [def.key]: { enabled: nextEnabled, notice }
+              });
+              if (nextToggles && typeof nextToggles === 'object') {
+                bootToggles = nextToggles;
+                currentState = {
+                  ...(currentState || {}),
+                  config: {
+                    ...(currentState?.config || {}),
+                    serviceToggles: nextToggles
+                  }
+                };
               }
-              <div>
-                <div style="font-weight:800; font-size:1.02rem; color:#fff; display:flex; align-items:center; gap:8px;">
-                  <span>👤 ${p.name}</span>
-                  <span style="font-size:0.72rem; padding:2px 8px; border-radius:999px; background:${isLive ? '#10b981' : 'rgba(245,158,11,0.22)'}; color:${isLive ? '#052e16' : '#fbbf24'};">${isLive ? '● LIVE ON TV NOW' : 'Waiting in Queue'}</span>
+              dirtyNotices.delete(def.key);
+              showToast(
+                'adminTogglesToast',
+                nextEnabled
+                  ? `✓ "${def.label}" is now ENABLED for staff.`
+                  : `✓ "${def.label}" is now DISABLED for staff.`
+              );
+            } catch (err) {
+              switchInput.checked = !nextEnabled;
+              showToast('adminTogglesToast', err?.message || 'Failed to update service toggle.', true);
+            } finally {
+              savingToggleKeys.delete(def.key);
+              if (currentState) renderServiceToggles(currentState);
+            }
+          });
+
+          saveBtn.addEventListener('click', () => saveServiceNotice(def.key));
+        });
+      }
+
+      function resolveServiceStatus(state, key) {
+        const storeStatus = getServiceStatus(state, key);
+        const bootToggle = bootToggles?.[key];
+        if (bootToggle) {
+          const bootTs = Number(bootToggle.updatedAt || 0);
+          const storeTs = Number(storeStatus.updatedAt || 0);
+          if (bootTs > storeTs || (storeTs === 0 && bootToggle.enabled === false)) {
+            return {
+              enabled: bootToggle.enabled !== false,
+              notice: typeof bootToggle.notice === 'string' ? bootToggle.notice : '',
+              updatedAt: bootTs
+            };
+          }
+        }
+        return storeStatus;
+      }
+
+      async function saveServiceNotice(key) {
+        const refs = toggleDomRefs.get(key);
+        const def = SERVICE_TOGGLE_DEFS.find(d => d.key === key);
+        if (!refs || !def) return;
+        const currentEnabled = Boolean(refs.switchInput.checked);
+        const notice = refs.noticeInput.value.trim();
+
+        savingToggleKeys.add(key);
+        try {
+          const nextToggles = await updateServiceToggles({
+            [key]: { enabled: currentEnabled, notice }
+          });
+          if (nextToggles && typeof nextToggles === 'object') {
+            bootToggles = nextToggles;
+            currentState = {
+              ...(currentState || {}),
+              config: {
+                ...(currentState?.config || {}),
+                serviceToggles: nextToggles
+              }
+            };
+          }
+          dirtyNotices.delete(key);
+          showToast('adminTogglesToast', `✓ Saved unavailable notice for "${def.label}".`);
+        } catch (err) {
+          showToast('adminTogglesToast', err?.message || 'Failed to save service notice.', true);
+        } finally {
+          savingToggleKeys.delete(key);
+          if (currentState) renderServiceToggles(currentState);
+        }
+      }
+
+      function renderServiceToggles(state) {
+        if (!state) return;
+        let enabledCount = 0;
+        SERVICE_TOGGLE_DEFS.forEach((def) => {
+          const refs = toggleDomRefs.get(def.key);
+          if (!refs) return;
+          const status = resolveServiceStatus(state, def.key);
+          if (status.enabled) enabledCount += 1;
+
+          refs.card.classList.toggle('is-disabled', !status.enabled);
+          refs.badge.textContent = status.enabled ? '● Enabled for Staff' : '⛔ Disabled for Staff';
+
+          if (!savingToggleKeys.has(def.key)) {
+            refs.switchInput.checked = status.enabled;
+            refs.stateLabel.textContent = status.enabled ? 'ON' : 'OFF';
+            if (document.activeElement !== refs.noticeInput && !dirtyNotices.has(def.key)) {
+              refs.noticeInput.value = status.notice || '';
+            }
+          }
+        });
+
+        const summary = document.getElementById('adminServiceToggleSummary');
+        if (summary) {
+          summary.textContent = `${enabledCount} / ${SERVICE_TOGGLE_DEFS.length} Enabled for Staff`;
+        }
+      }
+
+      buildServiceToggleCards();
+
+      subscribeState((state) => {
+        if (!state) return;
+        currentState = state;
+        renderServiceToggles(state);
+        populateFiltersAndModal(state);
+        renderAdminPresenters(state);
+        renderAdminBookings();
+        renderAdminRoomsList(state);
+      });
+
+      function renderAdminPresenters(state) {
+        const rd = state.remoteDisplay || {};
+        const now = Date.now();
+        const presenters = (rd.presenters || []).filter(p => !p.lastHeartbeat || (now - p.lastHeartbeat) < 60000);
+        const activeId = rd.activeMode === 'screen-share' ? rd.activePresenterId : null;
+        const container = document.getElementById('adminPresenterQueue');
+        if (!container) return;
+
+        if (presenters.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--cc-muted); border:1px dashed var(--cc-border); border-radius:12px;">No staff members are currently sharing their screen. Staff can click <strong>Share Screen & Audio to TV</strong> on the Staff Portal to join the queue.</div>`;
+          return;
+        }
+
+        container.innerHTML = presenters.map(p => {
+          const isLive = activeId === p.id;
+          return `
+            <div class="booking-row" style="border-left-color: ${isLive ? '#10b981' : '#f59e0b'}; ${isLive ? 'background:rgba(16,185,129,0.12);' : ''}">
+              <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                ${p.previewFrame
+                  ? `<img src="${p.previewFrame}" style="width:120px; height:68px; object-fit:cover; border-radius:8px; border:1px solid var(--cc-border);" />`
+                  : `<div style="width:120px; height:68px; border-radius:8px; background:#040914; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🖥️</div>`
+                }
+                <div>
+                  <div style="font-weight:800; font-size:1.02rem; color:#fff; display:flex; align-items:center; gap:8px;">
+                    <span>👤 ${p.name}</span>
+                    <span style="font-size:0.72rem; padding:2px 8px; border-radius:999px; background:${isLive ? '#10b981' : 'rgba(245,158,11,0.22)'}; color:${isLive ? '#052e16' : '#fbbf24'};">${isLive ? '● LIVE ON TV NOW' : 'Waiting in Queue'}</span>
+                  </div>
+                  <div style="font-size:0.86rem; color:var(--cc-sky); margin-top:2px;">📑 ${p.title || 'Screen Presentation'}</div>
+                  <div style="font-size:0.78rem; color:var(--cc-muted); margin-top:3px;">
+                    🏷️ ${p.department} • ${p.hasAudio ? '🔊 Audio Included' : '🔇 Video Only'}
+                  </div>
                 </div>
-                <div style="font-size:0.86rem; color:var(--cc-sky); margin-top:2px;">📑 ${p.title || 'Screen Presentation'}</div>
-                <div style="font-size:0.78rem; color:var(--cc-muted); margin-top:3px;">
-                  🏷️ ${p.department} • ${p.hasAudio ? '🔊 Audio Included' : '🔇 Video Only'}
+              </div>
+              <div class="booking-actions">
+                ${isLive
+                  ? `<button type="button" class="btn-edit" style="border-color:#f59e0b; color:#fbbf24;" onclick="adminPickPresenter(null)">⏹ Stop TV Output</button>`
+                  : `<button type="button" class="btn-edit" style="background:#10b981; border-color:#10b981; color:#052e16;" onclick="adminPickPresenter('${p.id}')">📺 Output This Screen to TV</button>`
+                }
+                <button type="button" class="btn-del" onclick="adminDisconnectPresenter('${p.id}')">✕ Disconnect</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.adminPickPresenter = async (presenterId) => {
+        try {
+          await selectActivePresenter(presenterId);
+          showToast('adminShareToast', presenterId ? '✓ Selected staff screen is now live on the HQ TV Receiver!' : '✓ Stopped TV screen share output.');
+        } catch (err) {
+          showToast('adminShareToast', err?.message || 'Failed to update active presenter.', true);
+        }
+      };
+
+      window.adminDisconnectPresenter = async (presenterId) => {
+        if (confirm('Disconnect this staff presenter?')) {
+          try {
+            await removePresenter(presenterId);
+            showToast('adminShareToast', '✓ Disconnected presenter.');
+          } catch (err) {
+            showToast('adminShareToast', err?.message || 'Failed to disconnect presenter.', true);
+          }
+        }
+      };
+
+      function populateFiltersAndModal(state) {
+        const rooms = state.rooms || [];
+        const depts = Object.keys(state.departments || {});
+
+        const roomFilter = document.getElementById('adminRoomFilter');
+        const prevFilter = roomFilter.value || 'ALL';
+        roomFilter.innerHTML = `<option value="ALL">All HQ Rooms (${rooms.length})</option>` +
+          rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        roomFilter.value = (prevFilter === 'ALL' || rooms.some(r => r.id === prevFilter)) ? prevFilter : 'ALL';
+
+        const editRoom = document.getElementById('editRoomId');
+        editRoom.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+
+        const editDept = document.getElementById('editDepartment');
+        editDept.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+      }
+
+      function renderAdminBookings() {
+        if (!currentState) return;
+        const rooms = currentState.rooms || [];
+        const roomMap = Object.fromEntries(rooms.map(r => [r.id, r]));
+        const roomFilter = document.getElementById('adminRoomFilter').value;
+        const scopeFilter = document.getElementById('adminScopeFilter').value;
+        const searchQ = document.getElementById('adminSearchBooking').value.trim().toLowerCase();
+
+        let list = [...(currentState.bookings || [])];
+        if (roomFilter !== 'ALL') {
+          list = list.filter(b => b.roomId === roomFilter);
+        }
+        if (scopeFilter === 'TODAY') {
+          list = list.filter(b => b.date === todayStr);
+        } else if (scopeFilter === 'UPCOMING') {
+          list = list.filter(b => b.date >= todayStr);
+        }
+        if (searchQ) {
+          list = list.filter(b =>
+            `${b.title} ${b.department} ${b.organizer} ${b.phone || ''} ${b.notes || ''}`.toLowerCase().includes(searchQ)
+          );
+        }
+
+        list.sort((a, b) => {
+          if (a.date !== b.date) return a.date.localeCompare(b.date);
+          return a.startTime.localeCompare(b.startTime);
+        });
+
+        const container = document.getElementById('adminBookingList');
+        if (list.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding:32px; color:var(--cc-muted);">No room reservations match the current filter.</div>`;
+          return;
+        }
+
+        container.innerHTML = list.map(b => {
+          const room = roomMap[b.roomId] || { name: b.roomId, color: '#1863dc' };
+          const waUrl = buildWhatsAppBookingUrl(b, room, 'starting');
+          const outlookUrls = buildOutlookCalendarUrls(b, room);
+
+          return `
+            <div class="booking-row" style="border-left-color: ${room.color || '#1863dc'};">
+              <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+                <div style="background:rgba(255,255,255,0.06); padding:10px 14px; border-radius:10px; min-width:130px; text-align:center;">
+                  <div style="font-weight:800; font-size:0.95rem; color:#fff;">${b.startTime} – ${b.endTime}</div>
+                  <div style="font-size:0.76rem; color:var(--cc-sky);">${b.date}</div>
                 </div>
+                <div>
+                  <div style="font-weight:700; font-size:1.02rem; color:#fff;">${b.title}</div>
+                  <div style="font-size:0.82rem; color:var(--cc-muted); margin-top:3px;">
+                    📍 <strong style="color:#e2e8f0;">${room.name}</strong> • 🏷️ ${b.department} • 👤 ${b.organizer || 'HQ Staff'}${b.phone ? ' • 📱 ' + b.phone : ''}
+                  </div>
+                  ${b.notes ? `<div style="font-size:0.78rem; color:#94a3b8; margin-top:4px;">💬 ${b.notes}</div>` : ''}
+                </div>
+              </div>
+              <div class="booking-actions" style="flex-wrap:wrap;">
+                <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="btn-edit" style="text-decoration:none;">📅 Outlook</a>
+                <button type="button" class="btn-edit" onclick="adminDownloadIcs('${b.id}')">📥 .ics</button>
+                <a href="${waUrl}" target="_blank" rel="noopener" class="btn-edit" style="border-color:#10b981; color:#6ee7b7; text-decoration:none;">💬 WhatsApp</a>
+                <button type="button" class="btn-edit" onclick="openEditModal('${b.id}')">✎ Edit / Update</button>
+                <button type="button" class="btn-del" onclick="adminDeleteBooking('${b.id}')">🗑 Delete</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.adminDownloadIcs = (bookingId) => {
+        const b = (currentState?.bookings || []).find(item => item.id === bookingId);
+        if (!b) return;
+        const room = (currentState?.rooms || []).find(r => r.id === b.roomId);
+        downloadOutlookIcs(b, room);
+      };
+
+      // =========================================================================
+      // ADMIN MEETING ROOM CUSTOMIZATION HANDLERS
+      // =========================================================================
+      function renderAdminRoomsList(state) {
+        const rooms = state.rooms || [];
+        const countBadge = document.getElementById('adminRoomCountBadge');
+        if (countBadge) countBadge.textContent = `${rooms.length} Rooms Available`;
+
+        const container = document.getElementById('adminRoomsList');
+        if (!container) return;
+
+        container.innerHTML = rooms.map(r => `
+          <div class="booking-row" style="border-left-color: ${r.color || '#1863dc'};">
+            <div>
+              <div style="font-weight:800; font-size:1.02rem; color:#fff; display:flex; align-items:center; gap:10px;">
+                <span>🏢 ${r.name}</span>
+                <span style="font-size:0.72rem; padding:2px 9px; border-radius:999px; background:${r.status === 'maintenance' ? 'rgba(245,158,11,0.22)' : 'rgba(16,185,129,0.22)'}; color:${r.status === 'maintenance' ? '#fbbf24' : '#6ee7b7'};">
+                  ${r.status === 'maintenance' ? '🛠️ Under Maintenance' : '● Available'}
+                </span>
+              </div>
+              <div style="font-size:0.84rem; color:var(--cc-sky); margin-top:3px;">
+                📍 ${r.floor || 'HQ'} • 👥 Capacity: ${r.capacity} pax
+              </div>
+              <div style="font-size:0.78rem; color:var(--cc-muted); margin-top:4px;">
+                🛠️ Amenities: ${(r.amenities || []).join(' • ')}
               </div>
             </div>
             <div class="booking-actions">
-              ${isLive
-                ? `<button type="button" class="btn-edit" style="border-color:#f59e0b; color:#fbbf24;" onclick="adminPickPresenter(null)">⏹ Stop TV Output</button>`
-                : `<button type="button" class="btn-edit" style="background:#10b981; border-color:#10b981; color:#052e16;" onclick="adminPickPresenter('${p.id}')">📺 Output This Screen to TV</button>`
-              }
-              <button type="button" class="btn-del" onclick="adminDisconnectPresenter('${p.id}')">✕ Disconnect</button>
+              <button type="button" class="btn-edit" onclick="adminStartEditRoom('${r.id}')">✎ Customize Room</button>
+              <button type="button" class="btn-del" onclick="adminRemoveRoom('${r.id}')">🗑 Remove Room</button>
             </div>
           </div>
-        `;
-      }).join('');
-    }
-
-    window.adminPickPresenter = async (presenterId) => {
-      await selectActivePresenter(presenterId);
-      showToast('adminShareToast', presenterId ? '✓ Selected staff screen is now live on the HQ TV Receiver!' : '✓ Stopped TV screen share output.');
-    };
-
-    window.adminDisconnectPresenter = async (presenterId) => {
-      if (confirm('Disconnect this staff presenter?')) {
-        await removePresenter(presenterId);
-        showToast('adminShareToast', '✓ Disconnected presenter.');
-      }
-    };
-
-    function populateFiltersAndModal(state) {
-      const rooms = state.rooms || [];
-      const depts = Object.keys(state.departments || {});
-
-      const roomFilter = document.getElementById('adminRoomFilter');
-      const prevFilter = roomFilter.value || 'ALL';
-      roomFilter.innerHTML = `<option value="ALL">All HQ Rooms (${rooms.length})</option>` +
-        rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-      roomFilter.value = prevFilter;
-
-      const editRoom = document.getElementById('editRoomId');
-      editRoom.innerHTML = rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-
-      const editDept = document.getElementById('editDepartment');
-      editDept.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
-    }
-
-    function renderAdminBookings() {
-      if (!currentState) return;
-      const rooms = currentState.rooms || [];
-      const roomMap = Object.fromEntries(rooms.map(r => [r.id, r]));
-      const roomFilter = document.getElementById('adminRoomFilter').value;
-      const scopeFilter = document.getElementById('adminScopeFilter').value;
-      const searchQ = document.getElementById('adminSearchBooking').value.trim().toLowerCase();
-
-      let list = [...(currentState.bookings || [])];
-      if (roomFilter !== 'ALL') {
-        list = list.filter(b => b.roomId === roomFilter);
-      }
-      if (scopeFilter === 'TODAY') {
-        list = list.filter(b => b.date === todayStr);
-      } else if (scopeFilter === 'UPCOMING') {
-        list = list.filter(b => b.date >= todayStr);
-      }
-      if (searchQ) {
-        list = list.filter(b =>
-          `${b.title} ${b.department} ${b.organizer} ${b.phone || ''} ${b.notes || ''}`.toLowerCase().includes(searchQ)
-        );
+        `).join('');
       }
 
-      list.sort((a, b) => {
-        if (a.date !== b.date) return a.date.localeCompare(b.date);
-        return a.startTime.localeCompare(b.startTime);
+      window.adminStartEditRoom = (roomId) => {
+        const r = (currentState?.rooms || []).find(item => item.id === roomId);
+        if (!r) return;
+        document.getElementById('admCfgRoomId').value = r.id;
+        document.getElementById('admCfgRoomName').value = r.name || '';
+        document.getElementById('admCfgRoomFloor').value = r.floor || '';
+        document.getElementById('admCfgRoomCapacity').value = r.capacity || 10;
+        document.getElementById('admCfgRoomStatus').value = r.status || 'available';
+        document.getElementById('admCfgRoomColor').value = r.color || '#1863dc';
+        document.getElementById('admCfgRoomAmenities').value = (r.amenities || []).join(', ');
+        document.getElementById('adminRoomFormTitle').textContent = `✎ Editing Room: ${r.name}`;
+        document.getElementById('admBtnSaveRoom').textContent = 'Save Room Changes';
+        document.getElementById('admBtnCancelRoomEdit').style.display = 'inline-block';
+        document.getElementById('roomCustomizationSection').scrollIntoView({ behavior: 'smooth' });
+      };
+
+      window.adminResetRoomForm = () => {
+        document.getElementById('admCfgRoomId').value = '';
+        document.getElementById('admCfgRoomName').value = '';
+        document.getElementById('admCfgRoomFloor').value = '';
+        document.getElementById('admCfgRoomCapacity').value = '12';
+        document.getElementById('admCfgRoomStatus').value = 'available';
+        document.getElementById('admCfgRoomColor').value = '#1863dc';
+        document.getElementById('admCfgRoomAmenities').value = '';
+        document.getElementById('adminRoomFormTitle').textContent = '➕ Add New HQ Meeting Room';
+        document.getElementById('admBtnSaveRoom').textContent = 'Add Meeting Room';
+        document.getElementById('admBtnCancelRoomEdit').style.display = 'none';
+      };
+
+      window.adminRemoveRoom = async (roomId) => {
+        const r = (currentState?.rooms || []).find(item => item.id === roomId);
+        if (!confirm(`Remove meeting room "${r?.name || roomId}"?`)) return;
+        try {
+          await deleteMeetingRoom(roomId);
+          showToast('adminRoomToast', '✓ Meeting room removed.');
+        } catch (err) {
+          showToast('adminRoomToast', err.message, true);
+        }
+      };
+
+      document.getElementById('adminRoomConfigForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('admCfgRoomId').value;
+        const name = document.getElementById('admCfgRoomName').value.trim();
+        const floor = document.getElementById('admCfgRoomFloor').value.trim();
+        const capacity = Number(document.getElementById('admCfgRoomCapacity').value) || 10;
+        const status = document.getElementById('admCfgRoomStatus').value;
+        const color = document.getElementById('admCfgRoomColor').value;
+        const amenities = document.getElementById('admCfgRoomAmenities').value.split(',').map(s => s.trim()).filter(Boolean);
+
+        try {
+          if (id) {
+            await updateMeetingRoom(id, { name, floor, capacity, status, color, amenities });
+            showToast('adminRoomToast', `✓ Updated "${name}" details!`);
+          } else {
+            await addMeetingRoom({ name, floor, capacity, status, color, amenities });
+            showToast('adminRoomToast', `✓ Added new meeting room "${name}"!`);
+          }
+          window.adminResetRoomForm();
+        } catch (err) {
+          showToast('adminRoomToast', err.message, true);
+        }
       });
 
-      const container = document.getElementById('adminBookingList');
-      if (list.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding:32px; color:var(--cc-muted);">No room reservations match the current filter.</div>`;
-        return;
-      }
+      document.getElementById('adminRoomFilter').addEventListener('change', renderAdminBookings);
+      document.getElementById('adminScopeFilter').addEventListener('change', renderAdminBookings);
+      document.getElementById('adminSearchBooking').addEventListener('input', renderAdminBookings);
 
-      container.innerHTML = list.map(b => {
-        const room = roomMap[b.roomId] || { name: b.roomId, color: '#1863dc' };
-        const waUrl = buildWhatsAppBookingUrl(b, room, 'starting');
-        const outlookUrls = buildOutlookCalendarUrls(b, room);
+      window.openEditModal = (bookingId) => {
+        const b = (currentState?.bookings || []).find(item => item.id === bookingId);
+        if (!b) return;
+        document.getElementById('modalError').style.display = 'none';
+        document.getElementById('editBookingId').value = b.id;
+        document.getElementById('editRoomId').value = b.roomId;
+        document.getElementById('editTitle').value = b.title || '';
+        document.getElementById('editDepartment').value = b.department || 'IT';
+        document.getElementById('editOrganizer').value = b.organizer || '';
+        document.getElementById('editDate').value = b.date || todayStr;
+        document.getElementById('editStartTime').value = b.startTime || '09:00';
+        document.getElementById('editEndTime').value = b.endTime || '10:00';
+        document.getElementById('editNotes').value = b.notes || '';
+        document.getElementById('editBookingModal').style.display = 'flex';
+      };
 
-        return `
-          <div class="booking-row" style="border-left-color: ${room.color || '#1863dc'};">
-            <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
-              <div style="background:rgba(255,255,255,0.06); padding:10px 14px; border-radius:10px; min-width:130px; text-align:center;">
-                <div style="font-weight:800; font-size:0.95rem; color:#fff;">${b.startTime} – ${b.endTime}</div>
-                <div style="font-size:0.76rem; color:var(--cc-sky);">${b.date}</div>
-              </div>
-              <div>
-                <div style="font-weight:700; font-size:1.02rem; color:#fff;">${b.title}</div>
-                <div style="font-size:0.82rem; color:var(--cc-muted); margin-top:3px;">
-                  📍 <strong style="color:#e2e8f0;">${room.name}</strong> • 🏷️ ${b.department} • 👤 ${b.organizer || 'HQ Staff'}${b.phone ? ' • 📱 ' + b.phone : ''}
-                </div>
-                ${b.notes ? `<div style="font-size:0.78rem; color:#94a3b8; margin-top:4px;">💬 ${b.notes}</div>` : ''}
-              </div>
-            </div>
-            <div class="booking-actions" style="flex-wrap:wrap;">
-              <a href="${outlookUrls.office365Url}" target="_blank" rel="noopener" class="btn-edit" style="text-decoration:none;">📅 Outlook</a>
-              <button type="button" class="btn-edit" onclick="adminDownloadIcs('${b.id}')">📥 .ics</button>
-              <a href="${waUrl}" target="_blank" rel="noopener" class="btn-edit" style="border-color:#10b981; color:#6ee7b7; text-decoration:none;">💬 WhatsApp</a>
-              <button type="button" class="btn-edit" onclick="openEditModal('${b.id}')">✎ Edit / Update</button>
-              <button type="button" class="btn-del" onclick="adminDeleteBooking('${b.id}')">🗑 Delete</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
+      window.closeEditModal = () => {
+        document.getElementById('editBookingModal').style.display = 'none';
+      };
 
-    window.adminDownloadIcs = (bookingId) => {
-      const b = (currentState?.bookings || []).find(item => item.id === bookingId);
-      if (!b) return;
-      const room = (currentState?.rooms || []).find(r => r.id === b.roomId);
-      downloadOutlookIcs(b, room);
-    };
+      document.getElementById('editBookingForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editBookingId').value;
+        const roomId = document.getElementById('editRoomId').value;
+        const title = document.getElementById('editTitle').value.trim();
+        const department = document.getElementById('editDepartment').value;
+        const organizer = document.getElementById('editOrganizer').value.trim();
+        const date = document.getElementById('editDate').value;
+        const startTime = document.getElementById('editStartTime').value;
+        const endTime = document.getElementById('editEndTime').value;
+        const notes = document.getElementById('editNotes').value.trim();
 
-    // =========================================================================
-    // ADMIN MEETING ROOM CUSTOMIZATION HANDLERS
-    // =========================================================================
-    function renderAdminRoomsList(state) {
-      const rooms = state.rooms || [];
-      const countBadge = document.getElementById('adminRoomCountBadge');
-      if (countBadge) countBadge.textContent = `${rooms.length} Rooms Available`;
-
-      const container = document.getElementById('adminRoomsList');
-      if (!container) return;
-
-      container.innerHTML = rooms.map(r => `
-        <div class="booking-row" style="border-left-color: ${r.color || '#1863dc'};">
-          <div>
-            <div style="font-weight:800; font-size:1.02rem; color:#fff; display:flex; align-items:center; gap:10px;">
-              <span>🏢 ${r.name}</span>
-              <span style="font-size:0.72rem; padding:2px 9px; border-radius:999px; background:${r.status === 'maintenance' ? 'rgba(245,158,11,0.22)' : 'rgba(16,185,129,0.22)'}; color:${r.status === 'maintenance' ? '#fbbf24' : '#6ee7b7'};">
-                ${r.status === 'maintenance' ? '🛠️ Under Maintenance' : '● Available'}
-              </span>
-            </div>
-            <div style="font-size:0.84rem; color:var(--cc-sky); margin-top:3px;">
-              📍 ${r.floor || 'HQ'} • 👥 Capacity: ${r.capacity} pax
-            </div>
-            <div style="font-size:0.78rem; color:var(--cc-muted); margin-top:4px;">
-              🛠️ Amenities: ${(r.amenities || []).join(' • ')}
-            </div>
-          </div>
-          <div class="booking-actions">
-            <button type="button" class="btn-edit" onclick="adminStartEditRoom('${r.id}')">✎ Customize Room</button>
-            <button type="button" class="btn-del" onclick="adminRemoveRoom('${r.id}')">🗑 Remove Room</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    window.adminStartEditRoom = (roomId) => {
-      const r = (currentState?.rooms || []).find(item => item.id === roomId);
-      if (!r) return;
-      document.getElementById('admCfgRoomId').value = r.id;
-      document.getElementById('admCfgRoomName').value = r.name || '';
-      document.getElementById('admCfgRoomFloor').value = r.floor || '';
-      document.getElementById('admCfgRoomCapacity').value = r.capacity || 10;
-      document.getElementById('admCfgRoomStatus').value = r.status || 'available';
-      document.getElementById('admCfgRoomColor').value = r.color || '#1863dc';
-      document.getElementById('admCfgRoomAmenities').value = (r.amenities || []).join(', ');
-      document.getElementById('adminRoomFormTitle').textContent = `✎ Editing Room: ${r.name}`;
-      document.getElementById('admBtnSaveRoom').textContent = 'Save Room Changes';
-      document.getElementById('admBtnCancelRoomEdit').style.display = 'inline-block';
-      document.getElementById('roomCustomizationSection').scrollIntoView({ behavior: 'smooth' });
-    };
-
-    window.adminResetRoomForm = () => {
-      document.getElementById('admCfgRoomId').value = '';
-      document.getElementById('admCfgRoomName').value = '';
-      document.getElementById('admCfgRoomFloor').value = '';
-      document.getElementById('admCfgRoomCapacity').value = '12';
-      document.getElementById('admCfgRoomStatus').value = 'available';
-      document.getElementById('admCfgRoomColor').value = '#1863dc';
-      document.getElementById('admCfgRoomAmenities').value = '';
-      document.getElementById('adminRoomFormTitle').textContent = '➕ Add New HQ Meeting Room';
-      document.getElementById('admBtnSaveRoom').textContent = 'Add Meeting Room';
-      document.getElementById('admBtnCancelRoomEdit').style.display = 'none';
-    };
-
-    window.adminRemoveRoom = async (roomId) => {
-      const r = (currentState?.rooms || []).find(item => item.id === roomId);
-      if (!confirm(`Remove meeting room "${r?.name || roomId}"?`)) return;
-      try {
-        await deleteMeetingRoom(roomId);
-        showToast('adminRoomToast', '✓ Meeting room removed.');
-      } catch (err) {
-        showToast('adminRoomToast', err.message, true);
-      }
-    };
-
-    document.getElementById('adminRoomConfigForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('admCfgRoomId').value;
-      const name = document.getElementById('admCfgRoomName').value.trim();
-      const floor = document.getElementById('admCfgRoomFloor').value.trim();
-      const capacity = Number(document.getElementById('admCfgRoomCapacity').value) || 10;
-      const status = document.getElementById('admCfgRoomStatus').value;
-      const color = document.getElementById('admCfgRoomColor').value;
-      const amenities = document.getElementById('admCfgRoomAmenities').value.split(',').map(s => s.trim()).filter(Boolean);
-
-      try {
-        if (id) {
-          await updateMeetingRoom(id, { name, floor, capacity, status, color, amenities });
-          showToast('adminRoomToast', `✓ Updated "${name}" details!`);
-        } else {
-          await addMeetingRoom({ name, floor, capacity, status, color, amenities });
-          showToast('adminRoomToast', `✓ Added new meeting room "${name}"!`);
+        try {
+          await updateRoomBooking(id, { roomId, title, department, organizer, date, startTime, endTime, notes });
+          window.closeEditModal();
+          showToast('adminBookingToast', '✓ Room booking updated and broadcasted!');
+        } catch (err) {
+          const errEl = document.getElementById('modalError');
+          errEl.textContent = err.message;
+          errEl.style.display = 'block';
         }
-        window.adminResetRoomForm();
-      } catch (err) {
-        showToast('adminRoomToast', err.message, true);
-      }
-    });
+      });
 
-    document.getElementById('adminRoomFilter').addEventListener('change', renderAdminBookings);
-    document.getElementById('adminScopeFilter').addEventListener('change', renderAdminBookings);
-    document.getElementById('adminSearchBooking').addEventListener('input', renderAdminBookings);
+      window.adminDeleteBooking = async (bookingId) => {
+        if (confirm('Are you sure you want to permanently delete this room reservation?')) {
+          try {
+            await deleteRoomBooking(bookingId);
+            showToast('adminBookingToast', '✓ Room reservation deleted.');
+          } catch (err) {
+            showToast('adminBookingToast', err?.message || 'Failed to delete room reservation.', true);
+          }
+        }
+      };
 
-    window.openEditModal = (bookingId) => {
-      const b = (currentState?.bookings || []).find(item => item.id === bookingId);
-      if (!b) return;
-      document.getElementById('modalError').style.display = 'none';
-      document.getElementById('editBookingId').value = b.id;
-      document.getElementById('editRoomId').value = b.roomId;
-      document.getElementById('editTitle').value = b.title || '';
-      document.getElementById('editDepartment').value = b.department || 'IT';
-      document.getElementById('editOrganizer').value = b.organizer || '';
-      document.getElementById('editDate').value = b.date || todayStr;
-      document.getElementById('editStartTime').value = b.startTime || '09:00';
-      document.getElementById('editEndTime').value = b.endTime || '10:00';
-      document.getElementById('editNotes').value = b.notes || '';
-      document.getElementById('editBookingModal').style.display = 'flex';
-    };
+      document.getElementById('credForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const curPass = document.getElementById('curAdminPass').value;
+        const newUser = document.getElementById('newAdminUser').value.trim();
+        const newPass = document.getElementById('newAdminPass').value;
 
-    window.closeEditModal = () => {
-      document.getElementById('editBookingModal').style.display = 'none';
-    };
+        const res = await updateAdminCredentials(curPass, newUser, newPass);
+        if (res.ok) {
+          document.getElementById('adminUserLabel').textContent = newUser;
+          document.getElementById('curAdminPass').value = '';
+          document.getElementById('newAdminPass').value = '';
+          showToast('credToast', '✓ Admin username and password updated!');
+        } else {
+          showToast('credToast', res.error || 'Failed to update credentials.', true);
+        }
+      });
+    }
 
-    document.getElementById('editBookingForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('editBookingId').value;
-      const roomId = document.getElementById('editRoomId').value;
-      const title = document.getElementById('editTitle').value.trim();
-      const department = document.getElementById('editDepartment').value;
-      const organizer = document.getElementById('editOrganizer').value.trim();
-      const date = document.getElementById('editDate').value;
-      const startTime = document.getElementById('editStartTime').value;
-      const endTime = document.getElementById('editEndTime').value;
-      const notes = document.getElementById('editNotes').value.trim();
-
-      try {
-        await updateRoomBooking(id, { roomId, title, department, organizer, date, startTime, endTime, notes });
-        window.closeEditModal();
-        showToast('adminBookingToast', '✓ Room booking updated and broadcasted!');
-      } catch (err) {
-        const errEl = document.getElementById('modalError');
-        errEl.textContent = err.message;
-        errEl.style.display = 'block';
-      }
-    });
-
-    window.adminDeleteBooking = async (bookingId) => {
-      if (confirm('Are you sure you want to permanently delete this room reservation?')) {
-        await deleteRoomBooking(bookingId);
-        showToast('adminBookingToast', '✓ Room reservation deleted.');
-      }
-    };
-
-    document.getElementById('credForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const curPass = document.getElementById('curAdminPass').value;
-      const newUser = document.getElementById('newAdminUser').value.trim();
-      const newPass = document.getElementById('newAdminPass').value;
-
-      const res = await updateAdminCredentials(curPass, newUser, newPass);
-      if (res.ok) {
-        document.getElementById('adminUserLabel').textContent = newUser;
-        document.getElementById('curAdminPass').value = '';
-        document.getElementById('newAdminPass').value = '';
-        showToast('credToast', '✓ Admin username and password updated!');
-      } else {
-        showToast('credToast', res.error || 'Failed to update credentials.', true);
-      }
-    });
+    initAdminPortal();
   </script>
 </body>
 </html>

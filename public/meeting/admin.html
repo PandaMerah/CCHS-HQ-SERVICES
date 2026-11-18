@@ -281,180 +281,209 @@
             resetToInitialSeed
         } from '/shared/cloud-store.js';
 
-        if (!requireAdminAuth()) {
-            throw new Error('Redirecting to Admin Login');
-        }
-        document.getElementById('adminPanelLogout').addEventListener('click', () => logoutAdmin('/'));
-
-        let departmentList = [];
-        let initialLoaded = false;
-
-        subscribeSyncStatus(({ mode }) => {
-            const badge = document.getElementById('syncBadge');
-            if (mode === 'firebase') {
-                badge.textContent = '● Firebase Cloud Sync';
-                badge.style.background = '#dcfce7';
-                badge.style.color = '#166534';
-            } else {
-                badge.textContent = '● Vercel Cloud Sync';
-                badge.style.background = '#e0f2fe';
-                badge.style.color = '#0369a1';
+        function initAlignmentAdmin() {
+            if (!requireAdminAuth()) {
+                return;
             }
-        });
 
-        subscribeState((data) => {
-            if (!data) return;
-            // Only overwrite form inputs on initial load or when explicitly refreshed
-            if (!initialLoaded) {
-                applyStateToForm(data);
-                initialLoaded = true;
-            }
-        });
+            document.getElementById('adminPanelLogout').addEventListener('click', () => logoutAdmin('/'));
 
-        function applyStateToForm(data) {
-            const depts = data.departments || {};
-            departmentList = Object.keys(depts).map(key => ({
-                originalKey: key,
-                name: key,
-                update: depts[key].update || "",
-                question: depts[key].question || ""
-            }));
+            let departmentList = [];
+            let initialLoaded = false;
+            const touchedFields = new Set();
 
-            const cfg = data.config || {};
-            document.getElementById('showQnA').checked = cfg.showQnA !== false;
-            document.getElementById('showDailyPhrases').checked = cfg.showDailyPhrases !== false;
-            document.getElementById('showVisionMission').checked = cfg.showVisionMission !== false;
-            document.getElementById('showSpeech').checked = cfg.showLastMinuteSpeech === true;
-
-            document.getElementById('visionText').value = cfg.visionText || "";
-            document.getElementById('missionText').value = cfg.missionText || "";
-            document.getElementById('speechText').value = cfg.lastMinuteSpeechText || "";
-
-            renderDepartments();
-        }
-
-        function renderDepartments() {
-            const list = document.getElementById('deptList');
-            list.innerHTML = '';
-
-            departmentList.forEach((item, index) => {
-                list.innerHTML += `
-                    <div class="dept-item">
-                        <button type="button" class="btn-secondary" onclick="moveDept(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
-                        <button type="button" class="btn-secondary" onclick="moveDept(${index}, 1)" ${index === departmentList.length - 1 ? 'disabled' : ''}>▼</button>
-                        <input type="text" value="${item.name.replace(/"/g, '&quot;')}" oninput="updateDeptName(${index}, this.value)" placeholder="Department Name">
-                        <button type="button" class="danger" onclick="removeDepartment(${index})">Remove</button>
-                    </div>`;
+            ['showQnA', 'showDailyPhrases', 'showVisionMission', 'showSpeech', 'visionText', 'missionText', 'speechText'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('change', () => touchedFields.add(id));
+                    el.addEventListener('input', () => touchedFields.add(id));
+                }
             });
-        }
 
-        function updateDeptName(index, newName) {
-            departmentList[index].name = newName;
-        }
+            subscribeSyncStatus(({ mode }) => {
+                const badge = document.getElementById('syncBadge');
+                if (mode === 'firebase') {
+                    badge.textContent = '● Firebase Cloud Sync';
+                    badge.style.background = '#dcfce7';
+                    badge.style.color = '#166534';
+                } else {
+                    badge.textContent = '● Vercel Cloud Sync';
+                    badge.style.background = '#e0f2fe';
+                    badge.style.color = '#0369a1';
+                }
+            });
 
-        function moveDept(index, direction) {
-            const targetIndex = index + direction;
-            if (targetIndex >= 0 && targetIndex < departmentList.length) {
-                const temp = departmentList[index];
-                departmentList[index] = departmentList[targetIndex];
-                departmentList[targetIndex] = temp;
-                renderDepartments();
+            subscribeState((data) => {
+                if (!data) return;
+                // Only overwrite form inputs on initial load or when explicitly refreshed
+                if (!initialLoaded) {
+                    applyStateToForm(data);
+                    initialLoaded = true;
+                }
+            });
+
+            function applyStateToForm(data, forceOverwrite = false) {
+                const depts = data.departments || {};
+                if (forceOverwrite || !touchedFields.has('deptList')) {
+                    departmentList = Object.keys(depts).map(key => ({
+                        originalKey: key,
+                        name: key,
+                        update: depts[key].update || "",
+                        question: depts[key].question || ""
+                    }));
+                    renderDepartments();
+                }
+
+                const cfg = data.config || {};
+                if (forceOverwrite || !touchedFields.has('showQnA')) {
+                    document.getElementById('showQnA').checked = cfg.showQnA !== false;
+                }
+                if (forceOverwrite || !touchedFields.has('showDailyPhrases')) {
+                    document.getElementById('showDailyPhrases').checked = cfg.showDailyPhrases !== false;
+                }
+                if (forceOverwrite || !touchedFields.has('showVisionMission')) {
+                    document.getElementById('showVisionMission').checked = cfg.showVisionMission !== false;
+                }
+                if (forceOverwrite || !touchedFields.has('showSpeech')) {
+                    document.getElementById('showSpeech').checked = cfg.showLastMinuteSpeech === true;
+                }
+
+                if (forceOverwrite || !touchedFields.has('visionText')) {
+                    document.getElementById('visionText').value = cfg.visionText || "";
+                }
+                if (forceOverwrite || !touchedFields.has('missionText')) {
+                    document.getElementById('missionText').value = cfg.missionText || "";
+                }
+                if (forceOverwrite || !touchedFields.has('speechText')) {
+                    document.getElementById('speechText').value = cfg.lastMinuteSpeechText || "";
+                }
             }
-        }
 
-        function addDepartment() {
-            const nameInput = document.getElementById('newDeptName');
-            const name = nameInput.value.trim().toUpperCase();
-            if (name) {
-                departmentList.push({
-                    originalKey: name,
-                    name: name,
-                    update: "Pending update...",
-                    question: "N/A"
+            function renderDepartments() {
+                const list = document.getElementById('deptList');
+                list.innerHTML = '';
+
+                departmentList.forEach((item, index) => {
+                    list.innerHTML += `
+                        <div class="dept-item">
+                            <button type="button" class="btn-secondary" onclick="moveDept(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                            <button type="button" class="btn-secondary" onclick="moveDept(${index}, 1)" ${index === departmentList.length - 1 ? 'disabled' : ''}>▼</button>
+                            <input type="text" value="${item.name.replace(/"/g, '&quot;')}" oninput="updateDeptName(${index}, this.value)" placeholder="Department Name">
+                            <button type="button" class="danger" onclick="removeDepartment(${index})">Remove</button>
+                        </div>`;
                 });
-                nameInput.value = '';
+            }
+
+            function updateDeptName(index, newName) {
+                departmentList[index].name = newName;
+            }
+
+            function moveDept(index, direction) {
+                const targetIndex = index + direction;
+                if (targetIndex >= 0 && targetIndex < departmentList.length) {
+                    const temp = departmentList[index];
+                    departmentList[index] = departmentList[targetIndex];
+                    departmentList[targetIndex] = temp;
+                    renderDepartments();
+                }
+            }
+
+            function addDepartment() {
+                const nameInput = document.getElementById('newDeptName');
+                const name = nameInput.value.trim().toUpperCase();
+                if (name) {
+                    departmentList.push({
+                        originalKey: name,
+                        name: name,
+                        update: "Pending update...",
+                        question: "N/A"
+                    });
+                    nameInput.value = '';
+                    renderDepartments();
+                }
+            }
+
+            function removeDepartment(index) {
+                departmentList.splice(index, 1);
                 renderDepartments();
             }
-        }
 
-        function removeDepartment(index) {
-            departmentList.splice(index, 1);
-            renderDepartments();
-        }
+            async function saveAdminSettings() {
+                const newDepartments = {};
+                departmentList.forEach(item => {
+                    const cleanName = item.name.trim();
+                    if (cleanName) {
+                        newDepartments[cleanName] = {
+                            update: item.update,
+                            question: item.question
+                        };
+                    }
+                });
 
-        async function saveAdminSettings() {
-            const newDepartments = {};
-            departmentList.forEach(item => {
-                const cleanName = item.name.trim();
-                if (cleanName) {
-                    newDepartments[cleanName] = {
-                        update: item.update,
-                        question: item.question
-                    };
-                }
-            });
+                const config = {
+                    showQnA: document.getElementById('showQnA').checked,
+                    showDailyPhrases: document.getElementById('showDailyPhrases').checked,
+                    showVisionMission: document.getElementById('showVisionMission').checked,
+                    showLastMinuteSpeech: document.getElementById('showSpeech').checked,
+                    visionText: document.getElementById('visionText').value,
+                    missionText: document.getElementById('missionText').value,
+                    lastMinuteSpeechText: document.getElementById('speechText').value
+                };
 
-            const config = {
-                showQnA: document.getElementById('showQnA').checked,
-                showDailyPhrases: document.getElementById('showDailyPhrases').checked,
-                showVisionMission: document.getElementById('showVisionMission').checked,
-                showLastMinuteSpeech: document.getElementById('showSpeech').checked,
-                visionText: document.getElementById('visionText').value,
-                missionText: document.getElementById('missionText').value,
-                lastMinuteSpeechText: document.getElementById('speechText').value
-            };
-
-            try {
-                const nextState = await saveAdminConfig({ config, departments: newDepartments });
-                applyStateToForm(nextState);
-                showStatus("Admin settings saved and broadcasted live to TV!", false);
-            } catch (err) {
-                showStatus("Error saving admin settings: " + err.message, true);
-            }
-        }
-
-        async function resetMeeting() {
-            if (confirm("Are you sure you want to reset all department updates for a new meeting?")) {
                 try {
-                    const nextState = await resetMeetingSession();
+                    const nextState = await saveAdminConfig({ config, departments: newDepartments });
                     applyStateToForm(nextState);
-                    showStatus("Meeting session reset for all departments!", false);
+                    showStatus("Admin settings saved and broadcasted live to TV!", false);
                 } catch (err) {
-                    showStatus("Error resetting meeting session.", true);
+                    showStatus("Error saving admin settings: " + err.message, true);
                 }
             }
-        }
 
-        async function restoreSeedData() {
-            if (confirm("Restore initial CCHSMeetingDashboard/data.json seed data and push to Cloud?")) {
-                try {
-                    const nextState = await resetToInitialSeed();
-                    applyStateToForm(nextState);
-                    showStatus("Initial data.json seed restored and broadcasted!", false);
-                } catch (err) {
-                    showStatus("Error restoring seed data.", true);
+            async function resetMeeting() {
+                if (confirm("Are you sure you want to reset all department updates for a new meeting?")) {
+                    try {
+                        const nextState = await resetMeetingSession();
+                        applyStateToForm(nextState);
+                        showStatus("Meeting session reset for all departments!", false);
+                    } catch (err) {
+                        showStatus("Error resetting meeting session.", true);
+                    }
                 }
             }
+
+            async function restoreSeedData() {
+                if (confirm("Restore initial CCHSMeetingDashboard/data.json seed data and push to Cloud?")) {
+                    try {
+                        const nextState = await resetToInitialSeed();
+                        applyStateToForm(nextState);
+                        showStatus("Initial data.json seed restored and broadcasted!", false);
+                    } catch (err) {
+                        showStatus("Error restoring seed data.", true);
+                    }
+                }
+            }
+
+            function showStatus(msg, isError) {
+                const statusEl = document.getElementById('status');
+                statusEl.innerText = msg;
+                statusEl.style.display = 'block';
+                statusEl.style.background = isError ? '#fde8e8' : '#e6f4ea';
+                statusEl.style.color = isError ? '#9b1c1c' : '#0e6251';
+                statusEl.style.border = `1px solid ${isError ? '#f8b4b4' : '#a3e0b5'}`;
+
+                setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+            }
+
+            window.updateDeptName = updateDeptName;
+            window.moveDept = moveDept;
+            window.addDepartment = addDepartment;
+            window.removeDepartment = removeDepartment;
+            window.saveAdminSettings = saveAdminSettings;
+            window.resetMeeting = resetMeeting;
+            window.restoreSeedData = restoreSeedData;
         }
 
-        function showStatus(msg, isError) {
-            const statusEl = document.getElementById('status');
-            statusEl.innerText = msg;
-            statusEl.style.display = 'block';
-            statusEl.style.background = isError ? '#fde8e8' : '#e6f4ea';
-            statusEl.style.color = isError ? '#9b1c1c' : '#0e6251';
-            statusEl.style.border = `1px solid ${isError ? '#f8b4b4' : '#a3e0b5'}`;
-
-            setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
-        }
-
-        window.updateDeptName = updateDeptName;
-        window.moveDept = moveDept;
-        window.addDepartment = addDepartment;
-        window.removeDepartment = removeDepartment;
-        window.saveAdminSettings = saveAdminSettings;
-        window.resetMeeting = resetMeeting;
-        window.restoreSeedData = restoreSeedData;
+        initAlignmentAdmin();
     </script>
 </body>
 </html>

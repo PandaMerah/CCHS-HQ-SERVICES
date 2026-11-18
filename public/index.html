@@ -581,6 +581,102 @@
       color: var(--cc-muted);
       font-size: 0.82rem;
     }
+
+    /* Disabled Service & Tool States (R1) */
+    .service-card.service-disabled,
+    .widget-card.service-disabled {
+      opacity: 0.84;
+      border-color: rgba(244, 63, 94, 0.42);
+      background: rgba(19, 37, 76, 0.56);
+    }
+
+    .service-card.service-disabled:hover {
+      transform: none;
+      background: rgba(19, 37, 76, 0.56);
+      border-color: rgba(244, 63, 94, 0.52);
+      box-shadow: none;
+    }
+
+    .status-tag.status-disabled {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fda4af;
+      border-color: rgba(244, 63, 94, 0.45);
+    }
+
+    .service-notice-banner {
+      background: rgba(244, 63, 94, 0.14);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: #fecdd3;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .service-notice-banner.admin-view {
+      background: rgba(245, 158, 11, 0.14);
+      border-color: rgba(245, 158, 11, 0.42);
+      color: #fde68a;
+    }
+
+    .chip-link.is-disabled,
+    .widget-action.is-disabled,
+    .pdf-shortcut.is-disabled {
+      background: rgba(148, 163, 184, 0.14);
+      color: #94a3b8;
+      border-color: rgba(148, 163, 184, 0.28);
+      cursor: not-allowed;
+      text-decoration: none;
+      transform: none;
+    }
+
+    .widget-action.is-disabled {
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+    }
+
+    .chip-link.is-disabled:hover,
+    .widget-action.is-disabled:hover,
+    .pdf-shortcut.is-disabled:hover {
+      background: rgba(148, 163, 184, 0.14);
+      color: #94a3b8;
+      border-color: rgba(148, 163, 184, 0.28);
+      transform: none;
+      text-decoration: none;
+    }
+
+    .pdf-disabled-pill {
+      margin-left: auto;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(244, 63, 94, 0.2);
+      color: #fda4af;
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      white-space: nowrap;
+    }
+
+    .admin-manage-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fbbf24;
+    }
+
+    .admin-manage-link:hover {
+      background: #f59e0b;
+      color: #0f172a;
+    }
   </style>
 </head>
 <body>
@@ -655,88 +751,92 @@
 
     <section class="services-grid" id="servicesGrid">
       <!-- 1. Staff Meeting Submission -->
-      <div class="service-card" data-keywords="staff input submission department update question weekly alignment">
+      <div class="service-card" data-service-card="departmentUpdate" data-keywords="staff input submission department update question weekly alignment">
         <div class="service-top">
           <div class="service-icon" style="background: rgba(16, 185, 129, 0.22); color: #34d399;">📝</div>
           <div class="service-info">
             <div class="service-header-row">
               <span class="service-name">Submit Department Update</span>
-              <span class="status-tag">Active</span>
+              <span class="status-tag" data-default-label="Active">Active</span>
             </div>
             <p class="service-desc">
               Submit your department's weekly or monthly alignment updates and Q&A questions with live slide preview.
             </p>
           </div>
         </div>
+        <div class="service-notice-banner" data-service-notice="departmentUpdate" hidden></div>
         <div class="service-footer">
           <div class="sub-links">
-            <a href="/meeting/input.html" class="chip-link">Submit Update →</a>
+            <a href="/meeting/input.html" class="chip-link" data-service-link="departmentUpdate" data-default-text="Submit Update →">Submit Update →</a>
           </div>
           <span>15 HQ Departments</span>
         </div>
       </div>
 
       <!-- 2. Room Booking System -->
-      <div class="service-card" data-keywords="room booking system boardroom reservation calendar schedule">
+      <div class="service-card" data-service-card="roomBooking" data-keywords="room booking system boardroom reservation calendar schedule">
         <div class="service-top">
           <div class="service-icon" style="background: rgba(139, 92, 246, 0.25); color: #c084fc;">📅</div>
           <div class="service-info">
             <div class="service-header-row">
               <span class="service-name">Book HQ Meeting Room</span>
-              <span class="status-tag">Online</span>
+              <span class="status-tag" data-default-label="Online">Online</span>
             </div>
             <p class="service-desc">
               Reserve HQ Boardroom, Discussion Rooms, Townhall Suite & Telehealth Pods and check room schedules.
             </p>
           </div>
         </div>
+        <div class="service-notice-banner" data-service-notice="roomBooking" hidden></div>
         <div class="service-footer">
           <div class="sub-links">
-            <a href="/booking/" class="chip-link">Book a Room →</a>
+            <a href="/booking/" class="chip-link" data-service-link="roomBooking" data-default-text="Book a Room →">Book a Room →</a>
           </div>
           <span>5 HQ Spaces</span>
         </div>
       </div>
 
       <!-- 3. Share Screen & Audio to TV (Google Meet Style) -->
-      <div class="service-card" data-keywords="remote display share screen audio tv presentation video showcase google meet">
+      <div class="service-card" data-service-card="screenShare" data-keywords="remote display share screen audio tv presentation video showcase google meet">
         <div class="service-top">
           <div class="service-icon" style="background: rgba(244, 63, 94, 0.22); color: #fb7185;">🖥️</div>
           <div class="service-info">
             <div class="service-header-row">
               <span class="service-name">Share Screen & Audio to TV</span>
-              <span class="status-tag">Live Cast</span>
+              <span class="status-tag" data-default-label="Live Cast">Live Cast</span>
             </div>
             <p class="service-desc">
               Share your presentation slides or showcase video with audio to the HQ TV (Google Meet style). Admin selects the active screen.
             </p>
           </div>
         </div>
+        <div class="service-notice-banner" data-service-notice="screenShare" hidden></div>
         <div class="service-footer">
           <div class="sub-links">
-            <a href="/display/?mode=share" class="chip-link">Launch Screen Share →</a>
+            <a href="/display/?mode=share" class="chip-link" data-service-link="screenShare" data-default-text="Launch Screen Share →">Launch Screen Share →</a>
           </div>
           <span>Video + Audio</span>
         </div>
       </div>
 
       <!-- 4. Self-Hosted PDF Editor / BentoPDF -->
-      <div class="service-card" data-keywords="bento pdf studio editor merge split sign compress watermark convert">
+      <div class="service-card" data-service-card="pdfStudio" data-keywords="bento pdf studio editor merge split sign compress watermark convert">
         <div class="service-top">
           <div class="service-icon" style="background: rgba(14, 165, 233, 0.22); color: #38bdf8;">📄</div>
           <div class="service-info">
             <div class="service-header-row">
               <span class="service-name">Open BentoPDF Studio</span>
-              <span class="status-tag">100% Private</span>
+              <span class="status-tag" data-default-label="100% Private">100% Private</span>
             </div>
             <p class="service-desc">
               Careclinics self-hosted browser PDF toolkit: Merge, Split, Organize, Sign & Stamp, Watermark, and Convert PDFs locally.
             </p>
           </div>
         </div>
+        <div class="service-notice-banner" data-service-notice="pdfStudio" hidden></div>
         <div class="service-footer">
           <div class="sub-links">
-            <a href="/pdf/" class="chip-link">Open PDF Studio →</a>
+            <a href="/pdf/" class="chip-link" data-service-link="pdfStudio" data-default-text="Open PDF Studio →">Open PDF Studio →</a>
           </div>
           <span>12 PDF Tools</span>
         </div>
@@ -750,11 +850,12 @@
 
     <section class="widgets-grid">
       <!-- Widget 1: Weekly Meeting Alignment Readiness -->
-      <div class="widget-card col-6">
+      <div class="widget-card col-6" data-service-widget="departmentUpdate">
         <div class="widget-header">
           <div class="widget-title">🎯 Weekly Meeting Alignment Readiness</div>
-          <a href="/meeting/input.html" class="widget-action">+ Submit Update</a>
+          <a href="/meeting/input.html" class="widget-action" data-service-link="departmentUpdate" data-default-text="+ Submit Update">+ Submit Update</a>
         </div>
+        <div class="service-notice-banner" data-service-notice="departmentUpdate" hidden></div>
         <div style="display: flex; justify-content: space-between; font-size: 0.84rem; color: var(--cc-muted);">
           <span id="deptProgressLabel">Calculating department readiness...</span>
           <strong id="deptProgressPct" style="color: #fff;">0%</strong>
@@ -766,33 +867,35 @@
       </div>
 
       <!-- Widget 2: HQ Meeting Rooms & Today's Schedule -->
-      <div class="widget-card col-6">
+      <div class="widget-card col-6" data-service-widget="roomBooking">
         <div class="widget-header">
           <div class="widget-title">🏢 HQ Meeting Rooms & Today's Schedule</div>
-          <a href="/booking/" class="widget-action">+ Book a Room →</a>
+          <a href="/booking/" class="widget-action" data-service-link="roomBooking" data-default-text="+ Book a Room →">+ Book a Room →</a>
         </div>
+        <div class="service-notice-banner" data-service-notice="roomBooking" hidden></div>
         <div class="mini-list" id="roomWidgetList"></div>
       </div>
 
       <!-- Widget 3: Quick BentoPDF Tools -->
-      <div class="widget-card col-12">
+      <div class="widget-card col-12" data-service-widget="pdfStudio">
         <div class="widget-header">
           <div class="widget-title">🛠️ Quick Launch — Careclinics BentoPDF Studio</div>
-          <a href="/pdf/" class="widget-action">Open Full PDF Studio →</a>
+          <a href="/pdf/" class="widget-action" data-service-link="pdfStudio" data-default-text="Open Full PDF Studio →">Open Full PDF Studio →</a>
         </div>
+        <div class="service-notice-banner" data-service-notice="pdfStudio" hidden></div>
         <div class="quick-pdf-grid">
-          <a href="/pdf/?tool=merge" class="pdf-shortcut"><span>📑</span> Merge PDF</a>
-          <a href="/pdf/?tool=split" class="pdf-shortcut"><span>✂️</span> Split PDF</a>
-          <a href="/pdf/?tool=organize" class="pdf-shortcut"><span>🗂️</span> Organize Pages</a>
-          <a href="/pdf/?tool=sign" class="pdf-shortcut"><span>✍️</span> Sign & Stamp</a>
-          <a href="/pdf/?tool=rotate" class="pdf-shortcut"><span>🔄</span> Rotate PDF</a>
-          <a href="/pdf/?tool=watermark" class="pdf-shortcut"><span>💧</span> Watermark</a>
-          <a href="/pdf/?tool=pagenumbers" class="pdf-shortcut"><span>🔢</span> Page Numbers</a>
-          <a href="/pdf/?tool=img2pdf" class="pdf-shortcut"><span>🖼️</span> Images to PDF</a>
-          <a href="/pdf/?tool=pdf2img" class="pdf-shortcut"><span>📸</span> PDF to Images</a>
-          <a href="/pdf/?tool=extracttext" class="pdf-shortcut"><span>📝</span> Extract Text</a>
-          <a href="/pdf/?tool=compress" class="pdf-shortcut"><span>⚡</span> Optimize PDF</a>
-          <a href="/pdf/?tool=metadata" class="pdf-shortcut"><span>🏷️</span> Edit Metadata</a>
+          <a href="/pdf/?tool=merge" class="pdf-shortcut" data-service-link="pdfStudio"><span>📑</span> Merge PDF</a>
+          <a href="/pdf/?tool=split" class="pdf-shortcut" data-service-link="pdfStudio"><span>✂️</span> Split PDF</a>
+          <a href="/pdf/?tool=organize" class="pdf-shortcut" data-service-link="pdfStudio"><span>🗂️</span> Organize Pages</a>
+          <a href="/pdf/?tool=sign" class="pdf-shortcut" data-service-link="pdfStudio"><span>✍️</span> Sign & Stamp</a>
+          <a href="/pdf/?tool=rotate" class="pdf-shortcut" data-service-link="pdfStudio"><span>🔄</span> Rotate PDF</a>
+          <a href="/pdf/?tool=watermark" class="pdf-shortcut" data-service-link="pdfStudio"><span>💧</span> Watermark</a>
+          <a href="/pdf/?tool=pagenumbers" class="pdf-shortcut" data-service-link="pdfStudio"><span>🔢</span> Page Numbers</a>
+          <a href="/pdf/?tool=img2pdf" class="pdf-shortcut" data-service-link="pdfStudio"><span>🖼️</span> Images to PDF</a>
+          <a href="/pdf/?tool=pdf2img" class="pdf-shortcut" data-service-link="pdfStudio"><span>📸</span> PDF to Images</a>
+          <a href="/pdf/?tool=extracttext" class="pdf-shortcut" data-service-link="pdfStudio"><span>📝</span> Extract Text</a>
+          <a href="/pdf/?tool=compress" class="pdf-shortcut" data-service-link="pdfStudio"><span>⚡</span> Optimize PDF</a>
+          <a href="/pdf/?tool=metadata" class="pdf-shortcut" data-service-link="pdfStudio"><span>🏷️</span> Edit Metadata</a>
         </div>
       </div>
     </section>
@@ -804,8 +907,188 @@
   </main>
 
   <script type="module">
-    import { subscribeState, subscribeSyncStatus } from '/shared/cloud-store.js';
+    import { subscribeState, subscribeSyncStatus, getServiceStatus } from '/shared/cloud-store.js';
     import { isAdminLoggedIn, logoutAdmin } from '/shared/auth.js';
+
+    const SERVICE_KEYS = ['departmentUpdate', 'roomBooking', 'screenShare', 'pdfStudio'];
+    const DEFAULT_UNAVAILABLE_NOTICE = 'Currently unavailable — temporarily disabled by administrator.';
+
+    let hydratedFromServer = isAdminLoggedIn();
+    let serverBootToggles = null;
+    let latestState = null;
+
+    function getLocalDateStr(d = new Date()) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    const hydrationPromise = isAdminLoggedIn()
+      ? Promise.resolve()
+      : fetch('/api/data', { cache: 'no-store' })
+          .then(res => (res.ok ? res.json() : null))
+          .then(data => {
+            if (data?.config?.serviceToggles) {
+              serverBootToggles = data.config.serviceToggles;
+            }
+          })
+          .catch(() => {})
+          .finally(() => {
+            hydratedFromServer = true;
+            if (latestState) applyAllServiceToggles(latestState);
+          });
+
+    function resolveServiceStatus(state, key) {
+      const storeStatus = getServiceStatus(state, key);
+      const bootToggle = serverBootToggles?.[key];
+      if (bootToggle) {
+        const bootTs = Number(bootToggle.updatedAt || 0);
+        const storeTs = Number(storeStatus.updatedAt || 0);
+        if (bootTs > storeTs || (storeTs === 0 && bootToggle.enabled === false)) {
+          return {
+            enabled: bootToggle.enabled !== false,
+            notice: typeof bootToggle.notice === 'string' ? bootToggle.notice : '',
+            updatedAt: bootTs
+          };
+        }
+      }
+      return storeStatus;
+    }
+
+    function applyAllServiceToggles(state) {
+      const admin = isAdminLoggedIn();
+
+      SERVICE_KEYS.forEach((key) => {
+        const status = resolveServiceStatus(state, key);
+        const disabled = !status.enabled;
+        const noticeText = (status.notice || '').trim() || DEFAULT_UNAVAILABLE_NOTICE;
+
+        // 1. Update service card & widget containers
+        document.querySelectorAll(`[data-service-card="${key}"], [data-service-widget="${key}"]`).forEach((box) => {
+          box.classList.toggle('service-disabled', disabled);
+
+          const tag = box.querySelector('.status-tag');
+          if (tag) {
+            if (!tag.dataset.defaultLabel) tag.dataset.defaultLabel = tag.textContent.trim();
+            tag.classList.toggle('status-disabled', disabled);
+            tag.textContent = disabled ? (admin ? 'Disabled (Staff)' : 'Disabled') : tag.dataset.defaultLabel;
+          }
+        });
+
+        // 2. Update XSS-safe notice banners
+        document.querySelectorAll(`[data-service-notice="${key}"]`).forEach((banner) => {
+          if (disabled) {
+            banner.hidden = false;
+            banner.classList.toggle('admin-view', admin);
+            banner.textContent = admin
+              ? `Admin Notice — Disabled for Staff: ${noticeText}`
+              : `Unavailable: ${noticeText}`;
+          } else {
+            banner.hidden = true;
+            banner.classList.remove('admin-view');
+            banner.textContent = '';
+          }
+        });
+
+        // 3. Update actionable links (.chip-link, .widget-action, .pdf-shortcut)
+        document.querySelectorAll(`[data-service-link="${key}"]`).forEach((link) => {
+          if (!link.dataset.href && link.getAttribute('href')) {
+            link.dataset.href = link.getAttribute('href');
+          }
+          if (!link.dataset.defaultText && !link.classList.contains('pdf-shortcut')) {
+            link.dataset.defaultText = link.textContent.trim();
+          }
+
+          const blockForStaff = disabled && !admin;
+          if (blockForStaff) {
+            link.removeAttribute('href');
+            link.setAttribute('aria-disabled', 'true');
+            link.setAttribute('data-service-disabled', 'true');
+            link.setAttribute('tabindex', '-1');
+            link.setAttribute('title', noticeText);
+            link.classList.add('is-disabled');
+
+            if (link.classList.contains('pdf-shortcut')) {
+              if (!link.querySelector('.pdf-disabled-pill')) {
+                const pill = document.createElement('span');
+                pill.className = 'pdf-disabled-pill';
+                pill.textContent = 'Unavailable';
+                link.appendChild(pill);
+              }
+            } else {
+              link.textContent = 'Unavailable';
+            }
+          } else {
+            if (link.dataset.href) {
+              link.setAttribute('href', link.dataset.href);
+            }
+            link.removeAttribute('aria-disabled');
+            link.removeAttribute('data-service-disabled');
+            link.removeAttribute('tabindex');
+            link.removeAttribute('title');
+            link.classList.remove('is-disabled');
+
+            if (link.classList.contains('pdf-shortcut')) {
+              const pill = link.querySelector('.pdf-disabled-pill');
+              if (pill) pill.remove();
+            } else if (link.dataset.defaultText) {
+              link.textContent = link.dataset.defaultText;
+            }
+          }
+        });
+
+        // 4. Admin awareness: quick manage link on disabled cards & widgets
+        document.querySelectorAll(`[data-service-card="${key}"] .sub-links, [data-service-widget="${key}"] .widget-header`).forEach((slot) => {
+          const existingManage = slot.querySelector(`.admin-manage-link[data-manage-for="${key}"]`);
+          if (admin && disabled) {
+            if (!existingManage) {
+              const manageLink = document.createElement('a');
+              manageLink.href = '/admin/#serviceTogglesSection';
+              manageLink.className = 'admin-manage-link';
+              manageLink.dataset.manageFor = key;
+              manageLink.textContent = '⚙️ Manage Toggles →';
+              slot.appendChild(manageLink);
+            }
+          } else if (existingManage) {
+            existingManage.remove();
+          }
+        });
+      });
+    }
+
+    // Capture-phase guard against click / keyboard activation on disabled or pre-hydrated links
+    function handleBlockedLinkInteraction(e) {
+      const link = e.target?.closest?.('[data-service-link]');
+      if (!link) return;
+
+      if (link.getAttribute('data-service-disabled') === 'true' || link.getAttribute('aria-disabled') === 'true') {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      if (!isAdminLoggedIn() && !hydratedFromServer) {
+        const key = link.dataset.serviceLink;
+        const targetHref = link.getAttribute('href') || link.dataset.href;
+        if (!key || !targetHref) return;
+        e.preventDefault();
+        e.stopPropagation();
+        hydrationPromise.then(() => {
+          const status = resolveServiceStatus(latestState, key);
+          if (status.enabled) {
+            window.location.href = targetHref;
+          }
+        });
+      }
+    }
+
+    document.addEventListener('click', handleBlockedLinkInteraction, true);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        handleBlockedLinkInteraction(e);
+      }
+    }, true);
 
     // Update Admin Login button if already logged in as Admin
     if (isAdminLoggedIn()) {
@@ -868,6 +1151,8 @@
     // Populate live widgets from unified state
     subscribeState((state) => {
       if (!state) return;
+      latestState = state;
+      applyAllServiceToggles(state);
 
       if (state.config?.visionText) {
         document.getElementById('heroVisionText').textContent = state.config.visionText;
@@ -909,7 +1194,7 @@
       }).join('');
 
       // 2. HQ Meeting Rooms & Today's Schedule
-      const todayStr = new Date().toISOString().slice(0, 10);
+      const todayStr = getLocalDateStr();
       const bookings = (state.bookings || []).filter(b => b.date === todayStr);
       document.getElementById('statRoomsToday').textContent = String(bookings.length);
 
